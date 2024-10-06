@@ -1,4 +1,17 @@
+import { Type } from 'class-transformer';
 import { IsDate, IsNumber, IsString } from 'class-validator';
+
+
+// enum EstadoCurso {
+//   ACTIVO
+//   INACTIVO
+// }
+
+
+enum EstadoCurso {
+  ACTIVO = 'ACTIVO',
+  INACTIVO = 'INACTIVO',
+}
 
 export class CreateCursoDto {
   @IsString()
@@ -8,12 +21,15 @@ export class CreateCursoDto {
   descripcion: string;
 
   @IsDate()
+  @Type(() => Date)
   fechaCreacion: Date;
 
   @IsDate()
+  @Type(() => Date)
   fechaInicio: Date;
 
   @IsDate()
+  @Type(() => Date)
   fechaFinalizacion: Date;
 
   @IsNumber()
@@ -26,7 +42,7 @@ export class CreateCursoDto {
   profesor: string;
 
   @IsString()
-  estado: string;
+  estado: EstadoCurso;
 
   @IsString()
   imagen: string;
