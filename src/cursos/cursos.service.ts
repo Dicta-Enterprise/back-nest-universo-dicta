@@ -16,12 +16,22 @@ export class CursosService extends PrismaClient implements OnModuleInit {
     super();
   }
 
-  create(createCursoDto: CreateCursoDto) {
-    return 'This action adds a new curso';
+  async create(createCursoDto: CreateCursoDto) {
+    try {
+      return 'curso';
+    } catch (error) {
+      this.logger.error(error);
+    }
   }
 
-  findAll() {
-    return `This action returns all cursos`;
+  async findAll() {
+    try {
+      const cursos = await this.curso.findMany();
+      return cursos;
+    } catch (error) {
+      this.logger.error(error);
+    }
+    return `Hola`;
   }
 
   findOne(id: number) {
