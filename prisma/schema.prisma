@@ -1,0 +1,70 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+enum EstadoCurso {
+  ACTIVO
+  INACTIVO
+}
+
+model Categoria {
+  id            String      @id @default(auto()) @map("_id") @db.ObjectId
+  nombre        String
+  estado        EstadoCurso
+  fechaCreacion DateTime
+  cursos        Curso[]
+}
+
+model Idioma {
+  id     String  @id @default(auto()) @map("_id") @db.ObjectId
+  nombre String
+  cursos Curso[]
+}
+
+model Profesor {
+  id       String  @id @default(auto()) @map("_id") @db.ObjectId
+  nombre   String
+  apellido String
+  email    String
+  cursos   Curso[]
+}
+
+model Planeta {
+  id          String  @id @default(auto()) @map("_id") @db.ObjectId
+  nombre      String
+  descripcion String
+  imagen      String
+  cursos      Curso[]
+}
+
+model Curso {
+  id                String      @id @default(auto()) @map("_id") @db.ObjectId
+  nombre            String
+  descripcion       String
+  fechaCreacion     DateTime
+  fechaInicio       DateTime
+  fechaFinalizacion DateTime
+  cantidadAlumnos   Int
+  precio            Float
+  profesor          Profesor    @relation(fields: [id], references: [id])
+  estado            EstadoCurso
+  imagen            String
+  video             String
+  duracion          Float
+  categoria         Categoria   @relation(fields: [id], references: [id])
+
+  idioma Idioma @relation(fields: [id], references: [id])
+
+  planetas Planeta @relation(fields: [id], references: [id])
+}
