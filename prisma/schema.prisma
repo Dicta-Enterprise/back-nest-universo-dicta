@@ -13,17 +13,58 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum EstadoCurso {
+enum EstadoGenerico {
   ACTIVO
   INACTIVO
+  PENDIENTE
+  ELIMINADO
+  DESHABILITADO
+}
+
+enum EstadoPayment {
+  PENDIENTE
+  APROBADO
+  RECHAZADO
+  CANCELADO
+  DEVUELTO
+  REEMBOLSADO
+  FALLIDO
+  COMPLETADO
+  EN_PROCESO
+  EN_ESPERA
+  ENVIADO
+  ENTREGADO
+  RECIBIDO
+  EN_REVISION
+  EN_VERIFICACION
+  VERIFICADO
+  NO_VERIFICADO
+  ACEPTADO
+  PAGADO
+  NO_PAGADO
+  PENDIENTE_PAGO
+  PENDIENTE_APROBACION
+  PENDIENTE_ENVIO
+  PENDIENTE_ENTREGA
+  PENDIENTE_VERIFICACION
+  PENDIENTE_REVISION
+  PENDIENTE_VERIFICACION_PAGO
+}
+
+enum TipoUsuario {
+  ADMIN
+  CLIENTE
+  TRABAJADOR
+  DESARROLLADOR
 }
 
 model Categoria {
-  id            String      @id @default(auto()) @map("_id") @db.ObjectId
-  nombre        String
-  estado        EstadoCurso
-  fechaCreacion DateTime
-  cursos        Curso[]
+  id                 String         @id @default(auto()) @map("_id") @db.ObjectId
+  nombre             String
+  estado             EstadoGenerico @default(ACTIVO)
+  fechaCreacion      DateTime       @default(now())
+  fechaActualizacion DateTime       @updatedAt
+  cursos             Curso[]
 }
 
 model Idioma {
@@ -49,7 +90,7 @@ model Planeta {
 }
 
 model Curso {
-  id                String      @id @default(auto()) @map("_id") @db.ObjectId
+  id                String         @id @default(auto()) @map("_id") @db.ObjectId
   nombre            String
   descripcion       String
   fechaCreacion     DateTime
@@ -57,12 +98,12 @@ model Curso {
   fechaFinalizacion DateTime
   cantidadAlumnos   Int
   precio            Float
-  profesor          Profesor    @relation(fields: [id], references: [id])
-  estado            EstadoCurso
+  profesor          Profesor       @relation(fields: [id], references: [id])
+  estado            EstadoGenerico
   imagen            String
   video             String
   duracion          Float
-  categoria         Categoria   @relation(fields: [id], references: [id])
-  idioma Idioma @relation(fields: [id], references: [id])
-  planetas Planeta @relation(fields: [id], references: [id])
+  categoria         Categoria      @relation(fields: [id], references: [id])
+  idioma            Idioma         @relation(fields: [id], references: [id])
+  planetas          Planeta        @relation(fields: [id], references: [id])
 }

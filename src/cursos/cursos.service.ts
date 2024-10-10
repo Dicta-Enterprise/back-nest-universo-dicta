@@ -5,7 +5,7 @@ import { PrismaClient } from '@prisma/client';
 
 @Injectable()
 export class CursosService extends PrismaClient implements OnModuleInit {
-  private readonly logger = new Logger('AuthService');
+  private readonly logger = new Logger('Cursos Service');
 
   onModuleInit() {
     this.$connect();
@@ -75,6 +75,7 @@ export class CursosService extends PrismaClient implements OnModuleInit {
   }
 
   update(id: number, updateCursoDto: UpdateCursoDto) {
+    console.log(updateCursoDto);
     return `This action updates a #${id} curso`;
   }
 

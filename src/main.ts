@@ -26,5 +26,6 @@ async function bootstrap() {
   await app.listen(envs.port);
 
   logger.log(`api corriendo en el puerto ${envs.port}`);
+  logger.log(`api corriendo en la bd ${envs.databaseUrl}`);
 }
 bootstrap();
