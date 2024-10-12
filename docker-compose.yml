@@ -1,0 +1,19 @@
+version: '3'
+
+services:
+
+  back-nest-dicta:
+    container_name: back-nest-dicta
+    build: 
+      context: .
+      dockerfile: dockerfile.prod
+    volumes:
+      - ./src:/usr/src/app/src
+    ports:
+      - 3000:3000
+    environment:
+      - PORT=3000
+      - DATABASE_URL=mongodb+srv://mdDicta2023:YtTQsy7uWbkKyR7U@dicta.3pwgqtl.mongodb.net/bddictacolombia?retryWrites=true&w=majority
+
+
+
