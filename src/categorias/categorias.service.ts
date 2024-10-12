@@ -1,7 +1,8 @@
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { HttpStatus, Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { CreateCategoriaDto } from './dto/create-categoria.dto';
 import { UpdateCategoriaDto } from './dto/update-categoria.dto';
 import { PrismaClient } from '@prisma/client';
+import { GenericArray, GenericSingle } from 'src/shared/class/Generic.Class';
 
 @Injectable()
 export class CategoriasService extends PrismaClient implements OnModuleInit {
@@ -18,19 +19,29 @@ export class CategoriasService extends PrismaClient implements OnModuleInit {
 
   async create(createCategoriaDto: CreateCategoriaDto) {
     try {
-
       const oneCategoria = await this.categoria.findUnique({
         where: {
           nombre: createCategoriaDto.nombre,
         },
       });
 
+      if (oneCategoria) {
+        return new GenericSingle(
+          oneCategoria,
+          HttpStatus.BAD_REQUEST,
+          'La categoría ya existe',
+        );
+      }
 
       const categoria = await this.categoria.create({
         data: createCategoriaDto,
       });
 
-      return categoria;
+      return new GenericSingle(
+        categoria,
+        HttpStatus.CREATED,
+        'Categoría creada',
+      );
     } catch (error) {
       this.logger.error(error);
       throw error;
@@ -39,32 +50,86 @@ export class CategoriasService extends PrismaClient implements OnModuleInit {
 
   async findAll() {
     try {
-      const categorias = await this.categoria.findMany();
-      return categorias;
+      const categorias = await this.categoria.findMany({
+        where: {
+          estado: 'ACTIVO',
+        },
+      });
+      return new GenericArray(
+        categorias,
+        HttpStatus.OK,
+        'Categorías encontradas',
+      );
     } catch (error) {
       throw error;
     }
   }
 
-  findOne(id: string) {
+  async findOne(id: string) {
     try {
-      const categoria = this.categoria.findUnique({
+      const categoria = await this.categoria.findUnique({
         where: {
           id: id,
         },
       });
-      return categoria;
+      return new GenericSingle(
+        categoria,
+        HttpStatus.OK,
+        'Categoría encontrada',
+      );
     } catch (error) {
       throw error;
     }
   }
 
-  update(id: number, updateCategoriaDto: UpdateCategoriaDto) {
-    console.log(updateCategoriaDto);
-    return `This action updates a #${id} categoria`;
+  async update(id: string, updateCategoriaDto: UpdateCategoriaDto) {
+    try {
+      const categoria = await this.categoria.update({
+        where: {
+          id: id,
+        },
+        data: updateCategoriaDto,
+      });
+
+      if (!categoria) {
+        return new GenericSingle(
+          categoria,
+          HttpStatus.NOT_FOUND,
+          'La categoría no existe',
+        );
+      }
+
+      return new GenericSingle(
+        categoria,
+        HttpStatus.OK,
+        'Categoría actualizada',
+      );
+    } catch (error) {
+      throw error;
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} categoria`;
+  async remove(id: string) {
+    try {
+      const categoria = await this.categoria.update({
+        where: {
+          id: id,
+        },
+        data: {
+          estado: 'INACTIVO', // Aquí actualizamos la propiedad 'estado' a false
+        },
+      });
+      if (!categoria) {
+        return new GenericSingle(
+          categoria,
+          HttpStatus.NOT_FOUND,
+          'La categoría no existe',
+        );
+      }
+
+      return new GenericSingle(categoria, HttpStatus.OK, 'Categoría eliminada');
+    } catch (error) {
+      throw error;
+    }
   }
 }
