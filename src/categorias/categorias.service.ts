@@ -3,6 +3,7 @@ import { CreateCategoriaDto } from './dto/create-categoria.dto';
 import { UpdateCategoriaDto } from './dto/update-categoria.dto';
 import { Categoria, PrismaClient } from '@prisma/client';
 import { GenericArray, GenericSingle } from 'src/shared/class/Generic.Class';
+import { CustomError } from 'src/shared/class/Error.Class';
 
 @Injectable()
 export class CategoriasService extends PrismaClient implements OnModuleInit {
@@ -45,10 +46,10 @@ export class CategoriasService extends PrismaClient implements OnModuleInit {
         'Categoría creada',
       );
     } catch (error) {
-      return new GenericSingle(
-        error,
+      throw new CustomError(
+        null,
+        error.message,
         HttpStatus.INTERNAL_SERVER_ERROR,
-        'Error al crear la categoría',
       );
     }
   }
@@ -66,10 +67,10 @@ export class CategoriasService extends PrismaClient implements OnModuleInit {
         'Categorías encontradas',
       );
     } catch (error) {
-      return new GenericSingle(
-        error,
+      throw new CustomError(
+        null,
+        error.message,
         HttpStatus.INTERNAL_SERVER_ERROR,
-        'Error al listar las categorías',
       );
     }
   }
@@ -89,10 +90,10 @@ export class CategoriasService extends PrismaClient implements OnModuleInit {
         'Categoría encontrada',
       );
     } catch (error) {
-      return new GenericSingle(
-        error,
+      throw new CustomError(
+        null,
+        error.message,
         HttpStatus.INTERNAL_SERVER_ERROR,
-        'Error al buscar la categoría',
       );
     }
   }
@@ -123,10 +124,10 @@ export class CategoriasService extends PrismaClient implements OnModuleInit {
         'Categoría actualizada',
       );
     } catch (error) {
-      return new GenericSingle(
-        error,
+      throw new CustomError(
+        null,
+        error.message,
         HttpStatus.INTERNAL_SERVER_ERROR,
-        'Error al actualizar la categoría',
       );
     }
   }
@@ -153,10 +154,10 @@ export class CategoriasService extends PrismaClient implements OnModuleInit {
 
       return new GenericSingle(categoria, HttpStatus.OK, 'Categoría eliminada');
     } catch (error) {
-      return new GenericSingle(
-        error,
+      throw new CustomError(
+        null,
+        error.message,
         HttpStatus.INTERNAL_SERVER_ERROR,
-        'Error al eliminar la categoría',
       );
     }
   }

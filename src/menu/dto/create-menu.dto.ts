@@ -1,11 +1,37 @@
-import { SubMenu } from '@prisma/client';
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { Type } from 'class-transformer';
+import {
+  IsArray,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
 
-export class CreateMenuDto {
+export class CreateSubMenuDto {
   @IsString()
+  @IsNotEmpty()
   nombre: string;
 
   @IsString()
+  @IsNotEmpty()
+  ruta: string;
+
+  @IsString()
+  @IsNotEmpty()
+  icono: string;
+
+  @IsString()
+  @IsNotEmpty()
+  color: string;
+}
+
+export class CreateMenuDto {
+  @IsString()
+  @IsNotEmpty()
+  nombre: string;
+
+  @IsString()
+  @IsOptional()
   ruta: string;
 
   @IsString()
@@ -16,6 +42,8 @@ export class CreateMenuDto {
   @IsNotEmpty()
   color: string;
 
-  @IsOptional()
-  menu: SubMenu[];
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CreateSubMenuDto) 
+  subMenu: CreateSubMenuDto[]; 
 }

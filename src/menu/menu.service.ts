@@ -17,8 +17,34 @@ export class MenuService extends PrismaClient implements OnModuleInit {
 
   async create(createMenuDto: CreateMenuDto) {
     try {
+      const menuExist = await this.menu.findFirst({
+        where: {
+          nombre: createMenuDto.nombre,
+        },
+      });
+
+      if (menuExist) {
+        return new GenericSingle(
+          'error',
+          HttpStatus.CONFLICT,
+          'El menú ya existe',
+        );
+      }
       const menu = await this.menu.create({
-        data: createMenuDto,
+        data: {
+          nombre: createMenuDto.nombre,
+          icono: createMenuDto.icono,
+          color: createMenuDto.color,
+          ruta: createMenuDto.ruta, 
+          submenus: {
+            create: createMenuDto.subMenu.map(sub => ({
+              nombre: sub.nombre,
+              icono: sub.icono,
+              color: sub.color,
+              ruta: sub.ruta,
+            })),
+          },
+        },
       });
 
       return new GenericSingle(menu, HttpStatus.CREATED, 'success');
@@ -31,9 +57,9 @@ export class MenuService extends PrismaClient implements OnModuleInit {
     }
   }
 
-  findAll() {
+  async findAll() {
     try {
-      const menu = this.menu.findMany({
+      const menu = await this.menu.findMany({
         where: {
           estado: 'ACTIVO',
         },
@@ -57,9 +83,9 @@ export class MenuService extends PrismaClient implements OnModuleInit {
     }
   }
 
-  findOne(id: string) {
+  async findOne(id: string) {
     try {
-      const menu = this.menu.findUnique({
+      const menu = await this.menu.findUnique({
         where: {
           id: id,
         },
@@ -75,9 +101,9 @@ export class MenuService extends PrismaClient implements OnModuleInit {
     }
   }
 
-  update(id: string, updateMenuDto: UpdateMenuDto) {
+  async update(id: string, updateMenuDto: UpdateMenuDto) {
     try {
-      const menu = this.menu.update({
+      const menu = await this.menu.update({
         where: {
           id: id,
         },
