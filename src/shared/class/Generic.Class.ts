@@ -1,4 +1,4 @@
-abstract class GenericBase<T> {
+export  abstract class GenericBase<T> {
   abstract data: T | T[];
 
   status: number;

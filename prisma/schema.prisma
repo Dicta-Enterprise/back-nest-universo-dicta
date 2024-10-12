@@ -107,3 +107,25 @@ model Curso {
   idioma            Idioma         @relation(fields: [id], references: [id])
   planetas          Planeta        @relation(fields: [id], references: [id])
 }
+
+model SubMenu {
+  id      String         @id @default(auto()) @map("_id") @db.ObjectId // Identificador único para cada submenú
+  nombre  String         @unique
+  padreId String?        @db.ObjectId // Referencia al ID del padre (opcional)
+  ruta    String         @unique
+  estado  EstadoGenerico @default(ACTIVO)
+  icono   String // Icono del submenú
+  color   String // Color del submenú
+  menu    Menu[]
+}
+
+model Menu {
+  id       String         @id @default(auto()) @map("_id") @db.ObjectId // Identificador único para cada menú
+  nombre   String         @unique
+  padreId  String?        @db.ObjectId // Referencia al ID del padre (opcional)
+  ruta     String // Ruta asociada al menú
+  icono    String // Icono del menú
+  estado   EstadoGenerico @default(ACTIVO)
+  color    String // Color del menú
+  submenus SubMenu        @relation(fields: [id], references: [id])
+}

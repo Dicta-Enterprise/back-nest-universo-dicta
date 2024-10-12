@@ -1,7 +1,7 @@
 import { HttpStatus, Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { CreateCategoriaDto } from './dto/create-categoria.dto';
 import { UpdateCategoriaDto } from './dto/update-categoria.dto';
-import { PrismaClient } from '@prisma/client';
+import { Categoria, PrismaClient } from '@prisma/client';
 import { GenericArray, GenericSingle } from 'src/shared/class/Generic.Class';
 
 @Injectable()
@@ -17,7 +17,9 @@ export class CategoriasService extends PrismaClient implements OnModuleInit {
     super();
   }
 
-  async create(createCategoriaDto: CreateCategoriaDto) {
+  async create(
+    createCategoriaDto: CreateCategoriaDto,
+  ): Promise<GenericSingle<Categoria> | GenericSingle<Error>> {
     try {
       const oneCategoria = await this.categoria.findUnique({
         where: {
@@ -43,12 +45,15 @@ export class CategoriasService extends PrismaClient implements OnModuleInit {
         'Categoría creada',
       );
     } catch (error) {
-      this.logger.error(error);
-      throw error;
+      return new GenericSingle(
+        error,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        'Error al crear la categoría',
+      );
     }
   }
 
-  async findAll() {
+  async findAll(): Promise<GenericArray<Categoria> | GenericSingle<Error>> {
     try {
       const categorias = await this.categoria.findMany({
         where: {
@@ -61,11 +66,17 @@ export class CategoriasService extends PrismaClient implements OnModuleInit {
         'Categorías encontradas',
       );
     } catch (error) {
-      throw error;
+      return new GenericSingle(
+        error,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        'Error al listar las categorías',
+      );
     }
   }
 
-  async findOne(id: string) {
+  async findOne(
+    id: string,
+  ): Promise<GenericSingle<Categoria> | GenericSingle<Error>> {
     try {
       const categoria = await this.categoria.findUnique({
         where: {
@@ -78,11 +89,18 @@ export class CategoriasService extends PrismaClient implements OnModuleInit {
         'Categoría encontrada',
       );
     } catch (error) {
-      throw error;
+      return new GenericSingle(
+        error,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        'Error al buscar la categoría',
+      );
     }
   }
 
-  async update(id: string, updateCategoriaDto: UpdateCategoriaDto) {
+  async update(
+    id: string,
+    updateCategoriaDto: UpdateCategoriaDto,
+  ): Promise<GenericSingle<Categoria> | GenericSingle<Error>> {
     try {
       const categoria = await this.categoria.update({
         where: {
@@ -105,11 +123,17 @@ export class CategoriasService extends PrismaClient implements OnModuleInit {
         'Categoría actualizada',
       );
     } catch (error) {
-      throw error;
+      return new GenericSingle(
+        error,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        'Error al actualizar la categoría',
+      );
     }
   }
 
-  async remove(id: string) {
+  async remove(
+    id: string,
+  ): Promise<GenericSingle<Categoria> | GenericSingle<Error>> {
     try {
       const categoria = await this.categoria.update({
         where: {
@@ -129,7 +153,11 @@ export class CategoriasService extends PrismaClient implements OnModuleInit {
 
       return new GenericSingle(categoria, HttpStatus.OK, 'Categoría eliminada');
     } catch (error) {
-      throw error;
+      return new GenericSingle(
+        error,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        'Error al eliminar la categoría',
+      );
     }
   }
 }
