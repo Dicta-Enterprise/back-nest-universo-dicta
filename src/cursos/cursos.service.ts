@@ -1,7 +1,8 @@
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { HttpStatus, Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { CreateCursoDto } from './dto/create-curso.dto';
 import { UpdateCursoDto } from './dto/update-curso.dto';
 import { PrismaClient } from '@prisma/client';
+import { CustomError } from 'src/shared/class/Error.Class';
 
 @Injectable()
 export class CursosService extends PrismaClient implements OnModuleInit {
@@ -56,7 +57,11 @@ export class CursosService extends PrismaClient implements OnModuleInit {
 
       return curso;
     } catch (error) {
-      this.logger.error(error);
+      throw new CustomError(
+        null,
+        error.message,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
@@ -65,21 +70,24 @@ export class CursosService extends PrismaClient implements OnModuleInit {
       const cursos = await this.curso.findMany();
       return cursos;
     } catch (error) {
-      this.logger.error(error);
+      throw new CustomError(
+        null,
+        error.message,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
-    return `Hola`;
   }
 
-  findOne(id: number) {
+  findOne(id: string) {
     return `This action returns a #${id} curso`;
   }
 
-  update(id: number, updateCursoDto: UpdateCursoDto) {
+  update(id: string, updateCursoDto: UpdateCursoDto) {
     console.log(updateCursoDto);
     return `This action updates a #${id} curso`;
   }
 
-  remove(id: number) {
+  remove(id: string) {
     return `This action removes a #${id} curso`;
   }
 }

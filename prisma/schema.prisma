@@ -76,14 +76,14 @@ model Idioma {
 model Profesor {
   id       String  @id @default(auto()) @map("_id") @db.ObjectId
   nombre   String
-  apellido String
+  apellido String  @unique
   email    String
   cursos   Curso[]
 }
 
 model Planeta {
   id          String  @id @default(auto()) @map("_id") @db.ObjectId
-  nombre      String
+  nombre      String  @unique
   descripcion String
   imagen      String
   cursos      Curso[]
@@ -91,7 +91,7 @@ model Planeta {
 
 model Curso {
   id                String         @id @default(auto()) @map("_id") @db.ObjectId
-  nombre            String
+  nombre            String         @unique
   descripcion       String
   fechaCreacion     DateTime
   fechaInicio       DateTime
@@ -129,4 +129,14 @@ model Menu {
   estado   EstadoGenerico @default(ACTIVO)
   color    String
   submenus SubMenu[]
+}
+
+model Galaxia {
+  id                 String         @id @default(auto()) @map("_id") @db.ObjectId
+  nombre             String         @unique
+  descripcion        String
+  imagen             String
+  estado             EstadoGenerico @default(ACTIVO)
+  fechaCreacion      DateTime       @default(now())
+  fechaActualizacion DateTime       @updatedAt
 }

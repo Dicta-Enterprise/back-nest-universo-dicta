@@ -82,6 +82,7 @@ export class CategoriasService extends PrismaClient implements OnModuleInit {
       const categoria = await this.categoria.findUnique({
         where: {
           id: id,
+          estado: 'ACTIVO',
         },
       });
       return new GenericSingle(

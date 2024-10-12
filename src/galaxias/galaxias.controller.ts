@@ -1,7 +1,16 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { GalaxiasService } from './galaxias.service';
 import { CreateGalaxiaDto } from './dto/create-galaxia.dto';
 import { UpdateGalaxiaDto } from './dto/update-galaxia.dto';
+import { ParseObjectIdPipe } from 'src/shared/pipes/parse-object-id.pipe';
 
 @Controller('galaxias')
 export class GalaxiasController {
@@ -18,17 +27,20 @@ export class GalaxiasController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.galaxiasService.findOne(+id);
+  findOne(@Param('id', ParseObjectIdPipe) id: string) {
+    return this.galaxiasService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateGalaxiaDto: UpdateGalaxiaDto) {
-    return this.galaxiasService.update(+id, updateGalaxiaDto);
+  update(
+    @Param('id', ParseObjectIdPipe) id: string,
+    @Body() updateGalaxiaDto: UpdateGalaxiaDto,
+  ) {
+    return this.galaxiasService.update(id, updateGalaxiaDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.galaxiasService.remove(+id);
+  remove(@Param('id', ParseObjectIdPipe) id: string) {
+    return this.galaxiasService.remove(id);
   }
 }
