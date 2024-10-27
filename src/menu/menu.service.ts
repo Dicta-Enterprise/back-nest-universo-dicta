@@ -84,48 +84,51 @@ export class MenuService extends PrismaClient implements OnModuleInit {
   }
 
   async findOne(id: string) {
-    try {
-      const menu = await this.menu.findUnique({
-        where: {
-          id: id,
-        },
-      });
+    console.log(id);
+    // try {
+    //   const menu = await this.menu.findUnique({
+    //     where: {
+    //       id: id,
+    //     },
+    //   });
 
-      return new GenericSingle(menu, HttpStatus.OK, 'success');
-    } catch (error) {
-      throw new CustomError(
-        null,
-        error.message,
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
+    //   return new GenericSingle(menu, HttpStatus.OK, 'success');
+    // } catch (error) {
+    //   throw new CustomError(
+    //     null,
+    //     error.message,
+    //     HttpStatus.INTERNAL_SERVER_ERROR,
+    //   );
+    // }
   }
 
   async update(id: string, updateMenuDto: UpdateMenuDto) {
-    try {
-      const menu = await this.menu.update({
-        where: {
-          id: id,
-        },
-        data: updateMenuDto,
-      });
+    console.log(id);
+    console.log(updateMenuDto);
+    // try {
+    //   const menu = await this.menu.update({
+    //     where: {
+    //       id: id,
+    //     },
+    //     data: updateMenuDto,
+    //   });
 
-      if (!menu) {
-        return new GenericSingle(
-          'error',
-          HttpStatus.NOT_FOUND,
-          'No se encontraron registros',
-        );
-      }
+    //   if (!menu) {
+    //     return new GenericSingle(
+    //       'error',
+    //       HttpStatus.NOT_FOUND,
+    //       'No se encontraron registros',
+    //     );
+    //   }
 
-      return new GenericSingle(menu, HttpStatus.OK, 'success');
-    } catch (error) {
-      throw new CustomError(
-        null,
-        error.message,
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
+    //   return new GenericSingle(menu, HttpStatus.OK, 'success');
+    // } catch (error) {
+    //   throw new CustomError(
+    //     null,
+    //     error.message,
+    //     HttpStatus.INTERNAL_SERVER_ERROR,
+    //   );
+    // }
   }
 
   remove(id: string) {
