@@ -103,7 +103,8 @@ model Curso {
   imagen            String
   video             String
   duracion          Float
-  categoria         Categoria      @relation(fields: [id], references: [id])
+  categoria         Categoria      @relation(fields: [categoriaId], references: [id])
+  categoriaId       String 
   idioma            Idioma         @relation(fields: [id], references: [id])
   planetas          Planeta        @relation(fields: [id], references: [id])
 }

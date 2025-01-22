@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpStatus, NotFoundException } from '@nestjs/common';
 import { CursosService } from './cursos.service';
 import { CreateCursoDto } from './dto/create-curso.dto';
 import { UpdateCursoDto } from './dto/update-curso.dto';
@@ -24,12 +24,20 @@ export class CursosController {
   }
 
   @Patch(':id')
-  update(@Param('id', ParseObjectIdPipe) id: string, @Body() updateCursoDto: UpdateCursoDto) {
-    return this.cursosService.update(id, updateCursoDto);
+  async update(@Param('id', ParseObjectIdPipe) id: string, @Body() updateCursoDto: UpdateCursoDto) {
+    try {
+      return await this.cursosService.update(id, updateCursoDto);
+    } catch (error) {
+      throw new NotFoundException('Curso no encontrado')
+    }
   }
 
   @Delete(':id')
   remove(@Param('id', ParseObjectIdPipe) id: string) {
-    return this.cursosService.remove(id);
+    try {
+      return this.cursosService.remove(id);
+    } catch (error) {
+      throw new NotFoundException('Curso no encontrado')
+    }
   }
 }

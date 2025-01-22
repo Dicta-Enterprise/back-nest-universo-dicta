@@ -1,6 +1,8 @@
 import { EstadoGenerico } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
-import { IsDate, IsNumber, IsString } from 'class-validator';
+import { 
+  IsDate, IsEnum, IsNumber, IsOptional, IsString 
+} from 'class-validator';
 
 export class CreateCursoDto {
   @IsString()
@@ -24,17 +26,21 @@ export class CreateCursoDto {
   fechaFinalizacion: Date;
 
   @IsNumber()
-  @Transform(({ value }) => value.trim())
   cantidadAlumnos: number;
 
   @IsNumber()
-  @Transform(({ value }) => value.trim())
   precio: number;
 
   @IsString()
-  profesor: string;
+  @IsOptional()
+  @Transform(({ value }) => value.trim())
+  profesor?: string;
 
   @IsString()
+  @IsEnum(EstadoGenerico, {
+    message:
+      'El estado proporcionado no es válido. Valores permitidos: ACTIVO, INACTIVO, PENDIENTE, ELIMINADO, DESHABILITADO.',
+  })
   estado: EstadoGenerico;
 
   @IsString()
@@ -46,7 +52,6 @@ export class CreateCursoDto {
   video: string;
 
   @IsNumber()
-  @Transform(({ value }) => value.trim())
   duracion: number;
 
   @IsString()
@@ -54,8 +59,12 @@ export class CreateCursoDto {
   categoria: string;
 
   @IsString()
+  @IsOptional()
+  @Transform(({ value }) => value.trim())
   idioma: string;
 
   @IsString()
+  @IsOptional()
+  @Transform(({ value }) => value.trim())
   planetas: string;
 }

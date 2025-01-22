@@ -1,8 +1,10 @@
 import { HttpStatus, Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { CreateCursoDto } from './dto/create-curso.dto';
 import { UpdateCursoDto } from './dto/update-curso.dto';
-import { PrismaClient } from '@prisma/client';
+import { Curso, PrismaClient } from '@prisma/client';
 import { CustomError } from 'src/shared/class/Error.Class';
+import { GenericSingle } from 'src/shared/class/Generic.Class';
+import { string } from 'joi';
 
 @Injectable()
 export class CursosService extends PrismaClient implements OnModuleInit {
@@ -19,7 +21,36 @@ export class CursosService extends PrismaClient implements OnModuleInit {
 
   async create(createCursoDto: CreateCursoDto) {
     try {
-      const curso = await this.curso.create({
+      
+      const oneCurso = await this.curso.findUnique({
+        where:{
+          nombre: createCursoDto.nombre
+        }
+      })
+
+      if(oneCurso){
+        return new CustomError(
+          'El curso con este nombre ya existe',
+          'Bab Request',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      const categoriaExistente = await this.categoria.findUnique({
+        where: {
+          id: createCursoDto.categoria,
+        },
+      });
+  
+      if (!categoriaExistente) {
+        return new CustomError(
+          'La categoría proporcionada no existe',
+          'Bad Request',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      return await this.curso.create({
         data: {
           nombre: createCursoDto.nombre,
           descripcion: createCursoDto.descripcion,
@@ -28,34 +59,19 @@ export class CursosService extends PrismaClient implements OnModuleInit {
           fechaFinalizacion: createCursoDto.fechaFinalizacion,
           cantidadAlumnos: createCursoDto.cantidadAlumnos,
           precio: createCursoDto.precio,
-          profesor: {
-            connect: {
-              id: createCursoDto.profesor,
-            },
-          },
           estado: createCursoDto.estado,
           imagen: createCursoDto.imagen,
           video: createCursoDto.video,
           duracion: createCursoDto.duracion,
-          categoria: {
-            connect: {
+          categoria:{
+            connect:{
               id: createCursoDto.categoria,
-            },
-          },
-          idioma: {
-            connect: {
-              id: createCursoDto.idioma,
-            },
-          },
-          planetas: {
-            connect: {
-              id: createCursoDto.planetas,
-            },
-          },
+            } 
+          }
         },
+        //data: createCursoDto,
       });
 
-      return curso;
     } catch (error) {
       throw new CustomError(
         null,
@@ -67,8 +83,7 @@ export class CursosService extends PrismaClient implements OnModuleInit {
 
   async findAll() {
     try {
-      const cursos = await this.curso.findMany();
-      return cursos;
+      return await this.curso.findMany();
     } catch (error) {
       throw new CustomError(
         null,
@@ -78,16 +93,129 @@ export class CursosService extends PrismaClient implements OnModuleInit {
     }
   }
 
-  findOne(id: string) {
-    return `This action returns a #${id} curso`;
+  async findOne(id: string) {
+    try {
+
+      const curso = await this.curso.findUnique({
+        where:{
+          id:id,
+          estado: 'ACTIVO',
+        }
+      });
+
+      if(!curso){
+        return new CustomError(
+          'El curso buscado no existe',
+          'Not Found',
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
+      return curso;
+
+    } catch (error) {
+      throw new CustomError(
+        null,
+        error.message,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
-  update(id: string, updateCursoDto: UpdateCursoDto) {
-    console.log(updateCursoDto);
-    return `This action updates a #${id} curso`;
+  async update(id: string, updateCursoDto: UpdateCursoDto) {
+    try {
+      
+      // const cursofind = await this.curso.findUnique({
+      //   where:{
+      //     id:id,
+      //     estado: 'ACTIVO',
+      //   }
+      // });
+
+      // if(!cursofind){
+      //   return new CustomError(
+      //     'El curso buscado no existe',
+      //     'Not Found',
+      //     HttpStatus.NOT_FOUND,
+      //   );
+      // }
+
+      const categoriaExistente = await this.categoria.findUnique({
+        where: {
+          id: updateCursoDto.categoria,
+        },
+      });
+  
+      if (!categoriaExistente) {
+        return new CustomError(
+          'La categoría proporcionada no existe',
+          'Bad Request',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      const curso = await this.curso.update({
+        where: {
+          id: id
+        },
+        data: {
+          nombre: updateCursoDto.nombre,
+          descripcion: updateCursoDto.descripcion,
+          fechaCreacion:  updateCursoDto.fechaCreacion,
+          fechaInicio:  updateCursoDto.fechaInicio,
+          fechaFinalizacion:  updateCursoDto.fechaFinalizacion,
+          cantidadAlumnos: updateCursoDto.cantidadAlumnos,
+          precio:  updateCursoDto.precio,
+          estado:  updateCursoDto.estado,
+          imagen:  updateCursoDto.imagen,
+          video:  updateCursoDto.video,
+          duracion:  updateCursoDto.duracion,
+          categoria:{
+            connect:{
+              id: updateCursoDto.categoria,
+            } 
+          }
+        },
+      });
+
+      // if(!curso){
+      //   return new CustomError(
+      //     'El curso buscado no existe',
+      //     'Not Found',
+      //     HttpStatus.NOT_FOUND,
+      //   );
+      // }
+
+      return new GenericSingle(curso, HttpStatus.OK, 'Curso actualizada');
+    } catch (error) {
+      throw new CustomError(
+        'Error',
+        error.message,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
-  remove(id: string) {
-    return `This action removes a #${id} curso`;
+  async remove(id: string) {
+    try {
+      
+      const curso = await this.curso.update({
+        where: {
+          id: id,
+        },
+        data: {
+          estado: 'INACTIVO',
+        },
+      });
+
+      return new GenericSingle(curso, HttpStatus.OK, 'Curso Inavilitado');
+
+    } catch (error) {
+      throw new CustomError(
+        'Error',
+        error.message,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 }
