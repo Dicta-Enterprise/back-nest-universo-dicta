@@ -1,6 +1,8 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
 import { LandingPageService } from './landing-page.service';
 import { CreateLandingPageDto } from './dto/create-landing-page.dto';
+import { ParseObjectIdPipe } from 'src/shared/pipes/parse-object-id.pipe';
+import { UpdateLandingPageDto } from './dto/update-landing-page';
 
 @Controller('landing-page')
 export class LandingPageController {
@@ -9,8 +11,6 @@ export class LandingPageController {
         private readonly landingPageService: LandingPageService
     ) { }
 
-
-    // Atributos a considerar , conectar bd - LISTOP
     @Post()
     create(@Body() createLandingPageDto: CreateLandingPageDto) {
         return this.landingPageService.create(createLandingPageDto);
@@ -19,5 +19,18 @@ export class LandingPageController {
     @Get()
     findAll() {
         return this.landingPageService.findAll();
+    }
+
+    @Get(':id')
+    findOne(@Param('id', ParseObjectIdPipe) id: string) {
+        return this.landingPageService.finOne(id);
+    }
+
+    @Patch(':id')
+    update(
+        @Param('id', ParseObjectIdPipe) id:string,
+        @Body() updateLandingPageDto:UpdateLandingPageDto,
+    ) {
+        return this.landingPageService.update(id,updateLandingPageDto)
     }
 }

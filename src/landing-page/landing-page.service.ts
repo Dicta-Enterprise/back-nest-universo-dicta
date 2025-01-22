@@ -1,7 +1,7 @@
 import { HttpStatus, Injectable, OnModuleInit } from '@nestjs/common';
 import { CreateLandingPageDto } from './dto/create-landing-page.dto';
 import { CustomError } from 'src/shared/class/Error.Class';
-import { GenericSingle } from 'src/shared/class/Generic.Class';
+import { GenericArray, GenericSingle } from 'src/shared/class/Generic.Class';
 import { PrismaClient } from '@prisma/client';
 
 @Injectable()
@@ -50,19 +50,66 @@ export class LandingPageService extends PrismaClient implements OnModuleInit {
       });
 
       // Retornar la nueva página creada
-      return new GenericSingle(landingPage, HttpStatus.CREATED, 'Página creada exitosamente');
+      return new GenericSingle(landingPage, HttpStatus.CREATED, 'Landing Page creada exitosamente');
     } catch (error) {
       // Manejo de errores genéricos
       throw new CustomError(
-        'Error al crear la página de aterrizaje',
+        'Error al crear la landing Page',
         error.message,
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }
 
+  async findAll() {
+    try {
+      const landingPages = await this.landingPage.findMany({
+        where: {
+          estado: 'ACTIVO',
+        },
+      });
 
-  findAll() {
-    return this.landingPage;
+      if (!landingPages) {
+        throw new CustomError(
+          'No se encontraron Landing Pages',
+          'Not Found',
+          HttpStatus.NOT_FOUND,
+        );
+      }
+      return new GenericArray(landingPages, HttpStatus.OK, 'Landing Pages encontradas')
+    } catch (error) {
+      throw new CustomError(
+        'Error',
+        error.message,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  async finOne(id: string) {
+    try {
+      const landingPage = await this.landingPage.findUnique({
+        where: {
+          id: id,
+          estado: 'ACTIVO',
+        },
+      });
+
+      if (!landingPage) {
+        throw new CustomError(
+          'No se encontró la landing page',
+          'Not Found',
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
+      return new GenericSingle(landingPage, HttpStatus.OK, 'Landing Page encontrada')
+    } catch (error) {
+      throw new CustomError(
+        'Error',
+        error.message,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 }
