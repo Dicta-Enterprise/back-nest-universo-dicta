@@ -3,6 +3,9 @@ import { CreateLandingPageDto } from './dto/create-landing-page.dto';
 import { CustomError } from 'src/shared/class/Error.Class';
 import { GenericArray, GenericSingle } from 'src/shared/class/Generic.Class';
 import { PrismaClient } from '@prisma/client';
+import { UpdateGalaxiaDto } from 'src/galaxias/dto/update-galaxia.dto';
+import { UpdateCategoriaDto } from '../categorias/dto/update-categoria.dto';
+import { UpdateLandingPageDto } from './dto/update-landing-page';
 
 @Injectable()
 export class LandingPageService extends PrismaClient implements OnModuleInit {
@@ -110,6 +113,33 @@ export class LandingPageService extends PrismaClient implements OnModuleInit {
         error.message,
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
+    }
+  }
+
+  async update(id: string, updateLandingPageDto: UpdateLandingPageDto) {
+    try {
+      const landingPage = await this.landingPage.update({
+        where: {
+          id: id,
+        },
+        data: updateLandingPageDto,
+      });
+
+      if (!landingPage) {
+        throw new CustomError(
+          'No se encontró la landing page',
+          'Not Found',
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
+      return new GenericSingle(landingPage, HttpStatus.OK, 'Landing page actualizada');
+    } catch (error) {
+      throw new CustomError(
+        'Error',
+        error.message,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      )
     }
   }
 }

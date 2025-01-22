@@ -28,9 +28,9 @@ export class LandingPageController {
 
     @Patch(':id')
     update(
-        @Param('id', ParseObjectIdPipe) id:string,
-        @Body() updateLandingPageDto:UpdateLandingPageDto,
+        @Param('id', ParseObjectIdPipe) id: string,
+        @Body() updateLandingPageDto: UpdateLandingPageDto,
     ) {
-        return this.landingPageService.update(id,updateLandingPageDto)
+        return this.landingPageService.update(id, updateLandingPageDto)
     }
 }
