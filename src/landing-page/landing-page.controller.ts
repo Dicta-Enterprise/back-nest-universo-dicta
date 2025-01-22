@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
 import { LandingPageService } from './landing-page.service';
 import { CreateLandingPageDto } from './dto/create-landing-page.dto';
 import { ParseObjectIdPipe } from 'src/shared/pipes/parse-object-id.pipe';
@@ -32,5 +32,10 @@ export class LandingPageController {
         @Body() updateLandingPageDto: UpdateLandingPageDto,
     ) {
         return this.landingPageService.update(id, updateLandingPageDto)
+    }
+
+    @Delete(':id')
+    remove(@Param('id', ParseObjectIdPipe) id: string) {
+        return this.landingPageService.remove(id);
     }
 }

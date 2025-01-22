@@ -142,4 +142,33 @@ export class LandingPageService extends PrismaClient implements OnModuleInit {
       )
     }
   }
+
+  async remove(id: string) {
+    try {
+      const landingPage = await this.landingPage.update({
+        where: {
+          id: id,
+        },
+        data: {
+          estado: 'INACTIVO',
+        },
+      });
+
+      if (!landingPage) {
+        throw new CustomError(
+          'No se encontró la landing page',
+          'Not Found',
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
+      return new GenericSingle(landingPage, HttpStatus.OK, 'Landing page eliminada');
+    } catch (error) {
+      throw new CustomError(
+        'Error',
+        error.message,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
 }
