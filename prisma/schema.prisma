@@ -89,7 +89,6 @@ model Planeta {
   estado      EstadoGenerico  @default(ACTIVO)
   fechaCreacion  DateTime @default(now())
   fechaActualizacion  DateTime  @updatedAt
-  galaxias  Galaxia   @relation(fields: [id], references: [id])
   cursos      Curso[]
 }
 
@@ -143,4 +142,12 @@ model Galaxia {
   estado             EstadoGenerico @default(ACTIVO)
   fechaCreacion      DateTime       @default(now())
   fechaActualizacion DateTime       @updatedAt
+}
+
+model LandingPage {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  titulo      String   @unique
+  descripcion String
+  contenido   String
+  estado             EstadoGenerico @default(ACTIVO)
 }
