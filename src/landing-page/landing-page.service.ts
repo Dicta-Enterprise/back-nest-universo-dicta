@@ -1,10 +1,8 @@
-import { HttpStatus, Injectable, OnModuleInit } from '@nestjs/common';
+import { HttpStatus, Injectable, NotFoundException, OnModuleInit } from '@nestjs/common';
 import { CreateLandingPageDto } from './dto/create-landing-page.dto';
 import { CustomError } from 'src/shared/class/Error.Class';
 import { GenericArray, GenericSingle } from 'src/shared/class/Generic.Class';
 import { PrismaClient } from '@prisma/client';
-import { UpdateGalaxiaDto } from 'src/galaxias/dto/update-galaxia.dto';
-import { UpdateCategoriaDto } from '../categorias/dto/update-categoria.dto';
 import { UpdateLandingPageDto } from './dto/update-landing-page';
 
 @Injectable()
@@ -16,46 +14,76 @@ export class LandingPageService extends PrismaClient implements OnModuleInit {
   constructor() {
     super();
   }
+  
   async create(createLandingPageDto: CreateLandingPageDto) {
     try {
-      // Verificar si ya existe una página con el mismo título
+      // Verificar que el planeta exista
+      const planeta = await this.planeta.findUnique({
+        where: { id: createLandingPageDto.planetaId },
+      });
+  
+      if (!planeta) {
+        return new CustomError(
+          `El planeta con ID ${createLandingPageDto.planetaId} no existe`,
+          'Conflict',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+  
+      // Verificar si el planeta ya está asignado a un landing page
+      const existingLandingForPlaneta = await this.landingPage.findFirst({
+        where: {
+          planetaId: createLandingPageDto.planetaId,
+        },
+      });
+  
+      if (existingLandingForPlaneta) {
+        return new CustomError(
+          `El planeta con ID ${createLandingPageDto.planetaId} ya está asignado a otra landing page`,
+          'Conflict',
+          HttpStatus.CONFLICT, // Código HTTP 409 para conflictos
+        );
+      }
+  
+      // Verificar si ya existe una Landing Page con el mismo título
       const existingLandingPage = await this.landingPage.findUnique({
         where: {
           titulo: createLandingPageDto.titulo,
         },
       });
-
+  
       if (existingLandingPage) {
         return new CustomError(
           'Ya existe una página de aterrizaje con ese título',
           'Conflict',
-          HttpStatus.BAD_REQUEST,
+          HttpStatus.CONFLICT, 
         );
       }
-
-      // Validar que los campos requeridos estén completos
-      const { titulo, descripcion, contenido } = createLandingPageDto;
-      if (!titulo || !descripcion || !contenido) {
-        return new CustomError(
-          'Todos los campos (título, descripción y contenido) son obligatorios',
-          'Bad Request',
-          HttpStatus.BAD_REQUEST,
-        );
-      }
-
-      // Crear una nueva página de aterrizaje
+  
+      // Crear una nueva Landing asociada al planeta
+      const { titulo, descripcion, contenido, estado } = createLandingPageDto;
       const landingPage = await this.landingPage.create({
         data: {
           titulo,
           descripcion,
           contenido,
+          estado: estado || 'ACTIVO',
+          planeta: {
+            connect: { id: createLandingPageDto.planetaId },
+          },
         },
       });
-
-      // Retornar la nueva página creada
-      return new GenericSingle(landingPage, HttpStatus.CREATED, 'Landing Page creada exitosamente');
+  
+      return new GenericSingle(
+        landingPage,
+        HttpStatus.CREATED,
+        'Página creada exitosamente',
+      );
     } catch (error) {
-      // Manejo de errores genéricos
+      if (error instanceof CustomError || error instanceof NotFoundException) {
+        throw error;
+      }
+
       throw new CustomError(
         'Error al crear la landing Page',
         error.message,

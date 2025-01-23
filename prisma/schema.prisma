@@ -90,6 +90,7 @@ model Planeta {
   fechaCreacion  DateTime @default(now())
   fechaActualizacion  DateTime  @updatedAt
   cursos      Curso[]
+  landingPage LandingPage?
 }
 
 model Curso {
@@ -145,9 +146,11 @@ model Galaxia {
 }
 
 model LandingPage {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  titulo      String   @unique
+  id          String         @id @default(auto()) @map("_id") @db.ObjectId
+  titulo      String         @unique
   descripcion String
   contenido   String
-  estado             EstadoGenerico @default(ACTIVO)
+  estado      EstadoGenerico @default(ACTIVO)
+  planetaId   String         @db.ObjectId @unique
+  planeta     Planeta        @relation(fields: [planetaId], references: [id])
 }
