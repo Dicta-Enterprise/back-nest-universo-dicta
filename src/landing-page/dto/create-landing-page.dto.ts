@@ -1,10 +1,13 @@
 import { EstadoGenerico } from "@prisma/client";
 import {
+    ArrayNotEmpty,
+    IsArray,
     IsEnum,
     IsMongoId,
     IsNotEmpty,
     IsOptional,
-    IsString
+    IsString,
+    IsUrl
 } from "class-validator";
 
 export class CreateLandingPageDto {
@@ -16,9 +19,10 @@ export class CreateLandingPageDto {
     @IsNotEmpty()
     descripcion: string;
 
-    @IsString()
-    @IsNotEmpty()
-    contenido: string;
+    @IsArray() 
+    @ArrayNotEmpty({ message: "El contenido no puede estar vacío." }) 
+    @IsString({ each: true, message: "Cada elemento de contenido debe ser un string válido." }) 
+    contenido: string[]; 
 
     @IsOptional()
     @IsEnum(EstadoGenerico, {
@@ -31,4 +35,16 @@ export class CreateLandingPageDto {
     @IsNotEmpty()
     @IsMongoId()
     planetaId: string;
+
+    @IsOptional()
+    @IsString()
+    color?: string; 
+
+    @IsOptional()
+    @IsUrl({
+        require_tld: true,
+    }, {
+        message: 'El valor de imagenUrl debe ser una URL válida',
+    })
+    imagenUrl?: string; 
 }
