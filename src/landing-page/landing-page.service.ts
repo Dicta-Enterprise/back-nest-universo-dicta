@@ -68,7 +68,7 @@ export class LandingPageService extends PrismaClient implements OnModuleInit {
           descripcion,
           contenido,
           estado: estado || 'ACTIVO',
-          planetaId: createLandingPageDto.planetaId, // Guardar directamente el planetaId
+          planetaId: createLandingPageDto.planetaId, // Guardar directamente
         },
       });
 
@@ -144,18 +144,66 @@ export class LandingPageService extends PrismaClient implements OnModuleInit {
 
   async update(id: string, updateLandingPageDto: UpdateLandingPageDto) {
     try {
+      // Verificar si se proporciona un planetaId y este es diferente al actual
+      if (updateLandingPageDto.planetaId) {
+        // Buscar la landing page existente
+        const existingLandingPage = await this.landingPage.findUnique({
+          where: { id },
+        });
+
+        if (!existingLandingPage) {
+          return new CustomError(
+            'No se encontró la landing page',
+            'Not Found',
+            HttpStatus.NOT_FOUND
+          );
+        }
+
+        if (updateLandingPageDto.planetaId !== existingLandingPage.planetaId) {
+          // Verificar que el planeta exista
+          const planeta = await this.planeta.findUnique({
+            where: { id: updateLandingPageDto.planetaId },
+          });
+
+          if (!planeta) {
+            return new CustomError(
+              `El planeta con ID ${updateLandingPageDto.planetaId} no existe`,
+              'Conflict',
+              HttpStatus.BAD_REQUEST
+            );
+          }
+
+          // Verificar si el planeta está asignado a otra landing page
+          const existingLandingForPlaneta = await this.landingPage.findFirst({
+            where: {
+              planetaId: updateLandingPageDto.planetaId,
+              id: { not: id }, // Excluir la landing actual
+            },
+          });
+
+          if (existingLandingForPlaneta) {
+            return new CustomError(
+              `El planeta con ID ${updateLandingPageDto.planetaId} ya está asignado a otra landing page`,
+              'Conflict',
+              HttpStatus.CONFLICT
+            );
+          }
+        }
+      }
+
+      // Actualizar la landing page
       const landingPage = await this.landingPage.update({
         where: {
-          id: id,
+          id: id
         },
         data: updateLandingPageDto,
       });
 
       if (!landingPage) {
-        throw new CustomError(
+        return new CustomError(
           'No se encontró la landing page',
           'Not Found',
-          HttpStatus.NOT_FOUND,
+          HttpStatus.NOT_FOUND
         );
       }
 
@@ -164,10 +212,11 @@ export class LandingPageService extends PrismaClient implements OnModuleInit {
       throw new CustomError(
         'Error',
         error.message,
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      )
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
     }
   }
+
 
   async remove(id: string) {
     try {

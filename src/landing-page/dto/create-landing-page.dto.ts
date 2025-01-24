@@ -7,22 +7,23 @@ import {
     IsNotEmpty,
     IsOptional,
     IsString,
-    IsUrl
+    IsUrl,
+    ValidateNested
 } from "class-validator";
 
 export class CreateLandingPageDto {
-    @IsString()
-    @IsNotEmpty()
+    @IsString({ message: "El título debe ser un string válido." })
+    @IsNotEmpty({ message: "El título no puede estar vacío." })
     titulo: string;
 
-    @IsString()
-    @IsNotEmpty()
+    @IsString({ message: "La descripción debe ser un string válido." })
+    @IsNotEmpty({ message: "La descripción no puede estar vacía." })
     descripcion: string;
 
-    @IsArray() 
-    @ArrayNotEmpty({ message: "El contenido no puede estar vacío." }) 
-    @IsString({ each: true, message: "Cada elemento de contenido debe ser un string válido." }) 
-    contenido: string[]; 
+    @IsArray({ message: "El contenido debe ser un array de strings." })
+    @ArrayNotEmpty({ message: "El contenido no puede estar vacío." })
+    @IsString({ each: true, message: "Cada elemento del contenido debe ser un string válido." })
+    contenido: string[];
 
     @IsOptional()
     @IsEnum(EstadoGenerico, {
@@ -31,20 +32,19 @@ export class CreateLandingPageDto {
     })
     estado: EstadoGenerico;
 
-    @IsString()
-    @IsNotEmpty()
-    @IsMongoId()
+    @IsString({ message: "El ID del planeta debe ser un string válido." })
+    @IsNotEmpty({ message: "El ID del planeta no puede estar vacío." })
+    @IsMongoId({ message: "El ID del planeta debe ser un ObjectId válido." })
     planetaId: string;
 
     @IsOptional()
-    @IsString()
-    color?: string; 
+    @IsString({ message: "El color debe ser un string válido." })
+    color?: string;
 
     @IsOptional()
-    @IsUrl({
-        require_tld: true,
-    }, {
-        message: 'El valor de imagenUrl debe ser una URL válida',
-    })
-    imagenUrl?: string; 
+    @IsUrl(
+        { require_tld: true },
+        { message: "El valor de imagenUrl debe ser una URL válida." }
+    )
+    imagenUrl?: string;
 }
