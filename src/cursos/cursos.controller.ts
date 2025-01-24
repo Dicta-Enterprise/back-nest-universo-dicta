@@ -25,19 +25,11 @@ export class CursosController {
 
   @Patch(':id')
   async update(@Param('id', ParseObjectIdPipe) id: string, @Body() updateCursoDto: UpdateCursoDto) {
-    try {
-      return await this.cursosService.update(id, updateCursoDto);
-    } catch (error) {
-      throw new NotFoundException('Curso no encontrado')
-    }
+    return await this.cursosService.update(id, updateCursoDto);
   }
 
   @Delete(':id')
   remove(@Param('id', ParseObjectIdPipe) id: string) {
-    try {
-      return this.cursosService.remove(id);
-    } catch (error) {
-      throw new NotFoundException('Curso no encontrado')
-    }
+    return this.cursosService.remove(id);
   }
 }

@@ -20,9 +20,7 @@ export class CursosService extends PrismaClient implements OnModuleInit {
 
   async create(createCursoDto: CreateCursoDto) {
     try {
-      
-      console.log(createCursoDto);
-
+    
       const oneCurso = await this.curso.findUnique({
         where:{
           nombre: createCursoDto.nombre
@@ -81,7 +79,7 @@ export class CursosService extends PrismaClient implements OnModuleInit {
 
       if(!curso){
         return new CustomError(
-          'El curso buscado no existe',
+          'El Curso buscado no existe o esta Inactivo',
           'Not Found',
           HttpStatus.NOT_FOUND,
         );
@@ -101,23 +99,11 @@ export class CursosService extends PrismaClient implements OnModuleInit {
   async update(id: string, updateCursoDto: UpdateCursoDto) {
     try {
       
-      // const cursofind = await this.curso.findUnique({
-      //   where:{
-      //     id:id,
-      //     estado: 'ACTIVO',
-      //   }
-      // });
-
-      // if(!cursofind){
-      //   return new CustomError(
-      //     'El curso buscado no existe',
-      //     'Not Found',
-      //     HttpStatus.NOT_FOUND,
-      //   );
-      // }
-
       const error = await validarExistenciaRelacionados(updateCursoDto, this.categoria, this.planeta);
       if (error) return error;
+      
+      const cursofind = await this.findOne(id);
+      if(cursofind) return cursofind;
 
       const curso = await this.curso.update({
         where: {
@@ -140,6 +126,9 @@ export class CursosService extends PrismaClient implements OnModuleInit {
 
   async remove(id: string) {
     try {
+
+      const cursofind = await this.findOne(id);
+      if(cursofind) return cursofind;
       
       const curso = await this.curso.update({
         where: {
