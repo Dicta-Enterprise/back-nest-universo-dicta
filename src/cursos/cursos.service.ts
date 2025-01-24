@@ -135,7 +135,7 @@ export class CursosService extends PrismaClient implements OnModuleInit {
         error.message,
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
-    }
+    } 
   }
 
   async remove(id: string) {
@@ -174,7 +174,7 @@ async function validarExistenciaRelacionados(createCursoDto: CreateCursoDto | Up
     });
 
     if (!entidadExistente) {
-      return new CustomError(message, 'Bad Request', HttpStatus.BAD_REQUEST);
+      return new CustomError(message, 'Not Found', HttpStatus.NOT_FOUND);
     }
   }
 
