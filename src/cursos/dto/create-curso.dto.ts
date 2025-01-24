@@ -1,7 +1,7 @@
 import { EstadoGenerico } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
 import { 
-  IsDate, IsEnum, IsNumber, IsOptional, IsString 
+  IsDate, IsEnum, IsMongoId, IsNumber, IsOptional, IsString 
 } from 'class-validator';
 
 export class CreateCursoDto {
@@ -32,11 +32,6 @@ export class CreateCursoDto {
   precio: number;
 
   @IsString()
-  @IsOptional()
-  @Transform(({ value }) => value.trim())
-  profesor?: string;
-
-  @IsString()
   @IsEnum(EstadoGenerico, {
     message:
       'El estado proporcionado no es válido. Valores permitidos: ACTIVO, INACTIVO, PENDIENTE, ELIMINADO, DESHABILITADO.',
@@ -55,16 +50,24 @@ export class CreateCursoDto {
   duracion: number;
 
   @IsString()
+  @IsMongoId()
   @Transform(({ value }) => value.trim())
-  categoria: string;
+  categoriaId: string;
+  
+  @IsString()
+  @IsOptional()
+  @IsMongoId()
+  @Transform(({ value }) => value.trim())
+  profesorId: string;
 
   @IsString()
   @IsOptional()
   @Transform(({ value }) => value.trim())
-  idioma: string;
+  idiomaId: string;
 
   @IsString()
   @IsOptional()
+  @IsMongoId()
   @Transform(({ value }) => value.trim())
-  planetas: string;
+  planetaId: string;
 }

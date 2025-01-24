@@ -1,10 +1,9 @@
 import { HttpStatus, Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { CreateCursoDto } from './dto/create-curso.dto';
 import { UpdateCursoDto } from './dto/update-curso.dto';
-import { Curso, PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import { CustomError } from 'src/shared/class/Error.Class';
 import { GenericSingle } from 'src/shared/class/Generic.Class';
-import { string } from 'joi';
 
 @Injectable()
 export class CursosService extends PrismaClient implements OnModuleInit {
@@ -22,6 +21,8 @@ export class CursosService extends PrismaClient implements OnModuleInit {
   async create(createCursoDto: CreateCursoDto) {
     try {
       
+      console.log(createCursoDto);
+
       const oneCurso = await this.curso.findUnique({
         where:{
           nombre: createCursoDto.nombre
@@ -36,40 +37,15 @@ export class CursosService extends PrismaClient implements OnModuleInit {
         );
       }
 
-      const categoriaExistente = await this.categoria.findUnique({
-        where: {
-          id: createCursoDto.categoria,
-        },
-      });
-  
-      if (!categoriaExistente) {
-        return new CustomError(
-          'La categoría proporcionada no existe',
-          'Bad Request',
-          HttpStatus.BAD_REQUEST,
-        );
-      }
+      const error = await validarExistenciaRelacionados(createCursoDto, this.categoria, this.planeta);
+      if (error) return error;
 
       return await this.curso.create({
         data: {
-          nombre: createCursoDto.nombre,
-          descripcion: createCursoDto.descripcion,
-          fechaCreacion: createCursoDto.fechaCreacion,
-          fechaInicio: createCursoDto.fechaInicio,
-          fechaFinalizacion: createCursoDto.fechaFinalizacion,
-          cantidadAlumnos: createCursoDto.cantidadAlumnos,
-          precio: createCursoDto.precio,
-          estado: createCursoDto.estado,
-          imagen: createCursoDto.imagen,
-          video: createCursoDto.video,
-          duracion: createCursoDto.duracion,
-          categoria:{
-            connect:{
-              id: createCursoDto.categoria,
-            } 
-          }
+          ...createCursoDto,
+          categoriaId: createCursoDto.categoriaId,
+          planetaId: createCursoDto.planetaId,
         },
-        //data: createCursoDto,
       });
 
     } catch (error) {
@@ -140,51 +116,17 @@ export class CursosService extends PrismaClient implements OnModuleInit {
       //   );
       // }
 
-      const categoriaExistente = await this.categoria.findUnique({
-        where: {
-          id: updateCursoDto.categoria,
-        },
-      });
-  
-      if (!categoriaExistente) {
-        return new CustomError(
-          'La categoría proporcionada no existe',
-          'Bad Request',
-          HttpStatus.BAD_REQUEST,
-        );
-      }
+      const error = await validarExistenciaRelacionados(updateCursoDto, this.categoria, this.planeta);
+      if (error) return error;
 
       const curso = await this.curso.update({
         where: {
           id: id
         },
         data: {
-          nombre: updateCursoDto.nombre,
-          descripcion: updateCursoDto.descripcion,
-          fechaCreacion:  updateCursoDto.fechaCreacion,
-          fechaInicio:  updateCursoDto.fechaInicio,
-          fechaFinalizacion:  updateCursoDto.fechaFinalizacion,
-          cantidadAlumnos: updateCursoDto.cantidadAlumnos,
-          precio:  updateCursoDto.precio,
-          estado:  updateCursoDto.estado,
-          imagen:  updateCursoDto.imagen,
-          video:  updateCursoDto.video,
-          duracion:  updateCursoDto.duracion,
-          categoria:{
-            connect:{
-              id: updateCursoDto.categoria,
-            } 
-          }
+          ...updateCursoDto,
         },
       });
-
-      // if(!curso){
-      //   return new CustomError(
-      //     'El curso buscado no existe',
-      //     'Not Found',
-      //     HttpStatus.NOT_FOUND,
-      //   );
-      // }
 
       return new GenericSingle(curso, HttpStatus.OK, 'Curso actualizada');
     } catch (error) {
@@ -218,4 +160,23 @@ export class CursosService extends PrismaClient implements OnModuleInit {
       );
     }
   }
+}
+
+async function validarExistenciaRelacionados(createCursoDto: CreateCursoDto | UpdateCursoDto, categoria: any, planeta: any) {
+  const relaciones = [
+    { model: categoria, id: createCursoDto.categoriaId, message: 'La categoría proporcionada no existe' },
+    { model: planeta, id: createCursoDto.planetaId, message: 'El planeta proporcionado no existe' },
+  ];
+
+  for (const { model, id, message } of relaciones) {
+    const entidadExistente = await model.findUnique({
+      where: { id },
+    });
+
+    if (!entidadExistente) {
+      return new CustomError(message, 'Bad Request', HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  return null;
 }

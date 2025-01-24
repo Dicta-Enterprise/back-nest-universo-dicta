@@ -43,8 +43,10 @@ export class PlanetasService extends PrismaClient implements OnModuleInit {
     }
   }
 
-  
+  findAll(){
 
+  }
+  
   findOne(id: number) {
     return `This action returns a #${id} planeta`;
   }
