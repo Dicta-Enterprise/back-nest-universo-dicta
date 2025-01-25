@@ -29,7 +29,7 @@ export class CursosService extends PrismaClient implements OnModuleInit {
 
       if(oneCurso){
         return new CustomError(
-          'El curso con este nombre ya existe',
+          `El Curso con este nombre (${oneCurso.nombre}) ya existe ID: ${oneCurso.id}`,
           'Bab Request',
           HttpStatus.BAD_REQUEST,
         );
@@ -37,6 +37,9 @@ export class CursosService extends PrismaClient implements OnModuleInit {
 
       const error = await validarExistenciaRelacionados(createCursoDto, this.categoria, this.planeta);
       if (error) return error;
+
+      const errorFechas = await validarRangoFechas(createCursoDto.fechaInicio, createCursoDto.fechaFinalizacion);
+      if (errorFechas) return errorFechas;
 
       return await this.curso.create({
         data: {
@@ -84,7 +87,7 @@ export class CursosService extends PrismaClient implements OnModuleInit {
           HttpStatus.NOT_FOUND,
         );
       }
-
+        
       return curso;
 
     } catch (error) {
@@ -102,8 +105,40 @@ export class CursosService extends PrismaClient implements OnModuleInit {
       const error = await validarExistenciaRelacionados(updateCursoDto, this.categoria, this.planeta);
       if (error) return error;
       
-      const cursofind = await this.findOne(id);
-      if(cursofind) return cursofind;
+      if(updateCursoDto.fechaInicio && updateCursoDto.fechaFinalizacion){
+        const errorFechas = await validarRangoFechas(updateCursoDto.fechaInicio, updateCursoDto.fechaFinalizacion);
+        if (errorFechas) return errorFechas;
+      }
+
+      const cursofind = await this.curso.findUnique({
+        where:{
+          id:id,
+          estado: 'ACTIVO',
+        }
+      });
+
+      if(!cursofind){
+        return new CustomError(
+          'El Curso buscado no existe o esta Inactivo',
+          'Not Found',
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
+      if (updateCursoDto.nombre) {
+        const cursoNombre = await this.curso.findFirst({
+          where: {
+            nombre: updateCursoDto.nombre,
+          },
+        });
+        if (cursoNombre) {
+          return new CustomError(
+            'Ya existe un curso con este nombre',
+            'Conflict',
+            HttpStatus.CONFLICT,
+          );
+        }
+      }
 
       const curso = await this.curso.update({
         where: {
@@ -113,8 +148,9 @@ export class CursosService extends PrismaClient implements OnModuleInit {
           ...updateCursoDto,
         },
       });
-
+      
       return new GenericSingle(curso, HttpStatus.OK, 'Curso actualizada');
+
     } catch (error) {
       throw new CustomError(
         'Error',
@@ -127,8 +163,20 @@ export class CursosService extends PrismaClient implements OnModuleInit {
   async remove(id: string) {
     try {
 
-      const cursofind = await this.findOne(id);
-      if(cursofind) return cursofind;
+      const cursofind = await this.curso.findUnique({
+        where:{
+          id:id,
+          estado: 'ACTIVO',
+        }
+      });
+
+      if(!cursofind){
+        return new CustomError(
+          'El Curso buscado no existe o esta Inactivo',
+          'Not Found',
+          HttpStatus.NOT_FOUND,
+        );
+      }
       
       const curso = await this.curso.update({
         where: {
@@ -153,8 +201,8 @@ export class CursosService extends PrismaClient implements OnModuleInit {
 
 async function validarExistenciaRelacionados(createCursoDto: CreateCursoDto | UpdateCursoDto, categoria: any, planeta: any) {
   const relaciones = [
-    { model: categoria, id: createCursoDto.categoriaId, message: 'La categoría proporcionada no existe' },
-    { model: planeta, id: createCursoDto.planetaId, message: 'El planeta proporcionado no existe' },
+    { model: categoria, id: createCursoDto.categoriaId, message: 'La Categoría proporcionada no existe' },
+    { model: planeta, id: createCursoDto.planetaId, message: 'El Planeta proporcionado no existe' },
   ];
 
   for (const { model, id, message } of relaciones) {
@@ -169,3 +217,16 @@ async function validarExistenciaRelacionados(createCursoDto: CreateCursoDto | Up
 
   return null;
 }
+
+async function validarRangoFechas(fechaInicio: Date, fechaFinalizacion: Date) {
+  if (fechaFinalizacion < fechaInicio) {
+    return new CustomError(
+      'La fecha de finalización debe ser posterior a la fecha de inicio',
+      'Bad Request',
+      HttpStatus.BAD_REQUEST,
+    );
+  }
+}
+
+
+

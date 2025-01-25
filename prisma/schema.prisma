@@ -89,22 +89,23 @@ model Planeta {
 }
 
 model Curso {
-  id                String         @id @default(auto()) @map("_id") @db.ObjectId
-  nombre            String         @unique
-  descripcion       String
-  fechaCreacion     DateTime
-  fechaInicio       DateTime
-  fechaFinalizacion DateTime
-  cantidadAlumnos   Int
-  precio            Float
-  estado            EstadoGenerico
-  imagen            String
-  video             String
-  duracion          Float
-  categoriaId       String          @db.ObjectId @unique
-  profesorId        String?         @db.ObjectId @unique
-  idiomaId          String?         @db.ObjectId @unique
-  planetaId         String          @db.ObjectId @unique
+  id                  String         @id @default(auto()) @map("_id") @db.ObjectId
+  nombre              String         @unique
+  descripcion         String
+  fechaCreacion       DateTime       @default(now())
+  fechaActualizacion  DateTime       @updatedAt
+  fechaInicio         DateTime
+  fechaFinalizacion   DateTime
+  cantidadAlumnos     Int
+  precio              Float
+  estado              EstadoGenerico
+  imagen              String
+  video               String
+  duracion            Float
+  categoriaId         String          @db.ObjectId @unique
+  profesorId          String?         @db.ObjectId @unique
+  idiomaId            String?         @db.ObjectId @unique
+  planetaId           String          @db.ObjectId @unique
 }
 
 model SubMenu {

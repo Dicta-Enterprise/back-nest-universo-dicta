@@ -1,34 +1,39 @@
 import { EstadoGenerico } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
 import { 
-  IsDate, IsEnum, IsMongoId, IsNumber, IsOptional, IsString 
+  IsDate, IsDefined, IsEnum, IsMongoId, IsNotEmpty, IsNumber, IsOptional, IsPositive, IsString, 
+  IsUrl, 
 } from 'class-validator';
 
 export class CreateCursoDto {
   @IsString()
+  @IsNotEmpty()
   @Transform(({ value }) => value.trim())
   nombre: string;
 
   @IsString()
+  @IsNotEmpty()
   @Transform(({ value }) => value.trim())
   descripcion: string;
 
   @IsDate()
-  @Type(() => Date)
-  fechaCreacion: Date;
-
-  @IsDate()
+  @IsNotEmpty()
   @Type(() => Date)
   fechaInicio: Date;
 
   @IsDate()
+  @IsNotEmpty()
   @Type(() => Date)
   fechaFinalizacion: Date;
 
   @IsNumber()
+  @IsDefined()
+  @IsPositive()
   cantidadAlumnos: number;
 
   @IsNumber()
+  @IsPositive()
+  @IsDefined()
   precio: number;
 
   @IsString()
@@ -38,15 +43,17 @@ export class CreateCursoDto {
   })
   estado: EstadoGenerico;
 
-  @IsString()
+  @IsUrl()
   @Transform(({ value }) => value.trim())
   imagen: string;
 
-  @IsString()
+  @IsUrl()
   @Transform(({ value }) => value.trim())
   video: string;
 
   @IsNumber()
+  @IsPositive()
+  @IsDefined()
   duracion: number;
 
   @IsString()
@@ -63,7 +70,7 @@ export class CreateCursoDto {
   @IsString()
   @IsOptional()
   @Transform(({ value }) => value.trim())
-  idiomaId: string;
+  idiomaId: string; // Enum 
 
   @IsString()
   @IsOptional()
