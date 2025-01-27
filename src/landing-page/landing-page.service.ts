@@ -15,75 +15,70 @@ export class LandingPageService extends PrismaClient implements OnModuleInit {
     super();
   }
 
+  private async verificarExistenciaPlaneta(planetaId: string): Promise<void> {
+    const planeta = await this.planeta.findUnique({ where: { id: planetaId } });
+
+    if (!planeta) {
+      throw new CustomError(
+        `El planeta con ID ${planetaId} no existe`,
+        'Conflict',
+        HttpStatus.BAD_REQUEST
+      )
+    }
+  }
+
+  private async verificarPlanetaNoAsignado(planetaId: string, excludeLandingId?: string): Promise<void> {
+    const existingLanding = await this.landingPage.findFirst({
+      where: {
+        planetaId,
+        id: excludeLandingId ? { not: excludeLandingId } : undefined
+      },
+    });
+
+    if (existingLanding) {
+      throw new CustomError(
+        `El planeta con ID ${planetaId} ya esta asignado a otra landing page`,
+        'Conflict',
+        HttpStatus.CONFLICT
+      );
+    }
+  }
+
+  private async verificarTituloUnico(titulo: string): Promise<void> {
+    const existingLanding = await this.landingPage.findUnique({ where: { titulo } });
+
+    if (existingLanding) {
+      throw new CustomError(
+        'Ya existe una Landing Page con ese titulo',
+        'Conflict',
+        HttpStatus.CONFLICT
+      );
+    }
+  }
+
   async create(createLandingPageDto: CreateLandingPageDto) {
     try {
-      // Verificar que el planeta exista en la base de datos
-      const planeta = await this.planeta.findUnique({
-        where: { id: createLandingPageDto.planetaId },
-      });
+      const { planetaId, titulo } = createLandingPageDto;
 
-      if (!planeta) {
-        return new CustomError(
-          `El planeta con ID ${createLandingPageDto.planetaId} no existe`,
-          'Conflict',
-          HttpStatus.BAD_REQUEST
-        );
-      }
-
-      // Verificar si el planeta ya está asignado a un landing page
-      const existingLandingForPlaneta = await this.landingPage.findFirst({
-        where: {
-          planetaId: createLandingPageDto.planetaId,
-        },
-      });
-
-      if (existingLandingForPlaneta) {
-        return new CustomError(
-          `El planeta con ID ${createLandingPageDto.planetaId} ya está asignado a otra landing page`,
-          'Conflict',
-          HttpStatus.CONFLICT
-        );
-      }
-
-      // Verificar si ya existe una Landing Page con el mismo título
-      const existingLandingPage = await this.landingPage.findUnique({
-        where: {
-          titulo: createLandingPageDto.titulo,
-        },
-      });
-
-      if (existingLandingPage) {
-        return new CustomError(
-          'Ya existe una página de aterrizaje con ese título',
-          'Conflict',
-          HttpStatus.CONFLICT
-        );
-      }
+      await this.verificarExistenciaPlaneta(planetaId);
+      await this.verificarPlanetaNoAsignado(planetaId);
+      await this.verificarTituloUnico(titulo);
 
       // Crear una nueva Landing Page
-      const { titulo, descripcion, contenido, estado } = createLandingPageDto;
       const landingPage = await this.landingPage.create({
         data: {
-          titulo,
-          descripcion,
-          contenido,
-          estado: estado || 'ACTIVO',
+          ...createLandingPageDto,
           planetaId: createLandingPageDto.planetaId, // Guardar directamente
         },
       });
+      return new GenericSingle(landingPage, HttpStatus.CREATED, 'Landing Page creada exitosamente');
 
-      return new GenericSingle(
-        landingPage,
-        HttpStatus.CREATED,
-        'Página creada exitosamente'
-      );
     } catch (error) {
-      if (error instanceof CustomError || error instanceof NotFoundException) {
-        throw error;
+      if (error instanceof CustomError) {
+        return error;
       }
-
       throw new CustomError(
-        'Error al crear la landing Page',
+        'Error al crear la Landing Page',
         error.message,
         HttpStatus.INTERNAL_SERVER_ERROR
       );
@@ -93,9 +88,7 @@ export class LandingPageService extends PrismaClient implements OnModuleInit {
   async findAll() {
     try {
       const landingPages = await this.landingPage.findMany({
-        where: {
-          estado: 'ACTIVO',
-        },
+        where: { estado: 'ACTIVO' }
       });
 
       if (!landingPages) {
@@ -106,16 +99,17 @@ export class LandingPageService extends PrismaClient implements OnModuleInit {
         );
       }
       return new GenericArray(landingPages, HttpStatus.OK, 'Landing Pages encontradas')
+
     } catch (error) {
       throw new CustomError(
-        'Error',
+        'Error al obtener las Landing Pages',
         error.message,
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }
 
-  async finOne(id: string) {
+  async findOne(id: string) {
     try {
       const landingPage = await this.landingPage.findUnique({
         where: {
@@ -125,17 +119,17 @@ export class LandingPageService extends PrismaClient implements OnModuleInit {
       });
 
       if (!landingPage) {
-        throw new CustomError(
-          'No se encontró la landing page',
+        return new CustomError(
+          `No se encontró la landing page con el ID: "${id}".`,
           'Not Found',
           HttpStatus.NOT_FOUND,
         );
       }
-
       return new GenericSingle(landingPage, HttpStatus.OK, 'Landing Page encontrada')
+
     } catch (error) {
       throw new CustomError(
-        'Error',
+        'Error al obtener la Landing Page',
         error.message,
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
@@ -144,103 +138,64 @@ export class LandingPageService extends PrismaClient implements OnModuleInit {
 
   async update(id: string, updateLandingPageDto: UpdateLandingPageDto) {
     try {
-      // Verificar si se proporciona un planetaId y este es diferente al actual
-      if (updateLandingPageDto.planetaId) {
-        // Buscar la landing page existente
-        const existingLandingPage = await this.landingPage.findUnique({
-          where: { id },
-        });
+      const { planetaId, titulo } = updateLandingPageDto;
+      const existingLanding = await this.landingPage.findUnique({ where: { id }, });
 
-        if (!existingLandingPage) {
-          return new CustomError(
-            'No se encontró la landing page',
-            'Not Found',
-            HttpStatus.NOT_FOUND
-          );
-        }
-
-        if (updateLandingPageDto.planetaId !== existingLandingPage.planetaId) {
-          // Verificar que el planeta exista
-          const planeta = await this.planeta.findUnique({
-            where: { id: updateLandingPageDto.planetaId },
-          });
-
-          if (!planeta) {
-            return new CustomError(
-              `El planeta con ID ${updateLandingPageDto.planetaId} no existe`,
-              'Conflict',
-              HttpStatus.BAD_REQUEST
-            );
-          }
-
-          // Verificar si el planeta está asignado a otra landing page
-          const existingLandingForPlaneta = await this.landingPage.findFirst({
-            where: {
-              planetaId: updateLandingPageDto.planetaId,
-              id: { not: id }, // Excluir la landing actual
-            },
-          });
-
-          if (existingLandingForPlaneta) {
-            return new CustomError(
-              `El planeta con ID ${updateLandingPageDto.planetaId} ya está asignado a otra landing page`,
-              'Conflict',
-              HttpStatus.CONFLICT
-            );
-          }
-        }
-      }
-
-      // Actualizar la landing page
-      const landingPage = await this.landingPage.update({
-        where: {
-          id: id
-        },
-        data: updateLandingPageDto,
-      });
-
-      if (!landingPage) {
+      if (!existingLanding) {
         return new CustomError(
-          'No se encontró la landing page',
+          `No se encontró la landing page con el ID: "${id}".`,
           'Not Found',
           HttpStatus.NOT_FOUND
         );
       }
 
+      if (planetaId && planetaId !== existingLanding.planetaId) {
+        await this.verificarExistenciaPlaneta(planetaId);
+        await this.verificarPlanetaNoAsignado(planetaId, id);
+      }
+      if (titulo && titulo !== existingLanding.titulo) {
+        await this.verificarTituloUnico(titulo);
+      }
+
+      // Actualizar
+      const landingPage = await this.landingPage.update({
+        where: { id: id },
+        data: updateLandingPageDto,
+      });
       return new GenericSingle(landingPage, HttpStatus.OK, 'Landing page actualizada');
+
     } catch (error) {
+      if (error instanceof CustomError) {
+        return error;
+      }
       throw new CustomError(
-        'Error',
+        'Error al actualizar la Landing Page',
         error.message,
         HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
   }
 
-
   async remove(id: string) {
     try {
-      const landingPage = await this.landingPage.update({
-        where: {
-          id: id,
-        },
-        data: {
-          estado: 'INACTIVO',
-        },
-      });
+      const existingLanding = await this.landingPage.findUnique({ where: { id }, });
 
-      if (!landingPage) {
-        throw new CustomError(
-          'No se encontró la landing page',
+      if (!existingLanding) {
+        return new CustomError(
+          `No se encontró la landing page con el ID: "${id}".`,
           'Not Found',
-          HttpStatus.NOT_FOUND,
+          HttpStatus.NOT_FOUND
         );
       }
-
+      const landingPage = await this.landingPage.update({
+        where: { id: id, },
+        data: { estado: 'INACTIVO' },
+      });
       return new GenericSingle(landingPage, HttpStatus.OK, 'Landing page eliminada');
+
     } catch (error) {
       throw new CustomError(
-        'Error',
+        'Error al eliminar la Landing Page',
         error.message,
         HttpStatus.INTERNAL_SERVER_ERROR,
       );

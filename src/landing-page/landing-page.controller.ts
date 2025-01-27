@@ -23,7 +23,7 @@ export class LandingPageController {
 
     @Get(':id')
     findOne(@Param('id', ParseObjectIdPipe) id: string) {
-        return this.landingPageService.finOne(id);
+        return this.landingPageService.findOne(id);
     }
 
     @Patch(':id')
