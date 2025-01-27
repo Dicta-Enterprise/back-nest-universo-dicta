@@ -21,19 +21,8 @@ export class CursosService extends PrismaClient implements OnModuleInit {
   async create(createCursoDto: CreateCursoDto) {
     try {
     
-      const oneCurso = await this.curso.findUnique({
-        where:{
-          nombre: createCursoDto.nombre
-        }
-      })
-
-      if(oneCurso){
-        return new CustomError(
-          `El Curso con este nombre (${oneCurso.nombre}) ya existe ID: ${oneCurso.id}`,
-          'Bab Request',
-          HttpStatus.BAD_REQUEST,
-        );
-      }
+      const cursofindN = await verificarExistenciaCurso({ nombre: createCursoDto.nombre }, this.curso);
+      if (cursofindN) return cursofindN;
 
       const error = await validarExistenciaRelacionados(createCursoDto, this.categoria, this.planeta);
       if (error) return error;
@@ -74,20 +63,20 @@ export class CursosService extends PrismaClient implements OnModuleInit {
     try {
 
       const curso = await this.curso.findUnique({
-        where:{
-          id:id,
+        where: {
+          id: id,
           estado: 'ACTIVO',
-        }
+        },
       });
-
-      if(!curso){
+  
+      if (!curso) {
         return new CustomError(
           'El Curso buscado no existe o esta Inactivo',
           'Not Found',
           HttpStatus.NOT_FOUND,
         );
       }
-        
+  
       return curso;
 
     } catch (error) {
@@ -110,34 +99,12 @@ export class CursosService extends PrismaClient implements OnModuleInit {
         if (errorFechas) return errorFechas;
       }
 
-      const cursofind = await this.curso.findUnique({
-        where:{
-          id:id,
-          estado: 'ACTIVO',
-        }
-      });
-
-      if(!cursofind){
-        return new CustomError(
-          'El Curso buscado no existe o esta Inactivo',
-          'Not Found',
-          HttpStatus.NOT_FOUND,
-        );
-      }
+      const cursofind = await verificarExistenciaCurso({ id, estado: 'ACTIVO' }, this.curso);
+      if (cursofind) return cursofind;
 
       if (updateCursoDto.nombre) {
-        const cursoNombre = await this.curso.findFirst({
-          where: {
-            nombre: updateCursoDto.nombre,
-          },
-        });
-        if (cursoNombre) {
-          return new CustomError(
-            'Ya existe un curso con este nombre',
-            'Conflict',
-            HttpStatus.CONFLICT,
-          );
-        }
+        const cursofindN = await verificarExistenciaCurso({ nombre: updateCursoDto.nombre }, this.curso);
+        if (cursofindN) return cursofindN;
       }
 
       const curso = await this.curso.update({
@@ -163,20 +130,8 @@ export class CursosService extends PrismaClient implements OnModuleInit {
   async remove(id: string) {
     try {
 
-      const cursofind = await this.curso.findUnique({
-        where:{
-          id:id,
-          estado: 'ACTIVO',
-        }
-      });
-
-      if(!cursofind){
-        return new CustomError(
-          'El Curso buscado no existe o esta Inactivo',
-          'Not Found',
-          HttpStatus.NOT_FOUND,
-        );
-      }
+      const cursofind = await verificarExistenciaCurso({ id, estado: 'ACTIVO' }, this.curso);
+      if (cursofind) return cursofind;
       
       const curso = await this.curso.update({
         where: {
@@ -228,5 +183,39 @@ async function validarRangoFechas(fechaInicio: Date, fechaFinalizacion: Date) {
   }
 }
 
+async function verificarExistenciaCurso(parametros: any, curso: any) {
+  const { id, nombre, estado} = parametros;
 
+  const cursofind = await curso.findFirst({
+    where: {
+      AND: [
+        id ? { id } : {},
+        estado ? { estado } : {},
+      ],
+    },
+  });
+
+  if (!cursofind) {
+    return new CustomError(
+      'El Curso buscado no existe o esta Inactivo',
+      'Conflict',
+      HttpStatus.CONFLICT,
+    );
+  }
+
+  if (nombre) {
+    const cursoNombre = await curso.findFirst({
+      where: { nombre },
+    });
+
+    if (cursoNombre) {
+      return new CustomError(
+        `El Curso con este nombre (${cursoNombre.nombre}) ya existe. ID: ${cursoNombre.id}`,
+        'Conflict',
+        HttpStatus.CONFLICT,
+      );
+    }
+  }
+  return null;
+}
 
