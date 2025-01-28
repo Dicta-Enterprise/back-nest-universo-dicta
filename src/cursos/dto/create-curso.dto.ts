@@ -8,12 +8,12 @@ import {
 export class CreateCursoDto {
   @IsString()
   @IsNotEmpty()
-  @Transform(({ value }) => value.trim())
+  @Transform(({ value }) => ( typeof value == 'string' ? value.trim(): value))
   nombre: string;
 
   @IsString()
   @IsNotEmpty()
-  @Transform(({ value }) => value.trim())
+  @Transform(({ value }) => ( typeof value == 'string' ? value.trim(): value))
   descripcion: string;
 
   @IsDate()
@@ -44,11 +44,11 @@ export class CreateCursoDto {
   estado: EstadoGenerico;
 
   @IsUrl()
-  @Transform(({ value }) => value.trim())
+  @Transform(({ value }) => ( typeof value == 'string' ? value.trim(): value))
   imagen: string;
 
   @IsUrl()
-  @Transform(({ value }) => value.trim())
+  @Transform(({ value }) => ( typeof value == 'string' ? value.trim(): value))
   video: string;
 
   @IsNumber()
@@ -58,23 +58,23 @@ export class CreateCursoDto {
 
   @IsString()
   @IsMongoId()
-  @Transform(({ value }) => value.trim())
+  @Transform(({ value }) => ( typeof value == 'string' ? value.trim(): value))
   categoriaId: string;
   
   @IsString()
   @IsOptional()
   @IsMongoId()
-  @Transform(({ value }) => value.trim())
+  @Transform(({ value }) => ( typeof value == 'string' ? value.trim(): value))
   profesorId: string;
 
   @IsString()
   @IsOptional()
-  @Transform(({ value }) => value.trim())
-  idiomaId: string; // Enum 
+  @Transform(({ value }) => ( typeof value == 'string' ? value.trim(): value))
+  idiomaId: string;
 
   @IsString()
   @IsOptional()
   @IsMongoId()
-  @Transform(({ value }) => value.trim())
+  @Transform(({ value }) => ( typeof value == 'string' ? value.trim(): value))
   planetaId: string;
 }
