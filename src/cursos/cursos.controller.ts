@@ -3,7 +3,9 @@ import { CursosService } from './cursos.service';
 import { CreateCursoDto } from './dto/create-curso.dto';
 import { UpdateCursoDto } from './dto/update-curso.dto';
 import { ParseObjectIdPipe } from 'src/shared/pipes/parse-object-id.pipe';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('cursos')
 @Controller('cursos')
 export class CursosController {
   constructor(private readonly cursosService: CursosService) {}

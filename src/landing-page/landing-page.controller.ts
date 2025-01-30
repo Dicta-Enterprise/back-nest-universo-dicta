@@ -3,7 +3,9 @@ import { LandingPageService } from './landing-page.service';
 import { CreateLandingPageDto } from './dto/create-landing-page.dto';
 import { ParseObjectIdPipe } from 'src/shared/pipes/parse-object-id.pipe';
 import { UpdateLandingPageDto } from './dto/update-landing-page';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('landing-page')
 @Controller('landing-page')
 export class LandingPageController {
 

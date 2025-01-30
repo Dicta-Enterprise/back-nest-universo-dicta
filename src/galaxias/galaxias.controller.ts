@@ -11,7 +11,9 @@ import { GalaxiasService } from './galaxias.service';
 import { CreateGalaxiaDto } from './dto/create-galaxia.dto';
 import { UpdateGalaxiaDto } from './dto/update-galaxia.dto';
 import { ParseObjectIdPipe } from 'src/shared/pipes/parse-object-id.pipe';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('galaxias')
 @Controller('galaxias')
 export class GalaxiasController {
   constructor(private readonly galaxiasService: GalaxiasService) {}
