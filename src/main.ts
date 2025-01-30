@@ -31,16 +31,6 @@ async function bootstrap() {
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
-
-  const config = new DocumentBuilder()
-    .setTitle('API Universo Dicta')
-    .setDescription('API de la aplicacion de universo dicta')
-    .setVersion('1.0')
-    // .addBearerAuth()
-    .build();
-
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
   await app.listen(envs.port);
 
   logger.log(`api corriendo en el puerto ${envs.port}`);
