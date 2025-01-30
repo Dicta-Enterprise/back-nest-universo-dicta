@@ -1,4 +1,4 @@
-import { HttpStatus, Injectable, NotFoundException, OnModuleInit } from '@nestjs/common';
+import { HttpStatus, Injectable, OnModuleInit } from '@nestjs/common';
 import { CreateLandingPageDto } from './dto/create-landing-page.dto';
 import { CustomError } from 'src/shared/class/Error.Class';
 import { GenericArray, GenericSingle } from 'src/shared/class/Generic.Class';
