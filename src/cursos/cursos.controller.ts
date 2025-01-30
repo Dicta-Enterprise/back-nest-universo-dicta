@@ -3,11 +3,13 @@ import { CursosService } from './cursos.service';
 import { CreateCursoDto } from './dto/create-curso.dto';
 import { UpdateCursoDto } from './dto/update-curso.dto';
 import { ParseObjectIdPipe } from 'src/shared/pipes/parse-object-id.pipe';
+import { ApiResponse } from '@nestjs/swagger';
 
 @Controller('cursos')
 export class CursosController {
   constructor(private readonly cursosService: CursosService) {}
 
+  @ApiResponse({status: 201, description: 'Curso creado', type: CreateCursoDto})
   @Post()
   create(@Body() createCursoDto: CreateCursoDto) {
     return this.cursosService.create(createCursoDto);
@@ -23,9 +25,10 @@ export class CursosController {
     return this.cursosService.findOne(id);
   }
 
+  @ApiResponse({status: 200, description: 'Curso actualizado', type: UpdateCursoDto})
   @Patch(':id')
-  async update(@Param('id', ParseObjectIdPipe) id: string, @Body() updateCursoDto: UpdateCursoDto) {
-    return await this.cursosService.update(id, updateCursoDto);
+  update(@Param('id', ParseObjectIdPipe) id: string, @Body() updateCursoDto: UpdateCursoDto) {
+    return this.cursosService.update(id, updateCursoDto);
   }
 
   @Delete(':id')
