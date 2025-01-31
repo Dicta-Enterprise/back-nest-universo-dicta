@@ -82,15 +82,16 @@ model Profesor {
 }
 
 model Planeta {
-  id                 String         @id @default(auto()) @map("_id") @db.ObjectId
-  nombre             String         @unique
-  descripcion        String
-  imagen             String
-  estado             EstadoGenerico @default(ACTIVO)
-  fechaCreacion      DateTime       @default(now())
-  fechaActualizacion DateTime       @updatedAt
-  galaxias           Galaxia        @relation(fields: [id], references: [id])
-  cursos             Curso[]
+  id          String  @id @default(auto()) @map("_id") @db.ObjectId
+  nombre      String  @unique
+  descripcion String
+  imagen      String
+  estado     EstadoGenerico  @default(ACTIVO)
+  fechaCreacion  DateTime @default(now())
+  fechaActualizacion  DateTime  @updatedAt
+  galaxiaId          String       @db.ObjectId
+  galaxia            Galaxia       @relation(fields: [galaxiaId], references: [id])
+  cursos      Curso[]
 }
 
 model Curso {
@@ -143,5 +144,5 @@ model Galaxia {
   estado             EstadoGenerico @default(ACTIVO)
   fechaCreacion      DateTime       @default(now())
   fechaActualizacion DateTime       @updatedAt
-  Planeta            Planeta[]
+  planetas           Planeta[]
 }
