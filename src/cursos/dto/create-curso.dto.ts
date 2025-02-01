@@ -44,7 +44,7 @@ export class CreateCursoDto {
   @IsDefined()
   precio: number;
 
-  @ApiProperty({example: 'ACTIVO'})
+  @ApiProperty({example: 'ACTIVO', enum: EstadoGenerico})
   @IsString()
   @IsEnum(EstadoGenerico, {
     message:
@@ -74,14 +74,14 @@ export class CreateCursoDto {
   @Transform(({ value }) => ( typeof value == 'string' ? value.trim(): value))
   categoriaId: string;
   
-  @ApiProperty({example: '670aa5b834951486809e8fa2'})
+  @ApiProperty({example: '670aa5b834951486809e8fa2', required: false})
   @IsString()
   @IsOptional()
   @IsMongoId()
   @Transform(({ value }) => ( typeof value == 'string' ? value.trim(): value))
   profesorId: string;
 
-  @ApiProperty({example: '670aa5b834951486809e8fa3'})
+  @ApiProperty({example: '670aa5b834951486809e8fa3', required: false})
   @IsString()
   @IsOptional()
   @Transform(({ value }) => ( typeof value == 'string' ? value.trim(): value))
