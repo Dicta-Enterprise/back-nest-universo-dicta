@@ -4,6 +4,7 @@ import { CustomError } from 'src/shared/class/Error.Class';
 import { GenericArray, GenericSingle } from 'src/shared/class/Generic.Class';
 import { PrismaClient } from '@prisma/client';
 import { UpdateLandingPageDto } from './dto/update-landing-page';
+import { verificarExistenciaPlaneta, verificarPlanetaNoAsignado, verificarTituloUnico } from './validations/landing-page.validation';
 
 @Injectable()
 export class LandingPageService extends PrismaClient implements OnModuleInit {
@@ -15,55 +16,8 @@ export class LandingPageService extends PrismaClient implements OnModuleInit {
     super();
   }
 
-  private async verificarExistenciaPlaneta(planetaId: string): Promise<void> {
-    const planeta = await this.planeta.findUnique({ where: { id: planetaId } });
-
-    if (!planeta) {
-      throw new CustomError(
-        `El planeta con ID ${planetaId} no existe`,
-        'Conflict',
-        HttpStatus.BAD_REQUEST
-      )
-    }
-  }
-
-  private async verificarPlanetaNoAsignado(planetaId: string, excludeLandingId?: string): Promise<void> {
-    const existingLanding = await this.landingPage.findFirst({
-      where: {
-        planetaId,
-        id: excludeLandingId ? { not: excludeLandingId } : undefined
-      },
-    });
-
-    if (existingLanding) {
-      throw new CustomError(
-        `El planeta con ID ${planetaId} ya esta asignado a otra landing page`,
-        'Conflict',
-        HttpStatus.CONFLICT
-      );
-    }
-  }
-
-  private async verificarTituloUnico(titulo: string): Promise<void> {
-    const existingLanding = await this.landingPage.findUnique({ where: { titulo } });
-
-    if (existingLanding) {
-      throw new CustomError(
-        'Ya existe una Landing Page con ese titulo',
-        'Conflict',
-        HttpStatus.CONFLICT
-      );
-    }
-  }
-
   async create(createLandingPageDto: CreateLandingPageDto) {
     try {
-      const { planetaId, titulo } = createLandingPageDto;
-
-      await this.verificarExistenciaPlaneta(planetaId);
-      await this.verificarPlanetaNoAsignado(planetaId);
-      await this.verificarTituloUnico(titulo);
-
       // Crear una nueva Landing Page
       const landingPage = await this.landingPage.create({
         data: {
@@ -74,9 +28,6 @@ export class LandingPageService extends PrismaClient implements OnModuleInit {
       return new GenericSingle(landingPage, HttpStatus.CREATED, 'Landing Page creada exitosamente');
 
     } catch (error) {
-      if (error instanceof CustomError) {
-        return error;
-      }
       throw new CustomError(
         'Error al crear la Landing Page',
         error.message,
@@ -84,6 +35,7 @@ export class LandingPageService extends PrismaClient implements OnModuleInit {
       );
     }
   }
+
 
   async findAll() {
     try {
@@ -150,11 +102,11 @@ export class LandingPageService extends PrismaClient implements OnModuleInit {
       }
 
       if (planetaId && planetaId !== existingLanding.planetaId) {
-        await this.verificarExistenciaPlaneta(planetaId);
-        await this.verificarPlanetaNoAsignado(planetaId, id);
+        await verificarExistenciaPlaneta(planetaId);
+        await verificarPlanetaNoAsignado(planetaId, id);
       }
       if (titulo && titulo !== existingLanding.titulo) {
-        await this.verificarTituloUnico(titulo);
+        await verificarTituloUnico(titulo);
       }
 
       // Actualizar

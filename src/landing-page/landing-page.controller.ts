@@ -1,9 +1,10 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, UsePipes } from '@nestjs/common';
 import { LandingPageService } from './landing-page.service';
 import { CreateLandingPageDto } from './dto/create-landing-page.dto';
 import { ParseObjectIdPipe } from 'src/shared/pipes/parse-object-id.pipe';
 import { UpdateLandingPageDto } from './dto/update-landing-page';
 import { ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { LandingPageValidationPipe } from './pipes/landing-page-validation.pipe';
 
 @ApiTags('landing-page')
 @Controller('landing-page')
@@ -14,6 +15,7 @@ export class LandingPageController {
     ) { }
 
     @Post()
+    @UsePipes(LandingPageValidationPipe)
     @ApiOperation({ summary: 'Crea una nueva Landing Page' })
     @ApiBody({ type: CreateLandingPageDto })
     @ApiResponse({ status: 201, description: 'Landing Page creada exitosamente' })
