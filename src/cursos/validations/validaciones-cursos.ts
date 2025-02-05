@@ -1,21 +1,8 @@
-import { BadRequestException, ConflictException, Injectable, NotFoundException, PipeTransform } from '@nestjs/common';
-import { PrismaClient } from '@prisma/client';
-import { CreateCursoDto } from 'src/cursos/dto/create-curso.dto';
-import { UpdateCursoDto } from 'src/cursos/dto/update-curso.dto';
+import { BadRequestException, ConflictException, NotFoundException } from "@nestjs/common";
+import { CreateCursoDto } from "../dto/create-curso.dto";
+import { UpdateCursoDto } from "../dto/update-curso.dto";
 
-@Injectable()
-export class ValidacionesCursosPipe extends PrismaClient implements PipeTransform  {
-  
-  async transform(value: CreateCursoDto | UpdateCursoDto) {
-
-    await this.validarExistenciaRelacionados(value, this.categoria, this.planeta);
-    await this.validarRangoFechas(value.fechaInicio, value.fechaFinalizacion);
-    await this.verificarExistenciaCurso(value, this.curso);
-
-    return value;
-  }
-
-  private async validarExistenciaRelacionados(createCursoDto: CreateCursoDto | UpdateCursoDto, categoria: any, planeta: any) {
+export async function validarExistenciaRelacionados(createCursoDto: CreateCursoDto | UpdateCursoDto, categoria: any, planeta: any) {
     const relaciones = [
       { model: categoria, id: createCursoDto.categoriaId, message: 'La Categoría proporcionada no existe' },
       { model: planeta, id: createCursoDto.planetaId, message: 'El Planeta proporcionado no existe' },
@@ -33,15 +20,15 @@ export class ValidacionesCursosPipe extends PrismaClient implements PipeTransfor
         throw new NotFoundException(message);
       }
     }
-  }
+}
 
-  private async validarRangoFechas(fechaInicio: Date, fechaFinalizacion: Date) {
+export async function validarRangoFechas(fechaInicio: Date, fechaFinalizacion: Date) {
     if (fechaFinalizacion < fechaInicio) {
       throw new BadRequestException('La fecha de finalización debe ser posterior a la fecha de inicio');
     }
-  }
+}
 
-  private async verificarExistenciaCurso(parametros: any, curso: any) {
+export async function verificarExistenciaCurso(parametros: any, curso: any) {
     const { id, nombre, estado } = parametros;
 
     const cursofind = await curso.findFirst({
@@ -66,8 +53,4 @@ export class ValidacionesCursosPipe extends PrismaClient implements PipeTransfor
         throw new ConflictException(`El Curso con este nombre (${cursoNombre.nombre}) ya existe. ID: ${cursoNombre.id}`);
       }
     }
-  }
 }
-
-
-

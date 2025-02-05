@@ -5,7 +5,7 @@ import { UpdateCursoDto } from './dto/update-curso.dto';
 import { ParseObjectIdPipe } from 'src/shared/pipes/parse-object-id.pipe';
 import { ApiResponse, ApiParam, ApiCreatedResponse, ApiBadRequestResponse, ApiConflictResponse, ApiOperation, ApiOkResponse, getSchemaPath } from '@nestjs/swagger';
 import { Curso } from './entities/curso.entity';
-import { ValidacionesCursosPipe } from './pipes/validaciones-cursos/validaciones-cursos.pipe';
+import { ValidacionesCursosPipe } from './pipes/validaciones-cursos.pipe';
 
 @Controller('cursos')
 export class CursosController {
