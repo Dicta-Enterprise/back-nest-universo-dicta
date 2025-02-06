@@ -1,10 +1,11 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, UsePipes } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
 import { LandingPageService } from './landing-page.service';
 import { CreateLandingPageDto } from './dto/create-landing-page.dto';
 import { ParseObjectIdPipe } from 'src/shared/pipes/parse-object-id.pipe';
 import { UpdateLandingPageDto } from './dto/update-landing-page';
 import { ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { LandingPageValidationPipe } from './pipes/landing-page-validation.pipe';
+import { ValidateLandingPage } from './shared/decorators/validate-landing.decorator';
+import { IsLandingPageExist } from './shared/decorators/is-landing-page-exist.decorator';
 
 @ApiTags('landing-page')
 @Controller('landing-page')
@@ -15,12 +16,11 @@ export class LandingPageController {
     ) { }
 
     @Post()
-    @UsePipes(LandingPageValidationPipe)
     @ApiOperation({ summary: 'Crea una nueva Landing Page' })
     @ApiBody({ type: CreateLandingPageDto })
     @ApiResponse({ status: 201, description: 'Landing Page creada exitosamente' })
     @ApiResponse({ status: 400, description: 'Datos inválidos' })
-    create(@Body() createLandingPageDto: CreateLandingPageDto) {
+    create(@Body() @ValidateLandingPage() createLandingPageDto: CreateLandingPageDto) {
         return this.landingPageService.create(createLandingPageDto);
     }
 
@@ -37,7 +37,7 @@ export class LandingPageController {
     @ApiParam({ name: 'id', example: '67979fcc88b3cb84a5cebf74', description: 'ID de la Landing Page' })
     @ApiResponse({ status: 200, description: 'Landing Page encontrada' })
     @ApiResponse({ status: 404, description: 'No se encontró la Landing Page con el ID proporcionado' })
-    findOne(@Param('id', ParseObjectIdPipe) id: string) {
+    findOne(@Param('id', ParseObjectIdPipe) id: string, @IsLandingPageExist() validated: any) {
         return this.landingPageService.findOne(id);
     }
 
@@ -49,7 +49,8 @@ export class LandingPageController {
     @ApiResponse({ status: 404, description: 'No se encontró la Landing Page con el ID proporcionado' })
     update(
         @Param('id', ParseObjectIdPipe) id: string,
-        @Body() updateLandingPageDto: UpdateLandingPageDto,
+        @Body() @ValidateLandingPage() updateLandingPageDto: UpdateLandingPageDto,
+        @IsLandingPageExist() validated: any
     ) {
         return this.landingPageService.update(id, updateLandingPageDto)
     }
@@ -59,7 +60,7 @@ export class LandingPageController {
     @ApiParam({ name: 'id', example: '67979fcc88b3cb84a5cebf74', description: 'ID de la Landing Page' })
     @ApiResponse({ status: 200, description: 'Landing Page eliminada correctamente' })
     @ApiResponse({ status: 404, description: 'No se encontró la Landing Page con el ID proporcionado' })
-    remove(@Param('id', ParseObjectIdPipe) id: string) {
+    remove(@Param('id', ParseObjectIdPipe) id: string, @IsLandingPageExist() validated: any) {
         return this.landingPageService.remove(id);
     }
 }

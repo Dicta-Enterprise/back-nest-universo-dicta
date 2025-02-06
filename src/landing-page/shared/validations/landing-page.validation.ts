@@ -45,3 +45,15 @@ export async function verificarTituloUnico(titulo: string): Promise<void> {
     }
 }
 
+export async function ExistenciaLandingPage(id: string): Promise<void> {
+    const existingLanding = await prisma.landingPage.findUnique({ where: { id } });
+
+    if (!existingLanding) {
+        throw new CustomError(
+            `No se encontró la landing page con el ID: "${id}".`,
+            'Not Found',
+            HttpStatus.NOT_FOUND
+        );
+    }
+}
+

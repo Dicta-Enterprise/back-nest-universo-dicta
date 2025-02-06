@@ -4,7 +4,6 @@ import { CustomError } from 'src/shared/class/Error.Class';
 import { GenericArray, GenericSingle } from 'src/shared/class/Generic.Class';
 import { PrismaClient } from '@prisma/client';
 import { UpdateLandingPageDto } from './dto/update-landing-page';
-import { verificarExistenciaPlaneta, verificarPlanetaNoAsignado, verificarTituloUnico } from './validations/landing-page.validation';
 
 @Injectable()
 export class LandingPageService extends PrismaClient implements OnModuleInit {
@@ -70,13 +69,6 @@ export class LandingPageService extends PrismaClient implements OnModuleInit {
         },
       });
 
-      if (!landingPage) {
-        return new CustomError(
-          `No se encontró la landing page con el ID: "${id}".`,
-          'Not Found',
-          HttpStatus.NOT_FOUND,
-        );
-      }
       return new GenericSingle(landingPage, HttpStatus.OK, 'Landing Page encontrada')
 
     } catch (error) {
@@ -90,26 +82,7 @@ export class LandingPageService extends PrismaClient implements OnModuleInit {
 
   async update(id: string, updateLandingPageDto: UpdateLandingPageDto) {
     try {
-      const { planetaId, titulo } = updateLandingPageDto;
-      const existingLanding = await this.landingPage.findUnique({ where: { id }, });
 
-      if (!existingLanding) {
-        return new CustomError(
-          `No se encontró la landing page con el ID: "${id}".`,
-          'Not Found',
-          HttpStatus.NOT_FOUND
-        );
-      }
-
-      if (planetaId && planetaId !== existingLanding.planetaId) {
-        await verificarExistenciaPlaneta(planetaId);
-        await verificarPlanetaNoAsignado(planetaId, id);
-      }
-      if (titulo && titulo !== existingLanding.titulo) {
-        await verificarTituloUnico(titulo);
-      }
-
-      // Actualizar
       const landingPage = await this.landingPage.update({
         where: { id: id },
         data: updateLandingPageDto,
@@ -117,9 +90,6 @@ export class LandingPageService extends PrismaClient implements OnModuleInit {
       return new GenericSingle(landingPage, HttpStatus.OK, 'Landing page actualizada');
 
     } catch (error) {
-      if (error instanceof CustomError) {
-        return error;
-      }
       throw new CustomError(
         'Error al actualizar la Landing Page',
         error.message,
@@ -130,15 +100,6 @@ export class LandingPageService extends PrismaClient implements OnModuleInit {
 
   async remove(id: string) {
     try {
-      const existingLanding = await this.landingPage.findUnique({ where: { id }, });
-
-      if (!existingLanding) {
-        return new CustomError(
-          `No se encontró la landing page con el ID: "${id}".`,
-          'Not Found',
-          HttpStatus.NOT_FOUND
-        );
-      }
       const landingPage = await this.landingPage.update({
         where: { id: id, },
         data: { estado: 'INACTIVO' },
