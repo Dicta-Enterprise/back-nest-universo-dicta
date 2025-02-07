@@ -22,12 +22,6 @@ export async function validarExistenciaRelacionados(createCursoDto: CreateCursoD
     }
 }
 
-export async function validarRangoFechas(fechaInicio: Date, fechaFinalizacion: Date) {
-    if (fechaFinalizacion < fechaInicio) {
-      throw new BadRequestException('La fecha de finalización debe ser posterior a la fecha de inicio');
-    }
-}
-
 export async function verificarExistenciaCurso(parametros: any, curso: any) {
     const { id, nombre, estado } = parametros;
 

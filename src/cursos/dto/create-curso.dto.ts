@@ -3,8 +3,10 @@ import { EstadoGenerico } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
 import { 
   IsDate, IsDefined, IsEnum, IsMongoId, IsNotEmpty, IsNumber, IsOptional, IsPositive, IsString, 
-  IsUrl, 
+  IsUrl,
+  MinDate,
 } from 'class-validator';
+import { IsFechaValida } from '../decorator/IsFechaValida.decorator';
 
 export class CreateCursoDto {
 
@@ -20,16 +22,19 @@ export class CreateCursoDto {
   @Transform(({ value }) => ( typeof value == 'string' ? value.trim(): value))
   descripcion: string;
 
-  @ApiProperty({example: '2021-09-01T00:00:00.000Z'})
+  @ApiProperty({example: new Date()})
   @IsDate()
   @IsNotEmpty()
   @Type(() => Date)
+  @MinDate(new Date())
   fechaInicio: Date;
 
-  @ApiProperty({example: '2021-11-01T00:00:00.000Z'})
+  @ApiProperty({example: new Date()})
   @IsDate()
   @IsNotEmpty()
   @Type(() => Date)
+  @MinDate(new Date())
+  @IsFechaValida()
   fechaFinalizacion: Date;
 
   @ApiProperty({example: 20})
