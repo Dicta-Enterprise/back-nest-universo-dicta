@@ -11,46 +11,46 @@ import { IsFechaValida } from '../decorator/IsFechaValida.decorator';
 export class CreateCursoDto {
 
   @ApiProperty({ example: 'Curso para ...' })
-  @IsString()
-  @IsNotEmpty()
+  @IsString({ message: 'El nombre del curso debe ser un texto' })
+  @IsNotEmpty({ message: 'El nombre del curso no puede estar vacío' })
   @Transform(({ value }) => ( typeof value == 'string' ? value.trim(): value))
   nombre: string;
 
   @ApiProperty({example: 'Un curso diseñado para ...'})
-  @IsString()
-  @IsNotEmpty()
+  @IsString({ message: 'La descripción debe ser un texto' })
+  @IsNotEmpty({ message: 'La descripción no puede estar vacía' })
   @Transform(({ value }) => ( typeof value == 'string' ? value.trim(): value))
   descripcion: string;
 
   @ApiProperty({example: new Date()})
-  @IsDate()
-  @IsNotEmpty()
+  @IsDate({ message: 'La fecha de inicio debe ser una fecha válida' })
+  @IsNotEmpty({ message: 'La fecha de inicio no puede estar vacía' })
   @Type(() => Date)
-  @MinDate(new Date())
+  @MinDate(new Date(), { message: 'La fecha de inicio No debe ser posterior a la fecha actual' })
   fechaInicio: Date;
 
   @ApiProperty({example: new Date()})
-  @IsDate()
-  @IsNotEmpty()
+  @IsDate({ message: 'La fecha de finalización debe ser una fecha válida' })
+  @IsNotEmpty({ message: 'La fecha de finalización no puede estar vacía' })
   @Type(() => Date)
-  @MinDate(new Date())
-  @IsFechaValida()
+  @MinDate(new Date(),{ message: 'La fecha de finalización No debe ser posterior a la fecha actual' })
+  @IsFechaValida({ message: 'La fecha de finalización debe ser posterior a la fecha de inicio' })
   fechaFinalizacion: Date;
 
   @ApiProperty({example: 20})
-  @IsNumber()
-  @IsDefined()
-  @IsPositive()
+  @IsNumber({}, { message: 'La cantidad de alumnos debe ser un número' })
+  @IsDefined({ message: 'La cantidad de alumnos es requerida' })
+  @IsPositive({ message: 'La cantidad de alumnos debe ser un número positivo' })
   cantidadAlumnos: number;
 
   @ApiProperty({example: 1000})
-  @IsNumber()
-  @IsPositive()
-  @IsDefined()
+  @IsNumber({}, { message: 'El precio debe ser un número' })
+  @IsPositive({ message: 'El precio debe ser un número positivo' })
+  @IsDefined({ message: 'El precio es requerido' })
   precio: number;
 
   @ApiProperty({example: 'ACTIVO', enum: EstadoGenerico})
-  @IsString()
+  @IsString({ message: 'El estado debe ser un texto' })
   @IsEnum(EstadoGenerico, {
     message:
       'El estado proporcionado no es válido. Valores permitidos: ACTIVO, INACTIVO, PENDIENTE, ELIMINADO, DESHABILITADO.',
@@ -58,19 +58,19 @@ export class CreateCursoDto {
   estado: EstadoGenerico;
 
   @ApiProperty({example: 'https://example.com/curso-imagen2.jpg'})
-  @IsUrl()
+  @IsUrl({}, { message: 'La URL de la imagen debe ser válida' })
   @Transform(({ value }) => ( typeof value == 'string' ? value.trim(): value))
   imagen: string;
 
   @ApiProperty({example: 'https://example.com/curso-video.mp4'})
-  @IsUrl()
+  @IsUrl({}, { message: 'La URL del video debe ser válida' })
   @Transform(({ value }) => ( typeof value == 'string' ? value.trim(): value))
   video: string;
 
   @ApiProperty({example: 40})
-  @IsNumber()
-  @IsPositive()
-  @IsDefined()
+  @IsNumber({}, { message: 'La duración debe ser un número' })
+  @IsPositive({ message: 'La duración debe ser un número positivo' })
+  @IsDefined({ message: 'La duración es requerida' })
   duracion: number;
 
   @ApiProperty({example: '670aa5b834951486809e8fa1'})
