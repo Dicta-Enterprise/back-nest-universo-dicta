@@ -3,7 +3,7 @@ import { CreateCursoDto } from './dto/create-curso.dto';
 import { UpdateCursoDto } from './dto/update-curso.dto';
 import { PrismaClient } from '@prisma/client';
 import { CustomError } from 'src/shared/class/Error.Class';
-import { GenericSingle } from 'src/shared/class/Generic.Class';
+import { GenericArray, GenericSingle } from 'src/shared/class/Generic.Class';
 
 @Injectable()
 export class CursosService extends PrismaClient implements OnModuleInit {
@@ -21,13 +21,19 @@ export class CursosService extends PrismaClient implements OnModuleInit {
   async create(createCursoDto: CreateCursoDto) {
     try {
 
-      return await this.curso.create({
+      const curso = await this.curso.create({
         data: {
           ...createCursoDto,
           categoriaId: createCursoDto.categoriaId,
           planetaId: createCursoDto.planetaId,
         },
       });
+
+      return new GenericSingle(
+        curso,
+        HttpStatus.CREATED,
+        'Curso creado',
+      );
 
     } catch (error) {
       throw new CustomError(
@@ -50,9 +56,13 @@ export class CursosService extends PrismaClient implements OnModuleInit {
           'Not Found',
           HttpStatus.NOT_FOUND,
         );
-      }
+      };
 
-      return cursos;
+      return new GenericArray(
+        cursos,
+        HttpStatus.OK,
+        'Cursos encontrados',
+      );
 
     } catch (error) {
       throw new CustomError(
@@ -81,7 +91,11 @@ export class CursosService extends PrismaClient implements OnModuleInit {
         );
       }
   
-      return curso;
+      return new GenericSingle(
+        curso,
+        HttpStatus.OK,
+        'Curso encontrado',
+      );
 
     } catch (error) {
       throw new CustomError(

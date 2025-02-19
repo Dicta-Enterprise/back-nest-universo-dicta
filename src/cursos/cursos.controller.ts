@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpStatus, NotFoundException, UsePipes } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpStatus, NotFoundException, UsePipes, Put } from '@nestjs/common';
 import { CursosService } from './cursos.service';
 import { CreateCursoDto } from './dto/create-curso.dto';
 import { UpdateCursoDto } from './dto/update-curso.dto';
@@ -47,7 +47,7 @@ export class CursosController {
     return this.cursosService.findOne(id);
   }
 
-  @Patch(':id')
+  @Put(':id')
   @ApiOperation({summary: 'Actualizar Curso por ID'})
   @ApiParam({ name: 'id', required: true, example: '67951f48ac0dee7220ed8462', description: 'El ID del Curso' })
   @ApiResponse({status: 200, description: 'Curso actualizado', type: UpdateCursoDto})
