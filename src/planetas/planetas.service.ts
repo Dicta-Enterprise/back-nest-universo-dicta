@@ -31,7 +31,7 @@ export class PlanetasService extends PrismaClient implements OnModuleInit {
   private async verificarGalaxiaSinAsignar(galaxiaId: string, excludeplanetaId?: string): Promise<void>{
     const existingPlaneta = await this.planeta.findFirst({
       where :{
-        galaxia: { id: galaxiaId },
+        galaxiaId,
         id: excludeplanetaId ? { not: excludeplanetaId } : undefined
       },
     });
