@@ -12,3 +12,4 @@ export class UpdateMenuDto extends PartialType(CreateMenuDto) {
       })
     estado: EstadoGenerico;
 }
+

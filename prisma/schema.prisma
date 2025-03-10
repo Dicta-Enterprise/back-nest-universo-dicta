@@ -89,7 +89,9 @@ model Planeta {
   estado     EstadoGenerico  @default(ACTIVO)
   fechaCreacion  DateTime @default(now())
   fechaActualizacion  DateTime  @updatedAt
-  galaxiaId          String       @db.ObjectId @unique
+  galaxiaId          String       @db.ObjectId 
+  galaxia        Galaxia    @relation(fields: [galaxiaId], references: [id]) 
+
   cursos      Curso[]
 }
 

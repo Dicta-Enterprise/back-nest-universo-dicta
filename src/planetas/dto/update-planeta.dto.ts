@@ -7,3 +7,4 @@ export class UpdatePlanetaDto extends PartialType(CreatePlanetaDto) {
   @IsMongoId({ message: 'El ID de la galaxia debe ser un ObjectId válido.' })
   galaxiaId?: string; // <- Agregado aquí y marcado como opcional
 }
+

@@ -26,7 +26,6 @@
     "@nestjs/mapped-types": "*",
     "@nestjs/mongoose": "^10.0.10",
     "@nestjs/platform-express": "^10.0.0",
-    "@prisma/client": "^6.3.0",
     "@nestjs/swagger": "^8.1.1",
     "@prisma/client": "^5.20.0",
     "class-transformer": "^0.5.1",
