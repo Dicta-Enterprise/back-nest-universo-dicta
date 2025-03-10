@@ -4,10 +4,7 @@ import { UpdatePlanetaDto } from './dto/update-planeta.dto';
 import { PrismaClient } from '@prisma/client';
 import { CustomError } from 'src/shared/class/Error.Class';
 import { GenericArray, GenericSingle } from '../shared/class/Generic.Class';
-
-
-
-
+import { verificarExistenciaGalaxia, verificarGalaxiaSinAsignar, verificarNombreUnico, verificarExistenciaPlaneta, verificarPlanetaActivo } from './validations/planeta-business-validations';
 
 @Injectable()
 export class PlanetasService extends PrismaClient implements OnModuleInit {
@@ -17,59 +14,22 @@ export class PlanetasService extends PrismaClient implements OnModuleInit {
   constructor(){
     super();
   }
-  private async veirificarExistenciaGalaxia(galaxiaId: string):Promise<void>{
-    const galaxia = await this.galaxia.findUnique({where:{id:galaxiaId}});
-    if(!galaxia){
-      throw new CustomError(
-        'La id de galaxia que esta colocando no existe',
-        'Conflict',
-        HttpStatus.BAD_REQUEST
-      )
-    }
-  }
 
-  private async verificarGalaxiaSinAsignar(galaxiaId: string, excludeplanetaId?: string): Promise<void>{
-    const existingPlaneta = await this.planeta.findFirst({
-      where :{
-        galaxiaId,
-        id: excludeplanetaId ? { not: excludeplanetaId } : undefined
-      },
-    });
-    if(existingPlaneta){
-      throw new CustomError(
-        `El planeta con ID ${galaxiaId} ya esta asignado a otra landing page`,
-        'Conflict',
-        HttpStatus.CONFLICT
-      )
-    }
-  }
-  private async verificarNombreUnico(nombre: string): Promise<void> {
-    const existingPlaneta = await this.planeta.findUnique({ where: { nombre } });
-
-    if (existingPlaneta) {
-      throw new CustomError(
-        'Ya existe un planeta con ese nombre',
-        'Conflict',
-        HttpStatus.CONFLICT
-      );
-    }
-  }
   async create(CreatePlanetaDto: CreatePlanetaDto) {
     try {
       const { galaxiaId, nombre } = CreatePlanetaDto;
 
-      await this.veirificarExistenciaGalaxia(galaxiaId);
-      await this.verificarGalaxiaSinAsignar(galaxiaId);
-      await this.verificarNombreUnico(nombre);
+      await verificarExistenciaGalaxia(galaxiaId);
+      await verificarGalaxiaSinAsignar(galaxiaId);
+      await verificarNombreUnico(nombre);
 
-      // Crear una nueva Landing Page
       const planeta = await this.planeta.create({
         data: {
           ...CreatePlanetaDto,
-          galaxiaId: CreatePlanetaDto.galaxiaId, // Guardar directamente
+          galaxiaId: CreatePlanetaDto.galaxiaId,
         },
       });
-      return new GenericSingle(planeta, HttpStatus.CREATED, 'planeta creado de forma exitosa');
+      return new GenericSingle(planeta, HttpStatus.CREATED, 'Planeta creado de forma exitosa');
 
     } catch (error) {
       if (error instanceof CustomError) {
@@ -91,12 +51,12 @@ export class PlanetasService extends PrismaClient implements OnModuleInit {
 
       if (!planeta) {
         throw new CustomError(
-          'No se encontraron Landing Pages',
+          'No se encontraron planetas',
           'Not Found',
           HttpStatus.NOT_FOUND,
         );
       }
-      return new GenericArray(planeta, HttpStatus.OK, 'planetas no encontrados')
+      return new GenericArray(planeta, HttpStatus.OK, 'Planetas encontrados');
 
     } catch (error) {
       throw new CustomError(
@@ -109,6 +69,9 @@ export class PlanetasService extends PrismaClient implements OnModuleInit {
 
   async findOne(id: string) {
     try {
+      await verificarExistenciaPlaneta(id);
+      await verificarPlanetaActivo(id);
+      
       const planeta = await this.planeta.findUnique({
         where: {
           id: id,
@@ -116,14 +79,7 @@ export class PlanetasService extends PrismaClient implements OnModuleInit {
         },
       });
 
-      if (!planeta) {
-        return new CustomError(
-          `No se encontro el planeta selccionado".`,
-          'Not Found',
-          HttpStatus.NOT_FOUND,
-        );
-      }
-      return new GenericSingle(planeta, HttpStatus.OK, 'Planeta encontrado')
+      return new GenericSingle(planeta, HttpStatus.OK, 'Planeta encontrado');
 
     } catch (error) {
       throw new CustomError(
@@ -136,26 +92,19 @@ export class PlanetasService extends PrismaClient implements OnModuleInit {
 
   async update(id: string, UpdatePlanetaDto: UpdatePlanetaDto) {
     try {
+      await verificarExistenciaPlaneta(id);
+      await verificarPlanetaActivo(id);
+
       const { galaxiaId, nombre } = UpdatePlanetaDto;
-      const existingPlaneta = await this.planeta.findUnique({ where: { id }, });
-
-      if (!existingPlaneta) {
-        return new CustomError(
-          `No se encontró el planeta seleccionado`,
-          'Not Found',
-          HttpStatus.NOT_FOUND
-        );
+      
+      if (galaxiaId) {
+        await verificarExistenciaGalaxia(galaxiaId);
+        await verificarGalaxiaSinAsignar(galaxiaId, id);
+      }
+      if (nombre) {
+        await verificarNombreUnico(nombre);
       }
 
-      if (galaxiaId && galaxiaId !== existingPlaneta.galaxiaId) {
-        await this.veirificarExistenciaGalaxia(galaxiaId);
-        await this.verificarGalaxiaSinAsignar(galaxiaId, id);
-      }
-      if (nombre && nombre !== existingPlaneta.nombre) {
-        await this.verificarNombreUnico(nombre);
-      }
-
-      // Actualizar
       const planeta = await this.planeta.update({
         where: { id: id },
         data: UpdatePlanetaDto,
@@ -174,23 +123,16 @@ export class PlanetasService extends PrismaClient implements OnModuleInit {
     }
   }
 
-
   async remove(id: string) {
     try {
-      const existingPlaneta = await this.planeta.findUnique({ where: { id }, });
+      await verificarExistenciaPlaneta(id);
+      await verificarPlanetaActivo(id);
 
-      if (!existingPlaneta) {
-        return new CustomError(
-          `No se encontró el planeta seleccionado".`,
-          'Not Found',
-          HttpStatus.NOT_FOUND
-        );
-      }
       const planeta = await this.planeta.update({
         where: { id: id, },
         data: { estado: 'INACTIVO' },
       });
-      return new GenericSingle(planeta, HttpStatus.OK, 'planeta eliminado');
+      return new GenericSingle(planeta, HttpStatus.OK, 'Planeta eliminado');
 
     } catch (error) {
       throw new CustomError(
@@ -200,5 +142,4 @@ export class PlanetasService extends PrismaClient implements OnModuleInit {
       );
     }
   }
-
 }
