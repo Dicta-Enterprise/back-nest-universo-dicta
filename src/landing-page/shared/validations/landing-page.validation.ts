@@ -33,8 +33,13 @@ export async function verificarPlanetaNoAsignado(planetaId: string, excludeLandi
     }
 }
 
-export async function verificarTituloUnico(titulo: string): Promise<void> {
-    const existingLanding = await prisma.landingPage.findUnique({ where: { titulo } });
+export async function verificarTituloUnico(titulo: string, excludeLandingId?: string): Promise<void> {
+    const existingLanding = await prisma.landingPage.findFirst({
+        where: {
+            titulo,
+            id: excludeLandingId ? { not: excludeLandingId } : undefined,
+        }
+    });
 
     if (existingLanding) {
         throw new CustomError(

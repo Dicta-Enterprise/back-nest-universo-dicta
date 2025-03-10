@@ -16,7 +16,7 @@ export const ValidateLandingPage = createParamDecorator(
       }
 
       if (titulo) {
-        await verificarTituloUnico(titulo);
+        await verificarTituloUnico(titulo,id);
       }
 
       return body; 
