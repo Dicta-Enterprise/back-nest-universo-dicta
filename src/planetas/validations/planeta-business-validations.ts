@@ -19,20 +19,26 @@ export async function verificarGalaxiaSinAsignar(galaxiaId: string, excludeplane
   const existingPlaneta = await prisma.planeta.findFirst({
     where: {
       galaxiaId,
+      estado: 'ACTIVO',
       id: excludeplanetaId ? { not: excludeplanetaId } : undefined,
     },
   });
   if (existingPlaneta) {
     throw new CustomError(
-      `El planeta con ID ${galaxiaId} ya está asignado a otra landing page`,
+      `La galaxia con ID ${galaxiaId} ya tiene un planeta asignado`,
       'Conflict',
       HttpStatus.CONFLICT
     );
   }
 }
 
-export async function verificarNombreUnico(nombre: string): Promise<void> {
-  const existingPlaneta = await prisma.planeta.findUnique({ where: { nombre } });
+export async function verificarNombreUnico(nombre: string, excludeplanetaId?: string): Promise<void> {
+  const existingPlaneta = await prisma.planeta.findFirst({
+    where: {
+      nombre,
+      id: excludeplanetaId ? { not: excludeplanetaId } : undefined,
+    },
+  });
 
   if (existingPlaneta) {
     throw new CustomError(

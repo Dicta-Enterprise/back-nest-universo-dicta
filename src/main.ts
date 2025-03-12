@@ -18,22 +18,23 @@ async function bootstrap() {
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
-      forbidNonWhitelisted: true,
     }),
   );
 
   const config = new DocumentBuilder()
     .setTitle('API Universo Dicta')
-    .setDescription('API de la aplicacion de universo dicta')
+    .setDescription('API de la aplicación Universo Dicta')
     .setVersion('1.0')
-    // .addBearerAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
-  await app.listen(envs.port);
+  SwaggerModule.setup('api/docs', app, document); 
 
-  logger.log(`api corriendo en el puerto ${envs.port}`);
-  logger.log(`api corriendo en la bd ${envs.databaseUrl}`);
+  const port = envs.port || 3000; 
+
+  await app.listen(port);
+
+  logger.log(`API corriendo en el puerto ${port}`);
+  logger.log(`Conectado a la base de datos: ${envs.databaseUrl}`);
 }
 bootstrap();
