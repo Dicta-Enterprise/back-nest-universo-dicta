@@ -20,13 +20,14 @@ export async function verificarPlanetaNoAsignado(planetaId: string, excludeLandi
     const existingLanding = await prisma.landingPage.findFirst({
         where: {
             planetaId,
-            id: excludeLandingId ? { not: excludeLandingId } : undefined
+            id: excludeLandingId ? { not: excludeLandingId } : undefined,
+            estado: { not: "INACTIVO" } // Considera solo landings activas
         },
     });
 
     if (existingLanding) {
         throw new CustomError(
-            `El planeta con ID ${planetaId} ya esta asignado a otra landing page`,
+            `El planeta con ID ${planetaId} ya está asignado a otra landing page activa`,
             'Conflict',
             HttpStatus.CONFLICT
         );
@@ -61,4 +62,3 @@ export async function ExistenciaLandingPage(id: string): Promise<void> {
         );
     }
 }
-
