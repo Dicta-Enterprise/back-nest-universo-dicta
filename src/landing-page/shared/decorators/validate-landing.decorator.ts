@@ -7,7 +7,7 @@ export const ValidateLandingPage = createParamDecorator(
     const request = ctx.switchToHttp().getRequest();
     const body = request.body;
     const { planetaId, titulo } = body;
-    const id = request.params.id; 
+    const id = request.params.id;
 
     try {
       if (planetaId) {
@@ -16,10 +16,10 @@ export const ValidateLandingPage = createParamDecorator(
       }
 
       if (titulo) {
-        await verificarTituloUnico(titulo,id);
+        await verificarTituloUnico(titulo, id);
       }
 
-      return body; 
+      return body;
     } catch (error) {
       if (error instanceof CustomError) {
         throw new HttpException(

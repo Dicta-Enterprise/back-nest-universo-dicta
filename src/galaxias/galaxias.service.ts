@@ -17,20 +17,6 @@ export class GalaxiasService extends PrismaClient implements OnModuleInit {
 
   async create(createGalaxiaDto: CreateGalaxiaDto) {
     try {
-      const oneGalaxia = await this.galaxia.findUnique({
-        where: {
-          nombre: createGalaxiaDto.nombre,
-        },
-      });
-
-      if (oneGalaxia) {
-        return new CustomError(
-          'Ya existe una galaxia con ese nombre',
-          'Conflict',
-          HttpStatus.BAD_REQUEST,
-        );
-      }
-
       const galaxia = await this.galaxia.create({
         data: createGalaxiaDto,
       });
@@ -38,7 +24,7 @@ export class GalaxiasService extends PrismaClient implements OnModuleInit {
       return new GenericSingle(galaxia, HttpStatus.CREATED, 'Galaxia creada');
     } catch (error) {
       throw new CustomError(
-        'Error',
+        'Error al crear la galaxia',
         error.message,
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
@@ -64,7 +50,7 @@ export class GalaxiasService extends PrismaClient implements OnModuleInit {
       return new GenericArray(galaxias, HttpStatus.OK, 'Galaxias encontradas');
     } catch (error) {
       throw new CustomError(
-        'Error',
+        'Error al obtener las galaxias',
         error.message,
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
@@ -80,18 +66,11 @@ export class GalaxiasService extends PrismaClient implements OnModuleInit {
         },
       });
 
-      if (!galaxia) {
-        throw new CustomError(
-          'No se encontró la galaxia',
-          'Not Found',
-          HttpStatus.NOT_FOUND,
-        );
-      }
-
       return new GenericSingle(galaxia, HttpStatus.OK, 'Galaxia encontrada');
+
     } catch (error) {
       throw new CustomError(
-        'Error',
+        'Error al obtener la galaxia',
         error.message,
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
@@ -101,24 +80,15 @@ export class GalaxiasService extends PrismaClient implements OnModuleInit {
   async update(id: string, updateGalaxiaDto: UpdateGalaxiaDto) {
     try {
       const galaxia = await this.galaxia.update({
-        where: {
-          id: id,
-        },
+        where: { id: id },
         data: updateGalaxiaDto,
       });
 
-      if (!galaxia) {
-        throw new CustomError(
-          'No se encontró la galaxia',
-          'Not Found',
-          HttpStatus.NOT_FOUND,
-        );
-      }
-
       return new GenericSingle(galaxia, HttpStatus.OK, 'Galaxia actualizada');
+
     } catch (error) {
       throw new CustomError(
-        'Error',
+        'Error al actualizar la galaxia',
         error.message,
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
@@ -128,26 +98,15 @@ export class GalaxiasService extends PrismaClient implements OnModuleInit {
   async remove(id: string) {
     try {
       const galaxia = await this.galaxia.update({
-        where: {
-          id: id,
-        },
-        data: {
-          estado: 'INACTIVO',
-        },
+        where: { id: id },
+        data: { estado: 'INACTIVO' },
       });
 
-      if (!galaxia) {
-        throw new CustomError(
-          'No se encontró la galaxia',
-          'Not Found',
-          HttpStatus.NOT_FOUND,
-        );
-      }
-
       return new GenericSingle(galaxia, HttpStatus.OK, 'Galaxia eliminada');
+
     } catch (error) {
       throw new CustomError(
-        'Error',
+        'Error al eliminar la galaxia',
         error.message,
         HttpStatus.INTERNAL_SERVER_ERROR,
       );

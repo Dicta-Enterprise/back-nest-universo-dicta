@@ -6,19 +6,24 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
+  IsUrl,
 } from 'class-validator';
 
 export class CreateGalaxiaDto {
-  @IsString()
-  @IsNotEmpty()
+  @IsString({ message: 'El nombre debe ser un string válido' })
+  @IsNotEmpty({ message: 'El nombre de la galaxia no puede estar vacío.' })
   @Transform(({ value }) => value.trim())
   nombre: string;
 
-  @IsString()
-  @IsNotEmpty()
+  @IsString({ message: "La descripción debe ser un string válido" })
+  @IsNotEmpty({ message: 'La descripción no puede estar vacía.' })
   descripcion: string;
 
   @IsString()
+  @IsUrl(
+          { require_tld: true },
+          { message: "El valor de imagen debe ser una URL válida" }
+      )
   imagen: string;
 
   @IsOptional()

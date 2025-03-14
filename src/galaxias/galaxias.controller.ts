@@ -12,14 +12,16 @@ import { CreateGalaxiaDto } from './dto/create-galaxia.dto';
 import { UpdateGalaxiaDto } from './dto/update-galaxia.dto';
 import { ParseObjectIdPipe } from 'src/shared/pipes/parse-object-id.pipe';
 import { ApiTags } from '@nestjs/swagger';
+import { ValidateGalaxia } from './shared/decorators/validate-galaxia.decorator';
+import { IsGalaxiaExist } from './shared/decorators/is-galaxia-exist.decorator';
 
 @ApiTags('galaxias')
 @Controller('galaxias')
 export class GalaxiasController {
-  constructor(private readonly galaxiasService: GalaxiasService) {}
+  constructor(private readonly galaxiasService: GalaxiasService) { }
 
   @Post()
-  create(@Body() createGalaxiaDto: CreateGalaxiaDto) {
+  create(@Body() @ValidateGalaxia() createGalaxiaDto: CreateGalaxiaDto) {
     return this.galaxiasService.create(createGalaxiaDto);
   }
 
@@ -29,20 +31,20 @@ export class GalaxiasController {
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseObjectIdPipe) id: string) {
+  findOne(@Param('id', ParseObjectIdPipe) id: string, @IsGalaxiaExist() validated: any) {
     return this.galaxiasService.findOne(id);
   }
 
   @Patch(':id')
   update(
     @Param('id', ParseObjectIdPipe) id: string,
-    @Body() updateGalaxiaDto: UpdateGalaxiaDto,
+    @Body() @ValidateGalaxia() updateGalaxiaDto: UpdateGalaxiaDto,
   ) {
     return this.galaxiasService.update(id, updateGalaxiaDto);
   }
 
   @Delete(':id')
-  remove(@Param('id', ParseObjectIdPipe) id: string) {
+  remove(@Param('id', ParseObjectIdPipe) id: string, @IsGalaxiaExist() validated: any) {
     return this.galaxiasService.remove(id);
   }
 }
