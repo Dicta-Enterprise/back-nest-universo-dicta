@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { EstadoGenerico } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
 import {
@@ -10,22 +11,39 @@ import {
 } from 'class-validator';
 
 export class CreateGalaxiaDto {
+  @ApiProperty({
+    example: "Nueva Galaxia",
+    description: "Nombre de la galaxia"
+  })
   @IsString({ message: 'El nombre debe ser un string válido' })
   @IsNotEmpty({ message: 'El nombre de la galaxia no puede estar vacío.' })
   @Transform(({ value }) => value.trim())
   nombre: string;
 
+  @ApiProperty({
+    example: "Esta es la descripción de nueva galaxia",
+    description: "Descripción de la galaxia"
+  })
   @IsString({ message: "La descripción debe ser un string válido" })
   @IsNotEmpty({ message: 'La descripción no puede estar vacía.' })
   descripcion: string;
 
+  @ApiProperty({
+    example: "https://example.com/galaxia-imagen.jpg",
+    description: "URL de la imagen"
+  })
   @IsString()
   @IsUrl(
-          { require_tld: true },
-          { message: "El valor de imagen debe ser una URL válida" }
-      )
+    { require_tld: true },
+    { message: "El valor de imagen debe ser una URL válida" }
+  )
   imagen: string;
 
+  @ApiProperty({
+    example: "ACTIVO",
+    enum: EstadoGenerico,
+    description: "Estado de la galaxia (opcional)"
+})
   @IsOptional()
   @IsEnum(EstadoGenerico, {
     message:

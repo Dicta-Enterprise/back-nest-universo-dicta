@@ -7,7 +7,7 @@ import { ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/s
 import { ValidateLandingPage } from './shared/decorators/validate-landing.decorator';
 import { IsLandingPageExist } from './shared/decorators/is-landing-page-exist.decorator';
 
-@ApiTags('landing-page')
+@ApiTags('Landing Page')
 @Controller('landing-page')
 export class LandingPageController {
 
@@ -34,7 +34,7 @@ export class LandingPageController {
 
     @Get(':id')
     @ApiOperation({ summary: 'Obtiene una Landing Page por ID' })
-    @ApiParam({ name: 'id', example: '67979fcc88b3cb84a5cebf74', description: 'ID de la Landing Page' })
+    @ApiParam({ name: 'id', example: '67d233e71bb71f59d56de0b8', description: 'ID de la Landing Page' })
     @ApiResponse({ status: 200, description: 'Landing Page encontrada' })
     @ApiResponse({ status: 404, description: 'No se encontró la Landing Page con el ID proporcionado' })
     findOne(@Param('id', ParseObjectIdPipe) id: string, @IsLandingPageExist() validated: any) {
@@ -43,7 +43,7 @@ export class LandingPageController {
 
     @Patch(':id')
     @ApiOperation({ summary: 'Actualiza una Landing Page existente' })
-    @ApiParam({ name: 'id', example: '67979fcc88b3cb84a5cebf74', description: 'ID de la Landing Page' })
+    @ApiParam({ name: 'id', example: '67d233e71bb71f59d56de0b8', description: 'ID de la Landing Page' })
     @ApiBody({ type: UpdateLandingPageDto })
     @ApiResponse({ status: 200, description: 'Landing Page actualizada correctamente' })
     @ApiResponse({ status: 404, description: 'No se encontró la Landing Page con el ID proporcionado' })
@@ -57,7 +57,7 @@ export class LandingPageController {
 
     @Delete(':id')
     @ApiOperation({ summary: 'Elimina una Landing Page (cambia su estado a INACTIVO)' })
-    @ApiParam({ name: 'id', example: '67979fcc88b3cb84a5cebf74', description: 'ID de la Landing Page' })
+    @ApiParam({ name: 'id', example: '67d233e71bb71f59d56de0b8', description: 'ID de la Landing Page' })
     @ApiResponse({ status: 200, description: 'Landing Page eliminada correctamente' })
     @ApiResponse({ status: 404, description: 'No se encontró la Landing Page con el ID proporcionado' })
     remove(@Param('id', ParseObjectIdPipe) id: string, @IsLandingPageExist() validated: any) {

@@ -68,7 +68,7 @@ export class CreateLandingPageDto {
     color?: string;
 
     @ApiProperty({
-        example: "https://picsum.photos/200",
+        example: "https://media-public.canva.com/uW7NI/MAD9dCuW7NI/1/tl.png",
         description: "URL de la imagen representativa (opcional)"
     })
     @IsOptional()
