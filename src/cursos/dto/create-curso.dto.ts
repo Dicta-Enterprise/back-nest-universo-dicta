@@ -7,6 +7,7 @@ import {
   MinDate,
 } from 'class-validator';
 import { IsFechaValida } from '../decorator/IsFechaValida.decorator';
+import { CalculoDuracion } from '../decorator/calculo-duracion.decorator';
 
 export class CreateCursoDto {
 
@@ -67,10 +68,7 @@ export class CreateCursoDto {
   @Transform(({ value }) => ( typeof value == 'string' ? value.trim(): value))
   video: string;
 
-  @ApiProperty({example: 40})
-  @IsNumber({}, { message: 'La duración debe ser un número' })
-  @IsPositive({ message: 'La duración debe ser un número positivo' })
-  @IsDefined({ message: 'La duración es requerida' })
+  @CalculoDuracion()
   duracion: number;
 
   @ApiProperty({example: '670aa5b834951486809e8fa1'})

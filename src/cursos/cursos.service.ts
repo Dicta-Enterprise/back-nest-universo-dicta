@@ -24,8 +24,6 @@ export class CursosService extends PrismaClient implements OnModuleInit {
       const curso = await this.curso.create({
         data: {
           ...createCursoDto,
-          categoriaId: createCursoDto.categoriaId,
-          planetaId: createCursoDto.planetaId,
         },
       });
 
