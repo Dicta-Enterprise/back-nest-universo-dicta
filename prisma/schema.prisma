@@ -68,9 +68,12 @@ model Categoria {
 }
 
 model Idioma {
-  id     String  @id @default(auto()) @map("_id") @db.ObjectId
-  nombre String
-  cursos Curso[]
+  id                 String  @id @default(auto()) @map("_id") @db.ObjectId
+  nombre             String
+  descripcion        String
+  estado             EstadoGenerico @default(ACTIVO)
+  fechaCreacion      DateTime       @default(now())
+  fechaActualizacion DateTime       @updatedAt
 }
 
 model Profesor {
@@ -107,7 +110,7 @@ model Curso {
   video             String
   duracion          Float
   categoria         Categoria      @relation(fields: [id], references: [id])
-  idioma            Idioma         @relation(fields: [id], references: [id])
+  idiomaId          String?         @db.ObjectId @unique
   planetas          Planeta        @relation(fields: [id], references: [id])
 }
 
