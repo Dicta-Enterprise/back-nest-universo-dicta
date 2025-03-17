@@ -7,9 +7,10 @@ import { MenuModule } from './menu/menu.module';
 import { PlanetasModule } from './planetas/planetas.module';
 import { CategoriasModule } from './categorias/categorias.module';
 import { LandingPageModule } from './landing-page/landing-page.module';
+import { IdiomasModule } from './idiomas/idiomas.module';
 
 @Module({
-  imports: [CursosModule, GalaxiasModule, MenuModule, PlanetasModule, CategoriasModule, LandingPageModule],
+  imports: [CursosModule, GalaxiasModule, MenuModule, PlanetasModule, CategoriasModule, LandingPageModule, IdiomasModule],
   controllers: [AppController],
   providers: [AppService],
 })
