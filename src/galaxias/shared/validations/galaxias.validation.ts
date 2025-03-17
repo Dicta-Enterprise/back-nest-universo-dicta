@@ -4,11 +4,11 @@ import { CustomError } from "src/shared/class/Error.Class";
 
 const prisma = new PrismaClient();
 
-export async function verificarNombreUnico(nombre: string, excludegalaxiaId?: string): Promise<void> {
+export async function verificarNombreUnico(nombre: string, excludeGalaxiaId?: string): Promise<void> {
     const existingGalaxia = await prisma.galaxia.findFirst({
         where: {
             nombre,
-            id: excludegalaxiaId ? { not: excludegalaxiaId } : undefined,
+            id: excludeGalaxiaId ? { not: excludeGalaxiaId } : undefined,
         }
     });
 
@@ -34,4 +34,3 @@ export async function ExistenciaGalaxia(id: string): Promise<void> {
         );
     }
 }
-
