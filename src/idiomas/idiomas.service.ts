@@ -84,7 +84,7 @@ export class IdiomasService extends PrismaClient implements OnModuleInit {
         data: updateIdiomaDto,
       });
 
-      return new GenericSingle(idioma, HttpStatus.OK, 'Idioma actualizada');
+      return new GenericSingle(idioma, HttpStatus.OK, 'Idioma actualizado');
 
     } catch (error) {
       throw new CustomError(

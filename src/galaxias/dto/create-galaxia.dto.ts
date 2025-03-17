@@ -43,7 +43,7 @@ export class CreateGalaxiaDto {
     example: "ACTIVO",
     enum: EstadoGenerico,
     description: "Estado de la galaxia (opcional)"
-})
+  })
   @IsOptional()
   @IsEnum(EstadoGenerico, {
     message:
