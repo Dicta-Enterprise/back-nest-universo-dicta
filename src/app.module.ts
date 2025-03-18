@@ -6,9 +6,10 @@ import { GalaxiasModule } from './galaxias/galaxias.module';
 import { MenuModule } from './menu/menu.module';
 import { PlanetasModule } from './planetas/planetas.module';
 import { CategoriasModule } from './categorias/categorias.module';
+import { ProfesorModule } from './profesor/profesor.module';
 
 @Module({
-  imports: [CursosModule, GalaxiasModule, MenuModule, PlanetasModule, CategoriasModule],
+  imports: [CursosModule, GalaxiasModule, MenuModule, PlanetasModule, CategoriasModule, ProfesorModule],
   controllers: [AppController],
   providers: [AppService],
 })

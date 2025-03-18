@@ -19,8 +19,8 @@ export class CursosController {
   @ApiBadRequestResponse({description: 'Error al crear el Curso Datos Invalidos'})
   @ApiResponse({ status: 400 ,description: 'La fecha de finalización debe ser posterior a la fecha de inicio'})
   @ApiConflictResponse({description: 'El Curso con este nombre (Curso ....) ya existe. ID: 67981138bb00c415258372a9'})
-  @UsePipes(ValidarRelacionesPipe)
-  create(@Body(new ValidarNombreDuplicadoPipe('curso')) createCursoDto: CreateCursoDto) {
+  @UsePipes(ValidarRelacionesPipe, new ValidarNombreDuplicadoPipe('curso', ['nombre']))
+  create(@Body() createCursoDto: CreateCursoDto) {
     return this.cursosService.create(createCursoDto);
   }
 
@@ -48,13 +48,13 @@ export class CursosController {
     return this.cursosService.findOne(id);
   }
 
-  @Put(':id')
+  @Patch(':id')
   @ApiOperation({summary: 'Actualizar Curso por ID'})
   @ApiParam({ name: 'id', required: true, example: '67951f48ac0dee7220ed8462', description: 'El ID del Curso' })
   @ApiResponse({status: 200, description: 'Curso actualizado', type: UpdateCursoDto})
   @ApiBadRequestResponse({description: 'Error al Actualizar el Curso Datos Invalidos'})
   @ApiConflictResponse({description: 'El Curso buscado no existe o esta Inactivo'})
-  update(@Param('id', ParseObjectIdPipe, new ValidarIDEntidadPipe('curso')) id: string, @Body(new ValidarNombreDuplicadoPipe('curso')) updateCursoDto: UpdateCursoDto) {
+  update(@Param('id', ParseObjectIdPipe, new ValidarIDEntidadPipe('curso')) id: string, @Body(new ValidarNombreDuplicadoPipe('curso',['nombre'])) updateCursoDto: UpdateCursoDto) {
     return this.cursosService.update(id, updateCursoDto);
   }
 

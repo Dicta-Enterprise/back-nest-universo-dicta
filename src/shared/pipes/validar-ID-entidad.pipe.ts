@@ -24,9 +24,7 @@ export class ValidarIDEntidadPipe implements PipeTransform {
     }
 
     if (entidadEncontrada.estado === 'INACTIVO') {
-      throw new ConflictException(`${this.entidad}' está inactiva`);
+      throw new ConflictException(`${this.entidad} está Inactivo`);
     }
-
-    return id;
   }
 }

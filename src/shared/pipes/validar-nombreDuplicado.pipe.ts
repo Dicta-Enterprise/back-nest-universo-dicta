@@ -1,30 +1,48 @@
-import { ArgumentMetadata, ConflictException, Injectable, PipeTransform } from "@nestjs/common";
+import { ArgumentMetadata, ConflictException, ExecutionContext, Injectable, PipeTransform } from "@nestjs/common";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
 @Injectable()
 export class ValidarNombreDuplicadoPipe implements PipeTransform {
-  constructor(private readonly entidad: string) {}
+  constructor(
+    private readonly entidad: string,
+    private readonly atributos: string[],
+  ) {}
 
-  async transform(value: any, metadata: ArgumentMetadata) {
-    if (!value.nombre) {
+  async transform(value: any, metadata: ArgumentMetadata, context?: ExecutionContext) {
+    if (!value || this.atributos.every((atributo) => !value[atributo])) {
       return value;
     }
 
     const modelo: any = prisma[this.entidad];
 
-    const nombreExistente = await modelo.findFirst({
+    const request = context?.switchToHttp().getRequest();
+    const id = request?.params?.id || null;
+
+    console.log('ID:', id);
+    console.log('Value:', value);
+
+    const whereConditions = this.atributos.map(atributo => ({
+      [atributo]: value[atributo]
+    }));
+
+    const registroExistente = await modelo.findFirst({
       where: {
-        nombre: value.nombre,
-        id: { not: value.id },
+        OR: whereConditions,
+        NOT: id ? { id } : undefined,
       },
     });
 
-    if (nombreExistente) {
-      throw new ConflictException(`${this.entidad} con este nombre ${nombreExistente.nombre} ya existe. ID: ${nombreExistente.id}`);
+    if (registroExistente) {
+      const duplicados = this.atributos.filter(attr => value[attr] === registroExistente[attr]);
+
+      const mensaje = duplicados.map(attr => `${attr}: '${value[attr]}'`).join(", ");
+      
+      throw new ConflictException(`El ${this.entidad} con ${mensaje} ya existe.`);
     }
 
-    return value;
+    return value
+
   }
 }
