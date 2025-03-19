@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpStatus, NotFoundException, UsePipes, Put } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpStatus, NotFoundException, UsePipes, Put, UseInterceptors } from '@nestjs/common';
 import { CursosService } from './cursos.service';
 import { CreateCursoDto } from './dto/create-curso.dto';
 import { UpdateCursoDto } from './dto/update-curso.dto';
@@ -7,7 +7,7 @@ import { ApiResponse, ApiParam, ApiCreatedResponse, ApiBadRequestResponse, ApiCo
 import { Curso } from './entities/curso.entity';
 import { ValidarRelacionesPipe } from 'src/shared/pipes/validacion-relacion-entidades.pipe';
 import { ValidarIDEntidadPipe } from 'src/shared/pipes/validar-ID-entidad.pipe';
-import { ValidarNombreDuplicadoPipe } from 'src/shared/pipes/validar-nombreDuplicado.pipe';
+import { ValidarDuplicadosInterceptor } from 'src/shared/interceptor/validar-duplicados.interceptor';
 
 @Controller('cursos')
 export class CursosController {
@@ -19,7 +19,8 @@ export class CursosController {
   @ApiBadRequestResponse({description: 'Error al crear el Curso Datos Invalidos'})
   @ApiResponse({ status: 400 ,description: 'La fecha de finalización debe ser posterior a la fecha de inicio'})
   @ApiConflictResponse({description: 'El Curso con este nombre (Curso ....) ya existe. ID: 67981138bb00c415258372a9'})
-  @UsePipes(ValidarRelacionesPipe, new ValidarNombreDuplicadoPipe('curso', ['nombre']))
+  @UseInterceptors(new ValidarDuplicadosInterceptor('curso', ['nombre']))
+  @UsePipes(ValidarRelacionesPipe)
   create(@Body() createCursoDto: CreateCursoDto) {
     return this.cursosService.create(createCursoDto);
   }
@@ -54,7 +55,8 @@ export class CursosController {
   @ApiResponse({status: 200, description: 'Curso actualizado', type: UpdateCursoDto})
   @ApiBadRequestResponse({description: 'Error al Actualizar el Curso Datos Invalidos'})
   @ApiConflictResponse({description: 'El Curso buscado no existe o esta Inactivo'})
-  update(@Param('id', ParseObjectIdPipe, new ValidarIDEntidadPipe('curso')) id: string, @Body(new ValidarNombreDuplicadoPipe('curso',['nombre'])) updateCursoDto: UpdateCursoDto) {
+  @UseInterceptors(new ValidarDuplicadosInterceptor('curso', ['nombre']))
+  update(@Param('id', ParseObjectIdPipe, new ValidarIDEntidadPipe('curso')) id: string, @Body() updateCursoDto: UpdateCursoDto) {
     return this.cursosService.update(id, updateCursoDto);
   }
 

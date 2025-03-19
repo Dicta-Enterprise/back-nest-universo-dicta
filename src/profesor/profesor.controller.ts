@@ -1,11 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors } from '@nestjs/common';
 import { ProfesorService } from './profesor.service';
 import { CreateProfesorDto } from './dto/create-profesor.dto';
 import { UpdateProfesorDto } from './dto/update-profesor.dto';
 import { ApiBadRequestResponse, ApiConflictResponse, ApiCreatedResponse, ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
 import { ParseObjectIdPipe } from 'src/shared/pipes/parse-object-id.pipe';
 import { ValidarIDEntidadPipe } from 'src/shared/pipes/validar-ID-entidad.pipe';
-import { ValidarNombreDuplicadoPipe } from 'src/shared/pipes/validar-nombreDuplicado.pipe';
+import { ValidarDuplicadosInterceptor } from 'src/shared/interceptor/validar-duplicados.interceptor';
 
 @Controller('profesor')
 export class ProfesorController {
@@ -16,7 +16,8 @@ export class ProfesorController {
   @ApiCreatedResponse({description: 'Profesor creado'})
   @ApiBadRequestResponse({description: 'Error al crear el Profesor Datos Invalidos'})
   @ApiConflictResponse({description: 'El Profesor con este correo electrónico ya existe'})
-  create(@Body(new ValidarNombreDuplicadoPipe('profesor',['email','apellido'])) createProfesorDto: CreateProfesorDto) {
+  @UseInterceptors(new ValidarDuplicadosInterceptor('profesor', ['email', 'apellido']))
+  create(@Body() createProfesorDto: CreateProfesorDto) {
     return this.profesorService.create(createProfesorDto);
   }
 
@@ -38,7 +39,8 @@ export class ProfesorController {
   @ApiOperation({summary: 'Actualizar Profesor por ID'})
   @ApiParam({ name: 'id', required: true, example: '67951f48ac0dee7220ed8462', description: 'El ID del Profesor' })
   @ApiResponse({status: 200, description: 'Profesor actualizado', type: UpdateProfesorDto})
-  update(@Param('id', ParseObjectIdPipe, new ValidarIDEntidadPipe('profesor')) id: string, @Body(new ValidarNombreDuplicadoPipe('profesor',['email,apellido'])) updateProfesorDto: UpdateProfesorDto) {
+  @UseInterceptors(new ValidarDuplicadosInterceptor('profesor', ['email', 'apellido']))
+  update(@Param('id', ParseObjectIdPipe, new ValidarIDEntidadPipe('profesor')) id: string, @Body() updateProfesorDto: UpdateProfesorDto) {
     return this.profesorService.update(id, updateProfesorDto);
   }
 

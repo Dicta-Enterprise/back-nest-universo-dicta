@@ -5,9 +5,9 @@ const prisma = new PrismaClient();
 
 @Injectable()
 export class ValidarIDEntidadPipe implements PipeTransform {
-  constructor(private readonly entidad: string) {}
+  constructor(private readonly entidad: string) { }
 
-  async transform(id:string, metadata: ArgumentMetadata) {
+  async transform(id: string, metadata: ArgumentMetadata) {
 
     const modelo: any = prisma[this.entidad];
 
@@ -26,5 +26,7 @@ export class ValidarIDEntidadPipe implements PipeTransform {
     if (entidadEncontrada.estado === 'INACTIVO') {
       throw new ConflictException(`${this.entidad} está Inactivo`);
     }
+
+    return id
   }
 }

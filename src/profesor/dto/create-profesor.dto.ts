@@ -24,10 +24,10 @@ export class CreateProfesorDto {
     @IsNotEmpty({ message: 'El Email no puede estar vacía' })
     email: string;
 
-    @ApiProperty({ example: '+51987654321', description: 'Número de teléfono del profesor' })
+    @ApiProperty({ example: '+51 987 654 321', description: 'Número de teléfono del profesor' })
     @IsString({ message: 'El teléfono debe ser un texto' })
-    @Matches(/^\+?\d{9,15}$/, {
-        message: 'El teléfono debe ser un número válido con 9 a 15 dígitos, opcionalmente con un prefijo "+"',
+    @Matches(/^\+?\d{1,4}(\s\d{3}){2,4}$/, {
+        message: 'El teléfono debe ser un número válido con 9 a 15 dígitos, opcionalmente con un prefijo "+" y espacios entre grupos de dígitos',
     })
     @IsNotEmpty({ message: 'El teléfono no puede estar vacío' })
     @Transform(({ value }) => (typeof value == 'string' ? value.trim() : value))
