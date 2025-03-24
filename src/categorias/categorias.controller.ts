@@ -13,7 +13,7 @@ import { UpdateCategoriaDto } from './dto/update-categoria.dto';
 import { ParseObjectIdPipe } from 'src/shared/pipes/parse-object-id.pipe';
 import { ApiTags } from '@nestjs/swagger';
 
-@ApiTags('categorias')
+@ApiTags('Categorias')
 @Controller('categorias')
 export class CategoriasController {
   constructor(private readonly categoriasService: CategoriasService) {}

@@ -10,20 +10,20 @@ import { Galaxia } from 'src/galaxias/entities/galaxia.entity';
 @Injectable()
 export class PlanetasService extends PrismaClient implements OnModuleInit {
   async onModuleInit() {
-      await this.$connect();
+    await this.$connect();
   }
-  constructor(){
+  constructor() {
     super();
   }
-  
-  async create(CreatePlanetaDto: CreatePlanetaDto){
-    try{
+
+  async create(CreatePlanetaDto: CreatePlanetaDto) {
+    try {
       const onePlaneta = await this.planeta.findUnique({
-        where:{
+        where: {
           nombre: CreatePlanetaDto.nombre,
         },
       });
-      if(onePlaneta){
+      if (onePlaneta) {
         return new CustomError(
           'Ya existe un planeta con ese nombre',
           'Conflict',
@@ -33,8 +33,8 @@ export class PlanetasService extends PrismaClient implements OnModuleInit {
       const planeta = await this.planeta.create({
         data: CreatePlanetaDto,
       });
-      return new GenericSingle (planeta, HttpStatus.CREATED, 'Planeta creado con exito');
-    } catch (error){
+      return new GenericSingle(planeta, HttpStatus.CREATED, 'Planeta creado con exito');
+    } catch (error) {
       throw new CustomError(
         'Error',
         error.message,
@@ -43,10 +43,6 @@ export class PlanetasService extends PrismaClient implements OnModuleInit {
     }
   }
 
-  findAll(){
-
-  }
-  
   findOne(id: number) {
     return `This action returns a #${id} planeta`;
   }
@@ -59,27 +55,27 @@ export class PlanetasService extends PrismaClient implements OnModuleInit {
     return `This action removes a #${id} planeta`;
   }
 
-  async findAll(){
-    try{
-       const planetas = await this.planeta.findMany({
-         where:{
-           //estado: 'ACTIVO',
-         },
-       });
-       if(!planetas){
-         throw new CustomError(
-           'No se encontraron planetas',
-           'Not Found',
-           HttpStatus.NOT_FOUND,
-         );
-       }
-       return new GenericArray(planetas, HttpStatus.OK, 'Planetas encontrados' );
-     } catch(error){
-       throw new CustomError(
-         'Error',
-         error.message,
-         HttpStatus.INTERNAL_SERVER_ERROR,
-       );
-     }
-   }
+  async findAll() {
+    try {
+      const planetas = await this.planeta.findMany({
+        where: {
+          estado: 'ACTIVO',
+        },
+      });
+      if (!planetas) {
+        throw new CustomError(
+          'No se encontraron planetas',
+          'Not Found',
+          HttpStatus.NOT_FOUND,
+        );
+      }
+      return new GenericArray(planetas, HttpStatus.OK, 'Planetas encontrados');
+    } catch (error) {
+      throw new CustomError(
+        'Error',
+        error.message,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
 }

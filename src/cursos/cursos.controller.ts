@@ -3,14 +3,13 @@ import { CursosService } from './cursos.service';
 import { CreateCursoDto } from './dto/create-curso.dto';
 import { UpdateCursoDto } from './dto/update-curso.dto';
 import { ParseObjectIdPipe } from 'src/shared/pipes/parse-object-id.pipe';
-import { ApiResponse, ApiParam, ApiCreatedResponse, ApiBadRequestResponse, ApiConflictResponse, ApiOperation, ApiOkResponse, getSchemaPath } from '@nestjs/swagger';
+import { ApiResponse, ApiParam, ApiCreatedResponse, ApiBadRequestResponse, ApiConflictResponse, ApiOperation, ApiOkResponse, getSchemaPath, ApiTags } from '@nestjs/swagger';
 import { Curso } from './entities/curso.entity';
 import { ValidarRelacionesPipe } from 'src/shared/pipes/validacion-relacion-entidades.pipe';
 import { ValidarIDEntidadPipe } from 'src/shared/pipes/validar-ID-entidad.pipe';
 import { ValidarDuplicadosInterceptor } from 'src/shared/interceptor/validar-duplicados.interceptor';
-import { ApiTags } from '@nestjs/swagger';
 
-@ApiTags('cursos')
+@ApiTags('Cursos')
 @Controller('cursos')
 export class CursosController {
   constructor(private readonly cursosService: CursosService) {}

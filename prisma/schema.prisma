@@ -97,7 +97,6 @@ model Planeta {
   estado      EstadoGenerico  @default(ACTIVO)
   fechaCreacion  DateTime @default(now())
   fechaActualizacion  DateTime  @updatedAt
-  cursos      Curso[]
 }
 
 model Curso {
@@ -115,8 +114,8 @@ model Curso {
   video               String
   duracion            Float
   categoriaId         String          @db.ObjectId @unique
-  profesorId          String?         @db.ObjectId @unique
-  idiomaId            String?         @db.ObjectId @unique
+  profesorId          String          @db.ObjectId @unique
+  idiomaId            String          @db.ObjectId @unique
   planetaId           String          @db.ObjectId @unique
 }
 
