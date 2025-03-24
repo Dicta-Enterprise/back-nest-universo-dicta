@@ -67,8 +67,12 @@ model Categoria {
 }
 
 model Idioma {
-  id     String  @id @default(auto()) @map("_id") @db.ObjectId
-  nombre String
+  id                 String  @id @default(auto()) @map("_id") @db.ObjectId
+  nombre             String
+  descripcion        String
+  estado             EstadoGenerico @default(ACTIVO)
+  fechaCreacion      DateTime       @default(now())
+  fechaActualizacion DateTime       @updatedAt
 }
 
 model Profesor {
@@ -93,6 +97,7 @@ model Planeta {
   estado      EstadoGenerico  @default(ACTIVO)
   fechaCreacion  DateTime @default(now())
   fechaActualizacion  DateTime  @updatedAt
+  cursos      Curso[]
 }
 
 model Curso {
@@ -146,4 +151,15 @@ model Galaxia {
   estado             EstadoGenerico @default(ACTIVO)
   fechaCreacion      DateTime       @default(now())
   fechaActualizacion DateTime       @updatedAt
+}
+
+model LandingPage {
+  id            String         @id @default(auto()) @map("_id") @db.ObjectId
+  titulo        String         @unique
+  descripcion   String
+  contenido     String[]       // Array de strings para manejar párrafos
+  estado        EstadoGenerico @default(ACTIVO)
+  planetaId     String         @db.ObjectId @unique
+  imagenUrl     String?        
+  color         String?        
 }

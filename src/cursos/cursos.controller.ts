@@ -8,7 +8,9 @@ import { Curso } from './entities/curso.entity';
 import { ValidarRelacionesPipe } from 'src/shared/pipes/validacion-relacion-entidades.pipe';
 import { ValidarIDEntidadPipe } from 'src/shared/pipes/validar-ID-entidad.pipe';
 import { ValidarDuplicadosInterceptor } from 'src/shared/interceptor/validar-duplicados.interceptor';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('cursos')
 @Controller('cursos')
 export class CursosController {
   constructor(private readonly cursosService: CursosService) {}

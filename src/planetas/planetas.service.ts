@@ -3,7 +3,7 @@ import { CreatePlanetaDto } from './dto/create-planeta.dto';
 import { UpdatePlanetaDto } from './dto/update-planeta.dto';
 import { PrismaClient } from '@prisma/client';
 import { CustomError } from 'src/shared/class/Error.Class';
-import { GenericSingle } from '../shared/class/Generic.Class';
+import { GenericArray, GenericSingle } from '../shared/class/Generic.Class';
 import { Galaxia } from 'src/galaxias/entities/galaxia.entity';
 
 
@@ -58,4 +58,28 @@ export class PlanetasService extends PrismaClient implements OnModuleInit {
   remove(id: number) {
     return `This action removes a #${id} planeta`;
   }
+
+  async findAll(){
+    try{
+       const planetas = await this.planeta.findMany({
+         where:{
+           //estado: 'ACTIVO',
+         },
+       });
+       if(!planetas){
+         throw new CustomError(
+           'No se encontraron planetas',
+           'Not Found',
+           HttpStatus.NOT_FOUND,
+         );
+       }
+       return new GenericArray(planetas, HttpStatus.OK, 'Planetas encontrados' );
+     } catch(error){
+       throw new CustomError(
+         'Error',
+         error.message,
+         HttpStatus.INTERNAL_SERVER_ERROR,
+       );
+     }
+   }
 }
