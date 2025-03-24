@@ -54,6 +54,11 @@ export class PlanetasService extends PrismaClient implements OnModuleInit {
     try {
       const planetas = await this.planeta.findMany({
         where: { estado: 'ACTIVO' },
+        include: {
+          galaxia:{
+            select:{nombre: true},
+          }
+        }
       });
 
       if (!planetas.length) {

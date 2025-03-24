@@ -89,8 +89,6 @@ model Planeta {
   estado     EstadoGenerico  @default(ACTIVO)
   fechaCreacion  DateTime @default(now())
   fechaActualizacion  DateTime  @updatedAt
-  galaxiaId          String       @db.ObjectId 
-  galaxia        Galaxia    @relation(fields: [galaxiaId], references: [id]) 
 
   cursos      Curso[]
 }
@@ -109,9 +107,10 @@ model Curso {
   imagen            String
   video             String
   duracion          Float
-  categoria         Categoria      @relation(fields: [id], references: [id])
-  idioma            Idioma         @relation(fields: [id], references: [id])
-  planetas          Planeta        @relation(fields: [id], references: [id])
+   categoriaId         String          @db.ObjectId @unique
+  profesorId          String?         @db.ObjectId @unique
+  idiomaId            String?         @db.ObjectId @unique
+  planetaId           String          @db.ObjectId @unique
 }
 
 model SubMenu {
