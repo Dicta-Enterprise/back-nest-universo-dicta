@@ -4,11 +4,13 @@ import { CustomError } from 'src/shared/class/Error.Class';
 
 export const ValidateLandingPage = createParamDecorator(
   async (_data: unknown, ctx: ExecutionContext) => {
-    const request = ctx.switchToHttp().getRequest();
-    const body = request.body;
-    const { planetaId, titulo } = body;
-    const id = request.params.id;
+    // Obtener la solicitud HTTP y su contenido
+    const request = ctx.switchToHttp().getRequest(); 
+    const body = request.body; // Datos enviados en el cuerpo de la petición
+    const { planetaId, titulo } = body; // Extraer planetaId y título del cuerpo
+    const id = request.params.id; // Obtener el ID de la landing page si está presente en la URL
 
+    // Metodos ubicados en shared > validations > landing-page.validation.ts
     try {
       if (planetaId) {
         await verificarExistenciaPlaneta(planetaId);
@@ -21,6 +23,7 @@ export const ValidateLandingPage = createParamDecorator(
 
       return body;
     } catch (error) {
+      // Si el error es una instancia de CustomError, lanzar una excepción HTTP con su información
       if (error instanceof CustomError) {
         throw new HttpException(
           {

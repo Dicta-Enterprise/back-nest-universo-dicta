@@ -13,11 +13,15 @@ import {
 } from "class-validator";
 
 export class CreateLandingPageDto {
-    @ApiProperty({ 
+
+    // Este es el Dto de Landing Page 
+    // Aqui se consideran los atributos establecidos: Ubicar model LandingPage (revisar prisma > schema.prisma)
+    // Revisar landing-page.controller.ts
+    @ApiProperty({ // Documentacion con Swagger
         example: "Landing Prueba",
         description: "Título de la landing page"
     })
-    @IsString({ message: "El título debe ser un string válido" })
+    @IsString({ message: "El título debe ser un string válido" }) // Validaciones con decoradores
     @IsNotEmpty({ message: "El título no puede estar vacío" })
     titulo: string;
 

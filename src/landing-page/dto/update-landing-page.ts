@@ -4,6 +4,7 @@ import { ApiPropertyOptional } from "@nestjs/swagger";
 import { EstadoGenerico } from "@prisma/client";
 
 export class UpdateLandingPageDto extends PartialType(CreateLandingPageDto) {
+    // Al actualizar se optó por atributos opcionales
     @ApiPropertyOptional({ 
         example: "Nueva Landing",
         description: "Nuevo título de la landing page (opcional)"
