@@ -68,9 +68,12 @@ model Categoria {
 }
 
 model Idioma {
-  id     String  @id @default(auto()) @map("_id") @db.ObjectId
-  nombre String
-  cursos Curso[]
+  id                 String  @id @default(auto()) @map("_id") @db.ObjectId
+  nombre             String
+  descripcion        String
+  estado             EstadoGenerico @default(ACTIVO)
+  fechaCreacion      DateTime       @default(now())
+  fechaActualizacion DateTime       @updatedAt
 }
 
 model Profesor {
@@ -86,6 +89,9 @@ model Planeta {
   nombre      String  @unique
   descripcion String
   imagen      String
+  estado      EstadoGenerico  @default(ACTIVO)
+  fechaCreacion  DateTime @default(now())
+  fechaActualizacion  DateTime  @updatedAt
   cursos      Curso[]
 }
 
@@ -104,7 +110,7 @@ model Curso {
   video             String
   duracion          Float
   categoria         Categoria      @relation(fields: [id], references: [id])
-  idioma            Idioma         @relation(fields: [id], references: [id])
+  idiomaId          String?         @db.ObjectId @unique
   planetas          Planeta        @relation(fields: [id], references: [id])
 }
 
@@ -139,4 +145,16 @@ model Galaxia {
   estado             EstadoGenerico @default(ACTIVO)
   fechaCreacion      DateTime       @default(now())
   fechaActualizacion DateTime       @updatedAt
+}
+// Este es el modelo propuesto (pueden incorporarse atributos como la fecha de creación y actualizacion)
+// Manejé un array de strings, puede manejarse similar para el color.
+model LandingPage {
+  id            String         @id @default(auto()) @map("_id") @db.ObjectId
+  titulo        String         @unique
+  descripcion   String
+  contenido     String[]       // Array de strings para manejar párrafos
+  estado        EstadoGenerico @default(ACTIVO)
+  planetaId     String         @db.ObjectId @unique
+  imagenUrl     String?        
+  color         String?        
 }

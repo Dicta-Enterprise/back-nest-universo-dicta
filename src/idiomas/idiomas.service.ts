@@ -1,12 +1,12 @@
 import { HttpStatus, Injectable, OnModuleInit } from '@nestjs/common';
-import { CreateGalaxiaDto } from './dto/create-galaxia.dto';
-import { UpdateGalaxiaDto } from './dto/update-galaxia.dto';
 import { PrismaClient } from '@prisma/client';
-import { CustomError } from 'src/shared/class/Error.Class';
+import { CreateIdiomaDto } from './dto/create-idioma.dto';
 import { GenericArray, GenericSingle } from 'src/shared/class/Generic.Class';
+import { CustomError } from 'src/shared/class/Error.Class';
+import { UpdateIdiomaDto } from './dto/update-idioma.dto';
 
 @Injectable()
-export class GalaxiasService extends PrismaClient implements OnModuleInit {
+export class IdiomasService extends PrismaClient implements OnModuleInit {
   async onModuleInit() {
     await this.$connect();
   }
@@ -15,42 +15,42 @@ export class GalaxiasService extends PrismaClient implements OnModuleInit {
     super();
   }
 
-  async create(createGalaxiaDto: CreateGalaxiaDto) {
+  async create(createIdiomaDto: CreateIdiomaDto) {
     try {
-      const galaxia = await this.galaxia.create({
-        data: createGalaxiaDto,
+      const idioma = await this.idioma.create({
+        data: createIdiomaDto,
       });
 
-      return new GenericSingle(galaxia, HttpStatus.CREATED, 'Galaxia creada');
+      return new GenericSingle(idioma, HttpStatus.CREATED, 'Idioma creado');
     } catch (error) {
       throw new CustomError(
-        'Error al crear la galaxia',
+        'Error al crear el idioma',
         error.message,
         HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      )
     }
   }
 
   async findAll() {
     try {
-      const galaxias = await this.galaxia.findMany({
+      const idiomas = await this.idioma.findMany({
         where: {
           estado: 'ACTIVO',
         },
       });
 
-      if (!galaxias) {
+      if (!idiomas) {
         throw new CustomError(
-          'No se encontraron galaxias',
+          'No se encontraron idiomas',
           'Not Found',
           HttpStatus.NOT_FOUND,
         );
       }
 
-      return new GenericArray(galaxias, HttpStatus.OK, 'Galaxias encontradas');
+      return new GenericArray(idiomas, HttpStatus.OK, 'Idiomas encontrados');
     } catch (error) {
       throw new CustomError(
-        'Error al obtener las galaxias',
+        'Error al obtener idiomas',
         error.message,
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
@@ -59,36 +59,36 @@ export class GalaxiasService extends PrismaClient implements OnModuleInit {
 
   async findOne(id: string) {
     try {
-      const galaxia = await this.galaxia.findUnique({
+      const idioma = await this.idioma.findUnique({
         where: {
           id: id,
           estado: 'ACTIVO',
         },
       });
 
-      return new GenericSingle(galaxia, HttpStatus.OK, 'Galaxia encontrada');
+      return new GenericSingle(idioma, HttpStatus.OK, 'Idioma encontrado');
 
     } catch (error) {
       throw new CustomError(
-        'Error al obtener la galaxia',
+        'Error al obtener el idioma',
         error.message,
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }
 
-  async update(id: string, updateGalaxiaDto: UpdateGalaxiaDto) {
+  async update(id: string, updateIdiomaDto: UpdateIdiomaDto) {
     try {
-      const galaxia = await this.galaxia.update({
+      const idioma = await this.idioma.update({
         where: { id: id },
-        data: updateGalaxiaDto,
+        data: updateIdiomaDto,
       });
 
-      return new GenericSingle(galaxia, HttpStatus.OK, 'Galaxia actualizada');
+      return new GenericSingle(idioma, HttpStatus.OK, 'Idioma actualizado');
 
     } catch (error) {
       throw new CustomError(
-        'Error al actualizar la galaxia',
+        'Error al actualizar el idioma',
         error.message,
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
@@ -97,16 +97,16 @@ export class GalaxiasService extends PrismaClient implements OnModuleInit {
 
   async remove(id: string) {
     try {
-      const galaxia = await this.galaxia.update({
+      const idioma = await this.idioma.update({
         where: { id: id },
         data: { estado: 'INACTIVO' },
       });
 
-      return new GenericSingle(galaxia, HttpStatus.OK, 'Galaxia eliminada');
+      return new GenericSingle(idioma, HttpStatus.OK, 'Idioma eliminado');
 
     } catch (error) {
       throw new CustomError(
-        'Error al eliminar la galaxia',
+        'Error al eliminar el idioma',
         error.message,
         HttpStatus.INTERNAL_SERVER_ERROR,
       );

@@ -18,51 +18,51 @@ export class CursosService extends PrismaClient implements OnModuleInit {
   }
 
   async create(createCursoDto: CreateCursoDto) {
-    try {
-      const curso = await this.curso.create({
-        data: {
-          nombre: createCursoDto.nombre,
-          descripcion: createCursoDto.descripcion,
-          fechaCreacion: createCursoDto.fechaCreacion,
-          fechaInicio: createCursoDto.fechaInicio,
-          fechaFinalizacion: createCursoDto.fechaFinalizacion,
-          cantidadAlumnos: createCursoDto.cantidadAlumnos,
-          precio: createCursoDto.precio,
-          profesor: {
-            connect: {
-              id: createCursoDto.profesor,
-            },
-          },
-          estado: createCursoDto.estado,
-          imagen: createCursoDto.imagen,
-          video: createCursoDto.video,
-          duracion: createCursoDto.duracion,
-          categoria: {
-            connect: {
-              id: createCursoDto.categoria,
-            },
-          },
-          idioma: {
-            connect: {
-              id: createCursoDto.idioma,
-            },
-          },
-          planetas: {
-            connect: {
-              id: createCursoDto.planetas,
-            },
-          },
-        },
-      });
+    // try {
+    //   const curso = await this.curso.create({
+    //     data: {
+    //       nombre: createCursoDto.nombre,
+    //       descripcion: createCursoDto.descripcion,
+    //       fechaCreacion: createCursoDto.fechaCreacion,
+    //       fechaInicio: createCursoDto.fechaInicio,
+    //       fechaFinalizacion: createCursoDto.fechaFinalizacion,
+    //       cantidadAlumnos: createCursoDto.cantidadAlumnos,
+    //       precio: createCursoDto.precio,
+    //       profesor: {
+    //         connect: {
+    //           id: createCursoDto.profesor,
+    //         },
+    //       },
+    //       estado: createCursoDto.estado,
+    //       imagen: createCursoDto.imagen,
+    //       video: createCursoDto.video,
+    //       duracion: createCursoDto.duracion,
+    //       categoria: {
+    //         connect: {
+    //           id: createCursoDto.categoria,
+    //         },
+    //       },
+    //       idioma: {
+    //         connect: {
+    //           id: createCursoDto.idioma,
+    //         },
+    //       },
+    //       planetas: {
+    //         connect: {
+    //           id: createCursoDto.planetas,
+    //         },
+    //       },
+    //     },
+    //   });
 
-      return curso;
-    } catch (error) {
-      throw new CustomError(
-        null,
-        error.message,
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
+    //   return curso;
+    // } catch (error) {
+    //   throw new CustomError(
+    //     null,
+    //     error.message,
+    //     HttpStatus.INTERNAL_SERVER_ERROR,
+    //   );
+    // }
   }
 
   async findAll() {
