@@ -151,7 +151,8 @@ model Galaxia {
   fechaCreacion      DateTime       @default(now())
   fechaActualizacion DateTime       @updatedAt
 }
-
+// Este es el modelo propuesto (pueden incorporarse atributos como la fecha de creación y actualizacion)
+// Manejé un array de strings, puede manejarse similar para el color.
 model LandingPage {
   id            String         @id @default(auto()) @map("_id") @db.ObjectId
   titulo        String         @unique

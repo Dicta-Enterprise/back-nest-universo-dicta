@@ -7,6 +7,7 @@ import { ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/s
 import { ValidateLandingPage } from './shared/decorators/validate-landing.decorator';
 import { IsLandingPageExist } from './shared/decorators/is-landing-page-exist.decorator';
 
+// Para acceder a Swagger : http://localhost:3000/api
 @ApiTags('Landing Page')
 @Controller('landing-page')
 export class LandingPageController {
@@ -15,15 +16,18 @@ export class LandingPageController {
         private readonly landingPageService: LandingPageService
     ) { }
 
+    // Manejo completo de CRUD 
+    // Post - crear
     @Post()
     @ApiOperation({ summary: 'Crea una nueva Landing Page' })
     @ApiBody({ type: CreateLandingPageDto })
     @ApiResponse({ status: 201, description: 'Landing Page creada exitosamente' })
     @ApiResponse({ status: 400, description: 'Datos inválidos' })
     create(@Body() @ValidateLandingPage() createLandingPageDto: CreateLandingPageDto) {
-        return this.landingPageService.create(createLandingPageDto);
+        return this.landingPageService.create(createLandingPageDto); // Ubicar este método en landing-page.service
     }
 
+    // Get - Obtener todas las landings
     @Get()
     @ApiOperation({ summary: 'Obtiene todas las Landing Pages cuyo estado es ACTIVO' })
     @ApiResponse({ status: 200, description: 'Landing Pages obtenidas exitosamente' })
@@ -32,6 +36,7 @@ export class LandingPageController {
         return this.landingPageService.findAll();
     }
 
+    // Get(:id) - Obtener una landing por id
     @Get(':id')
     @ApiOperation({ summary: 'Obtiene una Landing Page por ID' })
     @ApiParam({ name: 'id', example: '67d233e71bb71f59d56de0b8', description: 'ID de la Landing Page' })
@@ -41,6 +46,7 @@ export class LandingPageController {
         return this.landingPageService.findOne(id);
     }
 
+    // Patch(:id) - Actualizar
     @Patch(':id')
     @ApiOperation({ summary: 'Actualiza una Landing Page existente' })
     @ApiParam({ name: 'id', example: '67d233e71bb71f59d56de0b8', description: 'ID de la Landing Page' })
@@ -55,6 +61,7 @@ export class LandingPageController {
         return this.landingPageService.update(id, updateLandingPageDto)
     }
 
+    // Delete - Eliminar (Cambia el estado)
     @Delete(':id')
     @ApiOperation({ summary: 'Elimina una Landing Page (cambia su estado a INACTIVO)' })
     @ApiParam({ name: 'id', example: '67d233e71bb71f59d56de0b8', description: 'ID de la Landing Page' })

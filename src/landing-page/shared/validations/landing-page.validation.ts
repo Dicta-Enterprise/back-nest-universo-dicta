@@ -2,8 +2,15 @@ import { HttpStatus } from "@nestjs/common";
 import { PrismaClient } from "@prisma/client";
 import { CustomError } from "src/shared/class/Error.Class";
 
+// Aqui realicé mis validaciones personalizadas 
+// No las llamo en los servicios , en los servicios solo se maneja la logica 
+// para que cumpla con la funcionalidad del Mantenedor
+
+// Por esta razon cree decoradoreas que puse en el controller, antes de que lleguen a los servicios.
+// Revisar shared > decorators
 const prisma = new PrismaClient();
 
+// Verifica si un planeta existe en la base de datos antes de asignarlo a una landing page
 export async function verificarExistenciaPlaneta(planetaId: string): Promise<void> {
     const planeta = await prisma.planeta.findUnique({ where: { id: planetaId } });
 
@@ -16,6 +23,7 @@ export async function verificarExistenciaPlaneta(planetaId: string): Promise<voi
     }
 }
 
+// Verifica que un planeta no esté asignado a otra landing page activa
 export async function verificarPlanetaNoAsignado(planetaId: string, excludeLandingId?: string): Promise<void> {
     const existingLanding = await prisma.landingPage.findFirst({
         where: {
@@ -34,11 +42,12 @@ export async function verificarPlanetaNoAsignado(planetaId: string, excludeLandi
     }
 }
 
+// Verifica que el título de la landing page sea único antes de crear o actualizar
 export async function verificarTituloUnico(titulo: string, excludeLandingId?: string): Promise<void> {
     const existingLanding = await prisma.landingPage.findFirst({
         where: {
             titulo,
-            id: excludeLandingId ? { not: excludeLandingId } : undefined,
+            id: excludeLandingId ? { not: excludeLandingId } : undefined, // Excluye una landing específica si se pasa como parámetro
         }
     });
 
@@ -51,6 +60,7 @@ export async function verificarTituloUnico(titulo: string, excludeLandingId?: st
     }
 }
 
+// Verifica si una Landing Page existe en la base de datos antes de actualizar o eliminar
 export async function ExistenciaLandingPage(id: string): Promise<void> {
     const existingLanding = await prisma.landingPage.findUnique({ where: { id } });
 

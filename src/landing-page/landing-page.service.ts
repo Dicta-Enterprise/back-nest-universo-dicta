@@ -15,12 +15,13 @@ export class LandingPageService extends PrismaClient implements OnModuleInit {
     super();
   }
 
+  // Los servicios manejan una estructura similar (galaxias , idiomas)
   async create(createLandingPageDto: CreateLandingPageDto) {
     try {
-      // Crear una nueva Landing Page
+      // Crear una nueva Landing Page en la BD
       const landingPage = await this.landingPage.create({
         data: {
-          ...createLandingPageDto,
+          ...createLandingPageDto, // Datos del dto
           planetaId: createLandingPageDto.planetaId, // Guardar directamente
         },
       });
@@ -38,10 +39,11 @@ export class LandingPageService extends PrismaClient implements OnModuleInit {
 
   async findAll() {
     try {
+      // Buscar todas las Landing Pages que tengan estado 'ACTIVO'
       const landingPages = await this.landingPage.findMany({
         where: { estado: 'ACTIVO' }
       });
-
+      // si no se encontraron registros muestra el mensaje
       if (!landingPages) {
         throw new CustomError(
           'No se encontraron Landing Pages',
@@ -62,6 +64,7 @@ export class LandingPageService extends PrismaClient implements OnModuleInit {
 
   async findOne(id: string) {
     try {
+      // Buscar Landing por Id y que su estado sea ACTIVO
       const landingPage = await this.landingPage.findUnique({
         where: {
           id: id,
@@ -82,10 +85,10 @@ export class LandingPageService extends PrismaClient implements OnModuleInit {
 
   async update(id: string, updateLandingPageDto: UpdateLandingPageDto) {
     try {
-
+      // Actualiza con los datos proporcionados
       const landingPage = await this.landingPage.update({
-        where: { id: id },
-        data: updateLandingPageDto,
+        where: { id: id }, // la ubica por id 
+        data: updateLandingPageDto, // Aplica los cambios en el dto Update
       });
       return new GenericSingle(landingPage, HttpStatus.OK, 'Landing page actualizada');
 
@@ -100,9 +103,11 @@ export class LandingPageService extends PrismaClient implements OnModuleInit {
 
   async remove(id: string) {
     try {
+      // Marca la Landing Page como INACTIVO - No la elimina fisicamente de la BD ,
+      // por tema de buenas practicas es recomendable no eliminarlas.
       const landingPage = await this.landingPage.update({
-        where: { id: id, },
-        data: { estado: 'INACTIVO' },
+        where: { id: id, },  // Busca por ID
+        data: { estado: 'INACTIVO' }, // Cambia estado
       });
       return new GenericSingle(landingPage, HttpStatus.OK, 'Landing page eliminada');
 
