@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { EventEmitter2 } from '@nestjs/event-emitter';
-import { CategoriaResponseDto } from 'src/application/dto/categoria';
+import { EventEmitter2 } from '@nestjs/event-emitter';;
+import { Categoria } from 'src/core/entities/categoria/categoria.entity';
 import { CategoriaService } from 'src/core/services/categoria/categoria.service';
 import { CategoriaEvent } from 'src/domain/events/categoria/categoria-creada.event';
 import { Result } from 'src/shared/domain/result/result';
@@ -12,7 +12,7 @@ export class GetOneCategoriaUseCase {
     private readonly eventEmitter: EventEmitter2,
   ) {}
 
-  async execute(id: string): Promise<Result<CategoriaResponseDto>> {
+  async execute(id: string): Promise<Result<Categoria>> {
     try {
       const categorias = await this.categoriaService.obtenerUnaCategoria(id);
 

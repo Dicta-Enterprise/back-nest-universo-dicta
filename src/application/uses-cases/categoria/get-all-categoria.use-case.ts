@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { CategoriaResponseDto } from 'src/application/dto/categoria';
+import { Categoria } from 'src/core/entities/categoria/categoria.entity';
 import { CategoriaService } from 'src/core/services/categoria/categoria.service';
 import { Result } from 'src/shared/domain/result/result';
 
@@ -11,12 +11,13 @@ export class GetAllCategoriaUseCase {
     private readonly eventEmitter: EventEmitter2,
   ) {}
 
-  async execute(): Promise<Result<CategoriaResponseDto[]>> {
-    const categorias = await this.categoriaService.listarCategorias();
-    const categoriasDto = categorias.map((c) => ({
-      ...c,
-      fechaActualizacion: c.fechaActualizacion || new Date(),
-    }));
-    return Result.okList(categoriasDto);
+  async execute(): Promise<Result<Categoria[]>> {
+    try {
+      const categorias = await this.categoriaService.listarCategorias();
+
+      return Result.okList(categorias);
+    } catch (error) {
+      return Result.fail(error);
+    }
   }
 }
