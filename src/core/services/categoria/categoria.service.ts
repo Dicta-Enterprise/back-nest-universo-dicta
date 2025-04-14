@@ -3,7 +3,7 @@ import { EstadoGenerico } from '@prisma/client';
 import {
   CreateCategoriaDto,
   UpdateCategoriaDto,
-} from 'src/application/dto/categoria/dto';
+} from 'src/application/dto/categoria';
 
 import { CATEGORIA_REPOSITORY } from 'src/core/constants/constants';
 import { Categoria } from 'src/core/entities/categoria/categoria.entity';

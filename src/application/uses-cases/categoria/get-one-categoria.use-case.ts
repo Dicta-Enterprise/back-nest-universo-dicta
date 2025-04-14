@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { CategoriaResponseDto } from 'src/application/dto/categoria/dto/get-all-categoria.dto';
+import { CategoriaResponseDto } from 'src/application/dto/categoria';
 import { CategoriaService } from 'src/core/services/categoria/categoria.service';
 import { CategoriaEvent } from 'src/domain/events/categoria/categoria-creada.event';
 import { Result } from 'src/shared/domain/result/result';

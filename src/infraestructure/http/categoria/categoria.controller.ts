@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { ParseObjectIdPipe } from 'src/shared/pipes/parse-object-id.pipe';
 import * as useCase from 'src/application/uses-cases/categoria';
-import * as dto from 'src/application/dto/categoria/dto';
+import * as dto from 'src/application/dto/categoria';
 
 @Controller('categorias')
 export class CategoriaController {

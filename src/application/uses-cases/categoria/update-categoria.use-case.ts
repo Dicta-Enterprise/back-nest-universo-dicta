@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { UpdateCategoriaDto } from 'src/application/dto/categoria/dto/update-categoria.dto';
+import { UpdateCategoriaDto } from 'src/application/dto/categoria';
 import { Categoria } from 'src/core/entities/categoria/categoria.entity';
 import { CategoriaService } from 'src/core/services/categoria/categoria.service';
 import { CategoriaEvent } from 'src/domain/events/categoria/categoria-creada.event';
