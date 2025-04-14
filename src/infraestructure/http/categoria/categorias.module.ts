@@ -12,9 +12,7 @@ import { UpdateCategoriaUseCase } from 'src/application/uses-cases/categoria/upd
 import { DeleteCategoriaUseCase } from 'src/application/uses-cases/categoria/delete-categoria.use-case';
 
 @Module({
-  imports: [
-    
-    SharedModule, PrismaModule],
+  imports: [SharedModule, PrismaModule],
   controllers: [CategoriaController],
   providers: [
     {
@@ -26,7 +24,7 @@ import { DeleteCategoriaUseCase } from 'src/application/uses-cases/categoria/del
     GetAllCategoriaUseCase,
     GetOneCategoriaUseCase,
     UpdateCategoriaUseCase,
-    DeleteCategoriaUseCase
+    DeleteCategoriaUseCase,
   ],
   exports: [CategoriaService],
 })
