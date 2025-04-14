@@ -67,6 +67,7 @@ export class CategoriaPrismaRepository implements CategoriaRepository {
         estado: estado,
       },
     });
+
     return Categoria.fromPrisma(data);
   }
 }
