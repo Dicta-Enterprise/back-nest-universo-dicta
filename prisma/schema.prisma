@@ -61,6 +61,7 @@ enum TipoUsuario {
 model Categoria {
   id                 String         @id @default(auto()) @map("_id") @db.ObjectId
   nombre             String         @unique
+  descripcion        String
   estado             EstadoGenerico @default(ACTIVO)
   fechaCreacion      DateTime       @default(now())
   fechaActualizacion DateTime       @updatedAt

@@ -15,6 +15,9 @@ export class CreateCategoriaDto {
   nombre: string;
 
   @IsOptional()
+  descripcion: string;
+
+  @IsOptional()
   @IsEnum(EstadoGenerico, {
     message:
       'El estado proporcionado no es válido. Valores permitidos: ACTIVO, INACTIVO, PENDIENTE, ELIMINADO, DESHABILITADO.',
