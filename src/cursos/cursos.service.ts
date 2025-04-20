@@ -28,30 +28,30 @@ export class CursosService extends PrismaClient implements OnModuleInit {
           fechaFinalizacion: createCursoDto.fechaFinalizacion,
           cantidadAlumnos: createCursoDto.cantidadAlumnos,
           precio: createCursoDto.precio,
-          profesor: {
-            connect: {
-              id: createCursoDto.profesor,
-            },
-          },
+          // profesor: {
+          //   connect: {
+          //     id: createCursoDto.profesor,
+          //   },
+          // },
           estado: createCursoDto.estado,
           imagen: createCursoDto.imagen,
           video: createCursoDto.video,
           duracion: createCursoDto.duracion,
-          categoria: {
-            connect: {
-              id: createCursoDto.categoria,
-            },
-          },
-          idioma: {
-            connect: {
-              id: createCursoDto.idioma,
-            },
-          },
-          planetas: {
-            connect: {
-              id: createCursoDto.planetas,
-            },
-          },
+          // categoria: {
+          //   connect: {
+          //     id: createCursoDto.categoria,
+          //   },
+          // },
+          // idioma: {
+          //   connect: {
+          //     id: createCursoDto.idioma,
+          //   },
+          // },
+          // planetas: {
+          //   connect: {
+          //     id: createCursoDto.planetas,
+          //   },
+          // },
         },
       });
 

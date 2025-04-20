@@ -12,12 +12,13 @@ async function bootstrap() {
 
   app.enableCors({
     origin: '*',
-    methods: 'GET,PUT,POST,DELETE',
+    methods: 'GET,PUT,POST,DELETE,PATCH',
   });
 
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
+      forbidNonWhitelisted: true,
     }),
   );
 
@@ -28,7 +29,7 @@ async function bootstrap() {
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api/docs', app, document); 
+  SwaggerModule.setup('api', app, document); 
 
   const port = envs.port || 3000; 
 
@@ -38,3 +39,4 @@ async function bootstrap() {
   logger.log(`Conectado a la base de datos: ${envs.databaseUrl}`);
 }
 bootstrap();
+

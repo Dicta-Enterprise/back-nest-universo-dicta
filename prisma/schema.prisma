@@ -64,13 +64,13 @@ model Categoria {
   estado             EstadoGenerico @default(ACTIVO)
   fechaCreacion      DateTime       @default(now())
   fechaActualizacion DateTime       @updatedAt
-  cursos             Curso[]
+ 
 }
 
 model Idioma {
   id     String  @id @default(auto()) @map("_id") @db.ObjectId
   nombre String
-  cursos Curso[]
+
 }
 
 model Profesor {
@@ -78,7 +78,7 @@ model Profesor {
   nombre   String
   apellido String  @unique
   email    String
-  cursos   Curso[]
+ 
 }
 
 model Planeta {
@@ -89,8 +89,9 @@ model Planeta {
   estado     EstadoGenerico  @default(ACTIVO)
   fechaCreacion  DateTime @default(now())
   fechaActualizacion  DateTime  @updatedAt
-
-  cursos      Curso[]
+  galaxiaId   String  @db.ObjectId 
+  galaxia     Galaxia        @relation(fields: [galaxiaId], references: [id])
+ 
 }
 
 model Curso {
@@ -102,15 +103,11 @@ model Curso {
   fechaFinalizacion DateTime
   cantidadAlumnos   Int
   precio            Float
-  profesor          Profesor       @relation(fields: [id], references: [id])
   estado            EstadoGenerico
   imagen            String
   video             String
   duracion          Float
-   categoriaId         String          @db.ObjectId @unique
-  profesorId          String?         @db.ObjectId @unique
-  idiomaId            String?         @db.ObjectId @unique
-  planetaId           String          @db.ObjectId @unique
+  
 }
 
 model SubMenu {

@@ -46,4 +46,5 @@ export class CreatePlanetaDto {
   @PlanetaValidations.fechaCreacion()
   @Type(() => Date)
   fechaCreacion?: Date;
+
 }

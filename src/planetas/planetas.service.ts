@@ -6,7 +6,7 @@ import { CustomError } from 'src/shared/class/Error.Class';
 import { GenericArray, GenericSingle } from '../shared/class/Generic.Class';
 import { 
   verificarExistenciaGalaxia, 
-  verificarGalaxiaSinAsignar, 
+  // verificarGalaxiaSinAsignar, 
   verificarNombreUnico, 
   verificarExistenciaPlaneta, 
   verificarPlanetaActivo 
@@ -27,7 +27,7 @@ export class PlanetasService extends PrismaClient implements OnModuleInit {
       const { galaxiaId, nombre } = CreatePlanetaDto;
 
       await verificarExistenciaGalaxia(galaxiaId);
-      await verificarGalaxiaSinAsignar(galaxiaId);
+      // await verificarGalaxiaSinAsignar(galaxiaId);
       await verificarNombreUnico(nombre);
 
       const planeta = await this.planeta.create({
@@ -107,11 +107,15 @@ export class PlanetasService extends PrismaClient implements OnModuleInit {
       
       if (galaxiaId) {
         await verificarExistenciaGalaxia(galaxiaId);
-        await verificarGalaxiaSinAsignar(galaxiaId, id);
+        // await verificarGalaxiaSinAsignar(galaxiaId, id);
       }
 
-      if (nombre) {
+      const planetaActual = await this.planeta.findUnique({ where: { id } });
+
+      if (nombre && nombre !== planetaActual.nombre) {
         await verificarNombreUnico(nombre);
+      // if (nombre) {
+      //   await verificarNombreUnico(nombre);
       }
 
       const planeta = await this.planeta.update({
