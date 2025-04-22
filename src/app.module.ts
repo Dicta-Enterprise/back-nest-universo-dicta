@@ -1,17 +1,24 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { CursosModule } from './cursos/cursos.module';
-import { GalaxiasModule } from './galaxias/galaxias.module';
-import { MenuModule } from './menu/menu.module';
-import { PlanetasModule } from './planetas/planetas.module';
-import { CategoriasModule } from './categorias/categorias.module';
-import { LandingPageModule } from './landing-page/landing-page.module';
-import { IdiomasModule } from './idiomas/idiomas.module';
-import { ProfesorModule } from './profesor/profesor.module';
+import { CursosModule } from './infraestructure/http/curso/cursos.module';
+import { GalaxiasModule } from './infraestructure/http/galaxia/galaxias.module';
+import { PlanetasModule } from './infraestructure/http/planeta/planetas.module';
+import { CategoriaModule } from './infraestructure/http/categoria/categorias.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
+import { MenuModule } from './infraestructure/http/menu/menu.module';
+import { ProfesorModule } from './infraestructure/http/profesor/profesor.module';
 
 @Module({
-  imports: [CursosModule, GalaxiasModule, MenuModule, PlanetasModule, CategoriasModule, ProfesorModule, LandingPageModule, IdiomasModule],
+  imports: [
+    EventEmitterModule.forRoot(),
+    CursosModule,
+    GalaxiasModule,
+    MenuModule,
+    PlanetasModule,
+    CategoriaModule,
+    ProfesorModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
