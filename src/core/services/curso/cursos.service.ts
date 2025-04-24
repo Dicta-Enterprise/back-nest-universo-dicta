@@ -48,7 +48,7 @@ export class CursosService extends PrismaClient implements OnModuleInit {
               id: createCursoDto.idioma,
             },
           },
-          planetas: {
+          planeta: {
             connect: {
               id: createCursoDto.planetas,
             },
