@@ -23,6 +23,9 @@ export class GalaxiasController {
 
     private readonly getAllGalaxiaUseCase: useCase.GetAllGalaxiaUseCase,
     private readonly createUseCase: useCase.CreateGalaxiaUseCase,
+    private readonly getOneGalaxiaUseCase: useCase.GetOneGalaxiaUseCase,
+    private readonly updateGalaxiaUseCase: useCase.UpdateGalaxiaUseCase,
+    private readonly deleteGalaxiaUseCase: useCase.DeleteGalaxiaUseCase,
   ) {}
 
   @Post()

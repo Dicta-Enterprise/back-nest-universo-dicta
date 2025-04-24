@@ -74,31 +74,21 @@ export class GalaxiasService extends PrismaClient implements OnModuleInit {
     return this.repository.findAllActive();
   }
 
-  async findOne(id: string) {
-    try {
-      const galaxia = await this.galaxia.findUnique({
-        where: {
+  async findOne(id: string): Promise<Galaxia> {
+    const existe =  await this.repository.findById(id);
+
+    if (!existe) {
+      throw new BussinesRuleException(
+        'No se encontró la galaxia',
+        HttpStatus.NOT_FOUND,
+        {
           id: id,
-          estado: 'ACTIVO',
+          codigoError: 'GALAXIA_NO_ENCONTRADA',
         },
-      });
-
-      if (!galaxia) {
-        throw new CustomError(
-          'No se encontró la galaxia',
-          'Not Found',
-          HttpStatus.NOT_FOUND,
-        );
-      }
-
-      return new GenericSingle(galaxia, HttpStatus.OK, 'Galaxia encontrada');
-    } catch (error) {
-      throw new CustomError(
-        'Error',
-        error.message,
-        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
+    return existe;
+
   }
 
   async update(id: string, updateGalaxiaDto: UpdateGalaxiaDto) {

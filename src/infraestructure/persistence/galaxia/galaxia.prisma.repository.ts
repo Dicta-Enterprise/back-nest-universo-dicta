@@ -46,6 +46,12 @@ export class GalaxiaPrismaRepository implements GalaxiaRepository {
       where: {
         estado: 'ACTIVO',
       },
+      include: {
+        categorias: true,
+      },
+      orderBy: {
+        fechaCreacion: 'desc',
+      },
     });
 
     const res = Galaxia.fromPrismaList(galaxias);

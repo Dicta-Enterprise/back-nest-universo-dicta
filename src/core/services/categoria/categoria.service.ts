@@ -50,7 +50,7 @@ export class CategoriaService {
   }
 
   async obtenerUnaCategoria(id: string): Promise<Categoria> {
-    const existe = this.repository.findById(id);
+    const existe = await this.repository.findById(id);
 
     if (!existe) {
       throw new BussinesRuleException(

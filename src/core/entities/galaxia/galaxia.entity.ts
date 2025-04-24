@@ -1,5 +1,6 @@
-import { EstadoGenerico } from '@prisma/client';
-import { ObjectId } from 'mongodb';
+import {  EstadoGenerico } from '@prisma/client';
+import { Categoria } from '../categoria/categoria.entity';
+// import { ObjectId } from 'mongodb';
 
 export class Galaxia {
   constructor(
@@ -10,7 +11,7 @@ export class Galaxia {
     public estado: EstadoGenerico,
     public fechaCreacion: Date,
     public fechaActualizacion: Date,
-    public categorias:ObjectId[]
+    public categorias:Categoria[]
   ) {}
 
 
@@ -20,6 +21,7 @@ export class Galaxia {
 
 
     static fromPrisma(data: any): Galaxia {
+      console.log(data);
         return new Galaxia(
             data.id,
             data.nombre,
@@ -28,7 +30,7 @@ export class Galaxia {
             data.estado,
             data.fechaCreacion,
             data.fechaActualizacion,
-            data.categoriaId
+            Categoria.fromPrismaList(data.categorias)
         );
     }
 
