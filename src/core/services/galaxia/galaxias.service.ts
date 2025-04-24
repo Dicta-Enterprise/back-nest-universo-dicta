@@ -10,6 +10,7 @@ import { ValidatorService } from 'src/shared/application/validation/validator.se
 import { CustomError } from 'src/shared/class/Error.Class';
 import { GenericSingle } from 'src/shared/class/Generic.Class';
 import { BussinesRuleException } from 'src/shared/domain/exceptions/business-rule.exception';
+import { CategoriaService } from '../categoria/categoria.service';
 
 @Injectable()
 export class GalaxiasService extends PrismaClient implements OnModuleInit {
@@ -19,6 +20,7 @@ export class GalaxiasService extends PrismaClient implements OnModuleInit {
 
   constructor(
     @Inject(GALAXIA_REPOSITORY) private repository: GalaxiaRepository,
+    private categoriaService: CategoriaService,
     private readonly validator: ValidatorService,
   ) {
     super();
@@ -39,6 +41,18 @@ export class GalaxiasService extends PrismaClient implements OnModuleInit {
       );
     }
 
+    const categorias = await this.categoriaService.listarCategorias();
+
+    if (!categorias || categorias.length === 0) {
+      throw new BussinesRuleException(
+        'No hay categorías disponibles',
+        HttpStatus.BAD_REQUEST,
+        {
+          codigoError: 'CATEGORIAS_NO_ENCONTRADAS',
+        },
+      );
+    }
+
     const galaxia = new Galaxia(
       null,
       createGalaxiaDto.nombre,
@@ -47,9 +61,13 @@ export class GalaxiasService extends PrismaClient implements OnModuleInit {
       createGalaxiaDto.estado,
       createGalaxiaDto.fechaCreacion,
       createGalaxiaDto.fechaActualizacion,
+      [],
     );
 
-    return this.repository.save(galaxia);
+    return this.repository.save(
+      galaxia,
+      categorias.map((cat) => cat.id),
+    );
   }
 
   async findAll() {

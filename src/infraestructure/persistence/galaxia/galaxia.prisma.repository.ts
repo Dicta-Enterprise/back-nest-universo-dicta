@@ -2,10 +2,31 @@ import { Injectable } from '@nestjs/common';
 import { Galaxia } from 'src/core/entities/galaxia/galaxia.entity';
 import { GalaxiaRepository } from 'src/core/repositories/galaxia/galaxia.repository';
 import { PrismaService } from 'src/core/services/prisma/prisma.service';
-
+// import { ObjectId } from 'mongodb';
 @Injectable()
 export class GalaxiaPrismaRepository implements GalaxiaRepository {
   constructor(private prisma: PrismaService) {}
+
+  async save(galaxia: Galaxia, categoriaIds: string[]): Promise<Galaxia> {
+    //const idFormated = categoriaIds.map((id) => new ObjectId(id));
+
+    const data = await this.prisma.galaxia.create({
+      data: {
+        nombre: galaxia.nombre,
+        descripcion: galaxia.descripcion,
+        imagen: galaxia.imagen,
+        estado: galaxia.estado,
+        categorias: {
+          connect: categoriaIds.map((id) => ({ id })),
+        },
+      },
+      include: {
+        categorias: true,
+      },
+    });
+
+    return Galaxia.fromPrisma(data);
+  }
 
   findById(id: string): Promise<Galaxia | null> {
     console.log(id);
@@ -29,21 +50,6 @@ export class GalaxiaPrismaRepository implements GalaxiaRepository {
 
     const res = Galaxia.fromPrismaList(galaxias);
     return res;
-  }
-
-  async save(galaxia: Galaxia): Promise<Galaxia> {
-    const data = await this.prisma.galaxia.create({
-      data: {
-        nombre: galaxia.nombre,
-        descripcion: galaxia.descripcion,
-        imagen: galaxia.imagen,
-        estado: galaxia.estado,
-        fechaCreacion: galaxia.fechaCreacion,
-        fechaActualizacion: galaxia.fechaActualizacion,
-      },
-    });
-
-    return Galaxia.fromPrisma(data);
   }
 
   update(id: string, galaxia: Partial<Galaxia>): Promise<Galaxia> {

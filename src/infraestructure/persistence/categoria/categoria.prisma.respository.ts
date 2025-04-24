@@ -37,14 +37,8 @@ export class CategoriaPrismaRepository implements CategoriaRepository {
   }
 
   async findAllActive(): Promise<Categoria[]> {
-    const categorias = await this.prisma.categoria.findMany({
-      where: {
-        estado: 'ACTIVO',
-      },
-    });
-
+    const categorias = await this.prisma.categoria.findMany();
     const res = Categoria.fromPrismaList(categorias);
-
     return res;
   }
 

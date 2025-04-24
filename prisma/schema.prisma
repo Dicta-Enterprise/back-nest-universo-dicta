@@ -65,7 +65,9 @@ model Categoria {
   estado             EstadoGenerico @default(ACTIVO)
   fechaCreacion      DateTime       @default(now())
   fechaActualizacion DateTime       @updatedAt
-  cursos             Curso[] // Relación sin fields/references aquí
+  cursos             Curso[]
+  galaxias           Galaxia[]      @relation(fields: [galaxiaId], references: [id])
+  galaxiaId          String[]       @db.ObjectId
 }
 
 model Idioma {
@@ -127,4 +129,6 @@ model Galaxia {
   fechaCreacion      DateTime       @default(now())
   fechaActualizacion DateTime       @updatedAt
   planetas           Planeta[]
+  categorias         Categoria[]    @relation(fields: [categoriaId], references: [id])
+  categoriaId        String[]       @db.ObjectId
 }

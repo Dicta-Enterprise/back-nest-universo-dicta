@@ -1,4 +1,5 @@
 import { EstadoGenerico } from '@prisma/client';
+import { ObjectId } from 'mongodb';
 
 export class Galaxia {
   constructor(
@@ -9,6 +10,7 @@ export class Galaxia {
     public estado: EstadoGenerico,
     public fechaCreacion: Date,
     public fechaActualizacion: Date,
+    public categorias:ObjectId[]
   ) {}
 
 
@@ -26,6 +28,7 @@ export class Galaxia {
             data.estado,
             data.fechaCreacion,
             data.fechaActualizacion,
+            data.categoriaId
         );
     }
 
