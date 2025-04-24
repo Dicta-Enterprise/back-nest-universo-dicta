@@ -32,7 +32,7 @@ export class CategoriaController {
     }
 
     return {
-      data: result.getValue(),
+      data: result,
       message: 'Categoría creada',
     };
   }
