@@ -29,6 +29,7 @@ export class CategoriaPrismaRepository implements CategoriaRepository {
       data: {
         nombre: categoria.nombre,
         descripcion: categoria.descripcion,
+        imagenUrl: categoria.imagenUrl,
         estado: categoria.estado,
       },
     });

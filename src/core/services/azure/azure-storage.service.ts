@@ -5,7 +5,7 @@ import {
 } from '@azure/storage-blob';
 import { Injectable } from '@nestjs/common';
 import { envs } from 'src/config/envs';
-import { FolderEnum } from 'src/shared/enums/forlder.enum';
+import { AllowedFolder } from 'src/shared/types/folder.type';
 
 @Injectable()
 export class AzureStorageService {
@@ -27,7 +27,7 @@ export class AzureStorageService {
 
   async uploadFile(
     file: Express.Multer.File,
-    folder: FolderEnum,
+    folder: AllowedFolder,
   ): Promise<string> {
     const containerClient = this.blobServiceClient.getContainerClient(
       this.containerName,
@@ -63,5 +63,21 @@ export class AzureStorageService {
     }
 
     return blobClient;
+  }
+
+  async deleteBlob(blobName: string): Promise<boolean> {
+    const containerClient = this.blobServiceClient.getContainerClient(
+      this.containerName,
+    );
+    const blobClient = containerClient.getBlobClient(blobName);
+
+    const exists = await blobClient.exists();
+
+    if (exists) {
+      await blobClient.delete();
+      return true;
+    } else {
+      return false;
+    }
   }
 }

@@ -13,9 +13,15 @@ export class CreateCategoriaUseCase {
     private readonly eventEmitter: EventEmitter2,
   ) {}
 
-  async execute(dto: CreateCategoriaDto): Promise<Result<Categoria>> {
+  async execute(
+    dto: CreateCategoriaDto,
+    imagenResult: string,
+  ): Promise<Result<Categoria>> {
+    
+    const createDto = {...dto, imagenUrl: imagenResult };
+
     try {
-      const categoria = await this.categoriaService.crearCategoria(dto);
+      const categoria = await this.categoriaService.crearCategoria(createDto);
       this.eventEmitter.emit('categoria.creada', new CategoriaEvent(categoria));
       return Result.ok(categoria);
     } catch (error) {

@@ -33,4 +33,9 @@ export class CreateCategoriaDto {
   @IsOptional()
   @Type(() => Date)
   fechaActualizacion: Date;
+
+
+  @IsOptional()
+  @IsString()
+  imagenUrl: string;
 }

@@ -1,37 +1,39 @@
 import {
   Controller,
-  Get,
+  HttpException,
+  HttpStatus,
   Param,
   Post,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { AzureStorageService } from 'src/core/services/azure/azure-storage.service';
-import { FolderEnum } from 'src/shared/enums/forlder.enum';
+
+import { SaveImageStorageUseCase } from 'src/application/uses-cases/azure/save-image-storage.use.case';
+import { ValidateFolderPipe } from 'src/shared/pipes/validate-folder.pipe';
+import { AllowedFolder } from 'src/shared/types/folder.type';
 
 @Controller('az-upload')
 export class UploadController {
-  constructor(private readonly azureStorageService: AzureStorageService) {}
+  constructor(
+    private readonly saveImageStorageUseCase: SaveImageStorageUseCase,
+  ) {}
 
-  @Post('upload/:tipo')
+  @Post('upload/:folder')
   @UseInterceptors(FileInterceptor('file'))
-  uploadGenerico(
+  async uploadGenerico(
     @UploadedFile() file: Express.Multer.File,
-    @Param('folder') folder: FolderEnum,
+    @Param('folder', ValidateFolderPipe) folder: AllowedFolder,
   ) {
-    return this.azureStorageService.uploadFile(file, folder);
-  }
+    const result = await this.saveImageStorageUseCase.execute(file, folder);
 
-  @Get('test-health') //Validar si el contenedor existe
-  async testAzure() {
-    const blobName = 'cr7.jpg';
-    const blobClient = await this.azureStorageService.getBlob(blobName);
-
-    if (blobClient) {
-      return { message: 'Blob exists', url: blobClient.url };
-    } else {
-      return { message: 'Blob does not exist' };
+    if (result.isFailure) {
+      throw new HttpException(result.error.message, HttpStatus.BAD_REQUEST);
     }
+
+    return {
+      data: result,
+      message: `Imagen de ${folder} subida correctamente`,
+    };
   }
 }

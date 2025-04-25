@@ -8,10 +8,15 @@ import {
   Param,
   Patch,
   Post,
+  UseInterceptors,
 } from '@nestjs/common';
 import { ParseObjectIdPipe } from 'src/shared/pipes/parse-object-id.pipe';
 import * as useCase from 'src/application/uses-cases/categoria';
 import * as dto from 'src/application/dto/categoria';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { SaveImageStorageUseCase } from 'src/application/uses-cases/azure/save-image-storage.use.case';
+import { RequiredFile } from 'src/shared/decorator/required-file.decorator';
+import { DeleteImageStorageUseCase } from 'src/application/uses-cases/azure/delete-image-storage.use.case';
 
 @Controller('categorias')
 export class CategoriaController {
@@ -21,13 +26,30 @@ export class CategoriaController {
     private getOneCategoriaUseCase: useCase.GetOneCategoriaUseCase,
     private updateCategoriaUseCase: useCase.UpdateCategoriaUseCase,
     private deleteCategoriaUseCase: useCase.DeleteCategoriaUseCase,
+    private readonly saveImageStorageUseCase: SaveImageStorageUseCase,
+    private readonly deleteImageStorageUseCase: DeleteImageStorageUseCase,
   ) {}
 
   @Post()
-  async create(@Body() dto: dto.CreateCategoriaDto) {
-    const result = await this.createUseCase.execute(dto);
+  @UseInterceptors(FileInterceptor('file'))
+  async create(
+    @RequiredFile() file: Express.Multer.File,
+    @Body() dto: dto.CreateCategoriaDto,
+  ) {
+    
+    const imageResult = await this.saveImageStorageUseCase.execute(file, 'categorias');
+
+    if (imageResult.isFailure) {
+      throw new HttpException(
+        imageResult.error.message,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const result = await this.createUseCase.execute(dto, imageResult.getValue());
 
     if (result.isFailure) {
+      await this.deleteImageStorageUseCase.execute(imageResult.getValue());
       throw new HttpException(result.error.message, HttpStatus.BAD_REQUEST);
     }
 
@@ -36,6 +58,9 @@ export class CategoriaController {
       message: 'Categoría creada',
     };
   }
+
+
+
 
   @Get()
   async getAll() {
