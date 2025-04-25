@@ -1,5 +1,4 @@
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { EstadoGenerico } from '@prisma/client';
 import {
   CreateCategoriaDto,
   UpdateCategoriaDto,
@@ -38,7 +37,7 @@ export class CategoriaService {
       dto.nombre,
       dto.descripcion || '',
       dto.imagenUrl || '',
-      'ACTIVO',
+      true,
       new Date(),
       new Date(),
     );
@@ -78,7 +77,7 @@ export class CategoriaService {
       dto.nombre,
       dto.descripcion || '',
       dto.imagenUrl || '',
-      'ACTIVO',
+      true,
       new Date(),
       new Date(),
     );
@@ -89,10 +88,7 @@ export class CategoriaService {
   async eliminarCategoria(id: string): Promise<Categoria> {
     const categoria = await this.obtenerUnaCategoria(id);
 
-    const estado: EstadoGenerico =
-      categoria.estado === EstadoGenerico.INACTIVO
-        ? EstadoGenerico.ACTIVO
-        : EstadoGenerico.INACTIVO;
+    const estado: boolean = categoria.estado === true ? false : true; // Cambia el estado a false si ya está en false
 
     return this.repository.delete(id, estado);
   }

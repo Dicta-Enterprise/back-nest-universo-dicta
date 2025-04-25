@@ -4,13 +4,13 @@ export class Categoria {
     public nombre: string,
     public descripcion: string,
     public imagenUrl: string,
-    public estado: 'ACTIVO' | 'INACTIVO',
+    public estado: boolean,
     public fechaCreacion: Date,
     public fechaActualizacion: Date,
   ) {}
 
   public desactivar(): void {
-    this.estado = 'INACTIVO';
+    this.estado = false;
   }
 
   static fromPrismaList(data: any[]): Categoria[] {

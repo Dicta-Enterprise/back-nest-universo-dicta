@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { EstadoGenerico } from '@prisma/client';
 import { Categoria } from 'src/core/entities/categoria/categoria.entity';
 import { CategoriaRepository } from 'src/core/repositories/categoria/categoria.respository';
 import { PrismaService } from 'src/core/services/prisma/prisma.service';
@@ -55,7 +54,7 @@ export class CategoriaPrismaRepository implements CategoriaRepository {
     return Categoria.fromPrisma(data);
   }
 
-  async delete(id: string, estado: EstadoGenerico): Promise<Categoria> {
+  async delete(id: string, estado: boolean): Promise<Categoria> {
     const data = await this.prisma.categoria.update({
       where: { id },
       data: {

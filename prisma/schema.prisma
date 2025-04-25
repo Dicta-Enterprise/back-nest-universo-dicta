@@ -63,7 +63,7 @@ model Categoria {
   nombre             String         @unique
   descripcion        String
   imagenUrl          String
-  estado             EstadoGenerico @default(ACTIVO)
+  estado             Boolean        @default(true)
   fechaCreacion      DateTime       @default(now())
   fechaActualizacion DateTime       @updatedAt
   cursos             Curso[]

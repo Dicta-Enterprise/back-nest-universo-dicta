@@ -1,8 +1,7 @@
-import { EstadoGenerico } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
 import {
+  IsBoolean,
   IsDate,
-  IsEnum,
   IsNotEmpty,
   IsOptional,
   IsString,
@@ -18,11 +17,8 @@ export class CreateCategoriaDto {
   descripcion: string;
 
   @IsOptional()
-  @IsEnum(EstadoGenerico, {
-    message:
-      'El estado proporcionado no es válido. Valores permitidos: ACTIVO, INACTIVO, PENDIENTE, ELIMINADO, DESHABILITADO.',
-  })
-  estado: EstadoGenerico;
+  @IsBoolean()
+  estado: boolean;
 
   @IsDate()
   @IsOptional()
@@ -33,7 +29,6 @@ export class CreateCategoriaDto {
   @IsOptional()
   @Type(() => Date)
   fechaActualizacion: Date;
-
 
   @IsOptional()
   @IsString()
