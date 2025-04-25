@@ -10,7 +10,7 @@ import { AllowedFolder } from 'src/shared/types/folder.type';
 @Injectable()
 export class AzureStorageService {
   private blobServiceClient: BlobServiceClient;
-  private containerName: string = envs.azureBlobContainerName; // Replace with your container name
+  private containerName: string = envs.azureBlobContainerName;
 
   constructor() {
     const account = envs.azureStorageAccountName;
@@ -51,17 +51,6 @@ export class AzureStorageService {
       this.containerName,
     );
     const blobClient = containerClient.getBlobClient(blobName);
-
-    const exists = await blobClient.exists();
-
-    if (!exists) {
-      // this.logger.warn(`Blob no existe: ${blobName}`);
-      console.log('Blob no existe: ', blobName);
-    } else {
-      // this.logger.log(`Blob ya existe: ${blobClient.url}`);
-      console.log('Blob ya existe: ', blobClient.url);
-    }
-
     return blobClient;
   }
 

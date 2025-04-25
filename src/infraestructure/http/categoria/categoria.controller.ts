@@ -14,9 +14,8 @@ import { ParseObjectIdPipe } from 'src/shared/pipes/parse-object-id.pipe';
 import * as useCase from 'src/application/uses-cases/categoria';
 import * as dto from 'src/application/dto/categoria';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { SaveImageStorageUseCase } from 'src/application/uses-cases/azure/save-image-storage.use.case';
 import { RequiredFile } from 'src/shared/decorator/required-file.decorator';
-import { DeleteImageStorageUseCase } from 'src/application/uses-cases/azure/delete-image-storage.use.case';
+import * as azureCase from 'src/application/uses-cases/azure';
 
 @Controller('categorias')
 export class CategoriaController {
@@ -26,8 +25,8 @@ export class CategoriaController {
     private getOneCategoriaUseCase: useCase.GetOneCategoriaUseCase,
     private updateCategoriaUseCase: useCase.UpdateCategoriaUseCase,
     private deleteCategoriaUseCase: useCase.DeleteCategoriaUseCase,
-    private readonly saveImageStorageUseCase: SaveImageStorageUseCase,
-    private readonly deleteImageStorageUseCase: DeleteImageStorageUseCase,
+    private readonly saveImageStorageUseCase: azureCase.SaveImageStorageUseCase,
+    private readonly deleteImageStorageUseCase: azureCase.DeleteImageStorageUseCase,
   ) {}
 
   @Post()
@@ -36,7 +35,6 @@ export class CategoriaController {
     @RequiredFile() file: Express.Multer.File,
     @Body() dto: dto.CreateCategoriaDto,
   ) {
-    
     const imageResult = await this.saveImageStorageUseCase.execute(file, 'categorias');
 
     if (imageResult.isFailure) {
@@ -46,7 +44,7 @@ export class CategoriaController {
       );
     }
 
-    const result = await this.createUseCase.execute(dto, imageResult.getValue());
+    const result = await this.createUseCase.execute(dto,imageResult.getValue());
 
     if (result.isFailure) {
       await this.deleteImageStorageUseCase.execute(imageResult.getValue());
@@ -58,9 +56,6 @@ export class CategoriaController {
       message: 'Categoría creada',
     };
   }
-
-
-
 
   @Get()
   async getAll() {
