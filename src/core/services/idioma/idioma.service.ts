@@ -4,41 +4,37 @@ import { UpdateIdiomaDto } from 'src/application/dto/idioma/update-idioma.dto';
 import { IDIOMA_REPOSITORY } from 'src/core/constants/constants';
 import { Idioma } from 'src/core/entities/idioma/idioma.entity';
 import { IdiomaRepository } from 'src/core/repositories/idioma/idioma.repostitory';
-// import { ValidatorService } from 'src/shared/application/validation/validator.service';
+import { ValidatorService } from 'src/shared/application/validation/validator.service';
 import { BussinesRuleException } from 'src/shared/domain/exceptions/business-rule.exception';
 
 @Injectable()
 export class IdiomaService {
   constructor(
-    @Inject(IDIOMA_REPOSITORY)
-    private repository: IdiomaRepository,
-    //private readonly validator: ValidatorService,
+    @Inject(IDIOMA_REPOSITORY) private repository: IdiomaRepository,
+    private readonly validator: ValidatorService,
   ) {}
 
-  async crearIdioma(dto: any): Promise<any> {
-    console.log("jajja")
-  //   console.log(dto)
-  //   console.log('Entro en crearIdioma');  // Log para verificar que se entra en el servicio
-  //   //await this.validator.validate(dto, CreateIdiomaDto);
+  async crearIdioma(dto: any): Promise<Idioma> {
+
+    console.log("En el servicio");
+    await this.validator.validate(dto, CreateIdiomaDto);
      
-  //   const existe = await this.repository.findByName(dto.nombre);
-  //   console.log('Idioma encontrado:', existe);  // Log para verificar si ya existe el idioma
-    
-  //   // if (existe) {
-  //   //   throw new BussinesRuleException(
-  //   //     'El idioma ya existe',
-  //   //     HttpStatus.BAD_REQUEST,
-  //   //     {
-  //   //       nombre: dto.nombre,
-  //   //       codigoError: 'IDIOMA_DUPLICADO',
-  //   //     },
-  //   //   );
-  //   // }
+    const existe = await this.repository.findByName(dto.nombre);
+
+    if (existe) {
+      throw new BussinesRuleException(
+        'El idioma ya existe',
+        HttpStatus.BAD_REQUEST,
+        {
+          nombre: dto.nombre,
+          codigoError: 'IDIOMA_DUPLICADO',
+        },
+      );
+    }
   
-  //   const idioma = new Idioma(null, dto.nombre, true);
-  //   console.log('Idioma creado:', idioma);  // Log para verificar si el idioma se crea correctamente
-    
-  //   return this.repository.save(idioma);
+    const idioma = new Idioma(null, dto.nombre, true);
+
+    return this.repository.save(idioma);
   }
   
   async listarIdiomas(): Promise<Idioma[]> {

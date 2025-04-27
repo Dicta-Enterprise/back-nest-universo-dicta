@@ -74,7 +74,7 @@ model Categoria {
 model Idioma {
   id     String  @id @default(auto()) @map("_id") @db.ObjectId
   estado Boolean @default(true)
-  nombre String
+  nombre String  @unique
   cursos Curso[]
 }
 
