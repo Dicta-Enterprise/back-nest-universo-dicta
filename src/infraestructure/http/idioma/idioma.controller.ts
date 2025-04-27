@@ -15,6 +15,7 @@ export class IdiomaController {
   @Post()
   async create(@Body() createIdiomaDto: CreateIdiomaDto) {
     const result = await this.createIdiomaUseCase.execute(createIdiomaDto);
+    console.log(result)
     if (result.isFailure) {
       throw new HttpException(result.error.message, HttpStatus.BAD_REQUEST);
     }

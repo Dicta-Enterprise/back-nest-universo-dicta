@@ -1,12 +1,12 @@
-import { Estandar } from "src/core/entities/estandar/estandar.entity";
+import { Idioma } from "src/core/entities/idioma/idioma.entity"
 
 
 
 export interface IdiomaRepository {
-      findById(id: string): Promise<Estandar | null>;
-      findByName(nombre: string): Promise<Estandar | null>;
-      findAllActive(): Promise<Estandar[]>;
-      save(idioma: Estandar): Promise<Estandar>;
-      update(id: string, idioma: Partial<Estandar>): Promise<Estandar>;
-      delete(id: string, estado: Estandar): Promise<Estandar>;
+      findById(id: string): Promise<Idioma | null>;
+      findByName(nombre: string): Promise<Idioma | null>;
+      findAllActive(): Promise<Idioma[]>;
+      save(idioma: Idioma): Promise<Idioma>;
+      update(id: string, idioma: Partial<Idioma>): Promise<Idioma>;
+      delete(id: string, estado: boolean): Promise<Idioma>;
 }

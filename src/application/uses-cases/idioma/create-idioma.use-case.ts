@@ -1,19 +1,19 @@
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { CreateIdiomaDto } from 'src/application/dto/idioma/create-idioma.dto';
-import { Estandar } from 'src/core/entities/estandar/estandar.entity';
+import { Idioma } from 'src/core/entities/idioma/idioma.entity'
 import { IdiomaService } from 'src/core/services/idioma/idioma.service';
 import { Result } from 'src/shared/domain/result/result';
 
 export class CreateIdiomaUseCase {
   constructor(
-    private readonly idiomaSercive: IdiomaService,
+    private readonly idiomaService: IdiomaService,
     private readonly eventEmitter: EventEmitter2,
   ) {}
 
-  async execute(dto: CreateIdiomaDto): Promise<Result<Estandar>> {
+  async execute(dto: CreateIdiomaDto): Promise<Result<Idioma>> {
     try {
-      const idioma = await this.idiomaSercive.crearIdioma(dto);
-
+     console.log(dto)
+      const idioma = await this.idiomaService.crearIdioma(dto);
       return Result.ok(idioma);
     } catch (error) {
       return Result.fail(error);

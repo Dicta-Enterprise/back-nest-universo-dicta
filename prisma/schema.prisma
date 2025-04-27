@@ -59,20 +59,21 @@ enum TipoUsuario {
 }
 
 model Categoria {
-  id                 String         @id @default(auto()) @map("_id") @db.ObjectId
-  nombre             String         @unique
+  id                 String    @id @default(auto()) @map("_id") @db.ObjectId
+  nombre             String    @unique
   descripcion        String
   imagenUrl          String
-  estado             Boolean        @default(true)
-  fechaCreacion      DateTime       @default(now())
-  fechaActualizacion DateTime       @updatedAt
+  estado             Boolean   @default(true)
+  fechaCreacion      DateTime  @default(now())
+  fechaActualizacion DateTime  @updatedAt
   cursos             Curso[]
-  galaxias           Galaxia[]      @relation(fields: [galaxiaId], references: [id])
-  galaxiaId          String[]       @db.ObjectId
+  galaxias           Galaxia[] @relation(fields: [galaxiaId], references: [id])
+  galaxiaId          String[]  @db.ObjectId
 }
 
 model Idioma {
   id     String  @id @default(auto()) @map("_id") @db.ObjectId
+  estado Boolean @default(true)
   nombre String
   cursos Curso[]
 }

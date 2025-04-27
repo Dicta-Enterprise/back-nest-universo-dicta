@@ -5,5 +5,5 @@ export class CreateIdiomaDto {
   @IsString()
   @IsNotEmpty()
   @Transform(({ value }) => value.trim())
-  descripcion: string;
+  nombre: string;
 }

@@ -6,6 +6,7 @@ import { IDIOMA_REPOSITORY } from 'src/core/constants/constants';
 import { IdiomaPrismaRepository } from 'src/infraestructure/persistence/idioma/idoma.prisma.repository';
 import { IdiomaService } from 'src/core/services/idioma/idioma.service';
 import { CreateIdiomaUseCase } from 'src/application/uses-cases/idioma/create-idioma.use-case';
+import { ValidatorService } from 'src/shared/application/validation/validator.service';
 
 @Module({
   imports: [SharedModule, PrismaModule],
@@ -17,6 +18,7 @@ import { CreateIdiomaUseCase } from 'src/application/uses-cases/idioma/create-id
     },
     IdiomaService,
     CreateIdiomaUseCase,
+    ValidatorService,
   ],
   exports: [IdiomaService],
 })
