@@ -8,9 +8,12 @@ export class IdiomaPrismaRepository implements IdiomaRepository {
 
   constructor(private prisma: PrismaService) {}
 
-  findById(id: string): Promise<Idioma | null> {
-    console.log('id', id);
-    throw new Error('Method not implemented.');
+  async findById(id: string): Promise<Idioma | null> {
+    const data = await this.prisma.idioma.findUnique({
+         where: { id },
+       });
+   
+       return data ? Idioma.fromPrisma(data) : null;
   }
 
 
@@ -24,9 +27,12 @@ export class IdiomaPrismaRepository implements IdiomaRepository {
   }
 
 
-  findAllActive(): Promise<Idioma[]> {
-    throw new Error('Method not implemented.');
+  async findAllActive(): Promise<Idioma[]> {
+    const idiomas = await this.prisma.idioma.findMany(); 
+    const result = Idioma.fromPrismaList(idiomas);  
+    return result;  
   }
+  
 
   
   async save(idioma: Idioma): Promise<Idioma> {
@@ -42,12 +48,26 @@ export class IdiomaPrismaRepository implements IdiomaRepository {
   }
 
 
-  update(id: string, idioma: Partial<Idioma>): Promise<Idioma> {
-    console.log('idioma', idioma);
-    throw new Error('Method not implemented.');
+  async update(id: string, idioma: Partial<Idioma>): Promise<Idioma> {
+    const data = await this.prisma.idioma.update({
+      where: { id }, 
+      data: {
+        nombre: idioma.nombre, 
+        estado: idioma.estado,
+      },
+    });
+
+    return Idioma.fromPrisma(data);
   }
-  delete(id: string, estado: boolean): Promise<Idioma> {
-    console.log('id', id, estado);
-    throw new Error('Method not implemented.');
+
+  async delete(id: string, estado: boolean): Promise<Idioma> {
+    console.log("Metodo delete")
+         const data = await this.prisma.idioma.update({
+          where: { id },
+          data: {
+            estado: estado,
+          },
+        });
+        return Idioma.fromPrisma(data);
   }
 }

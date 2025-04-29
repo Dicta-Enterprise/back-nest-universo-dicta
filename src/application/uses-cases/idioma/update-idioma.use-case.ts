@@ -13,7 +13,7 @@ export class ActualizarIdiomaCasoDeUso {
     private readonly eventEmitter: EventEmitter2,
   ) {}
 
-  async ejecutar(
+  async execute(
     id: string,
     dto: UpdateIdiomaDto,
   ): Promise<Result<Idioma>> {

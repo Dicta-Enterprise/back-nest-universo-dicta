@@ -16,7 +16,7 @@ export class IdiomaService {
 
   async crearIdioma(dto: any): Promise<Idioma> {
 
-    console.log("En el servicio");
+    
     await this.validator.validate(dto, CreateIdiomaDto);
      
     const existe = await this.repository.findByName(dto.nombre);
@@ -39,9 +39,10 @@ export class IdiomaService {
   
   async listarIdiomas(): Promise<Idioma[]> {
       return this.repository.findAllActive();
-    }
+  }
 
    async obtenerUnIdioma(id: string): Promise<Idioma> {
+    
       const existe = await this.repository.findById(id);
   
       if (!existe) {
@@ -63,20 +64,21 @@ export class IdiomaService {
       id: string,
       dto: UpdateIdiomaDto,
     ): Promise<Idioma> {
-      //await this.validator.validate(dto, UpdateIdiomaDto);
+      await this.validator.validate(dto, UpdateIdiomaDto);
     
       const idioma = new Idioma(
         id,
         dto.nombre,
-        true, // Mantienes el estado como activo
+        true, 
       );
     
       return this.repository.update(id, idioma);
     }
     
   async eliminarIdioma(id: string): Promise<Idioma> {
+    console.log("servicio",id)
       const idioma = await this.obtenerUnIdioma(id);
-  
+      console.log("idioma",idioma)
       const estado: boolean = idioma.estado === true ? false : true; // Cambia el estado a false si ya está en false
   
       return this.repository.delete(id, estado);
