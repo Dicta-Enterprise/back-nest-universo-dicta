@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { EstadoGenerico } from '@prisma/client';
 import { Categoria } from 'src/core/entities/categoria/categoria.entity';
 import { CategoriaRepository } from 'src/core/repositories/categoria/categoria.respository';
 import { PrismaService } from 'src/core/services/prisma/prisma.service';
@@ -29,6 +28,7 @@ export class CategoriaPrismaRepository implements CategoriaRepository {
       data: {
         nombre: categoria.nombre,
         descripcion: categoria.descripcion,
+        imagenUrl: categoria.imagenUrl,
         estado: categoria.estado,
       },
     });
@@ -37,14 +37,8 @@ export class CategoriaPrismaRepository implements CategoriaRepository {
   }
 
   async findAllActive(): Promise<Categoria[]> {
-    const categorias = await this.prisma.categoria.findMany({
-      where: {
-        estado: 'ACTIVO',
-      },
-    });
-
+    const categorias = await this.prisma.categoria.findMany();
     const res = Categoria.fromPrismaList(categorias);
-
     return res;
   }
 
@@ -60,7 +54,7 @@ export class CategoriaPrismaRepository implements CategoriaRepository {
     return Categoria.fromPrisma(data);
   }
 
-  async delete(id: string, estado: EstadoGenerico): Promise<Categoria> {
+  async delete(id: string, estado: boolean): Promise<Categoria> {
     const data = await this.prisma.categoria.update({
       where: { id },
       data: {

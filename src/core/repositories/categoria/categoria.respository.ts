@@ -1,4 +1,4 @@
-import { EstadoGenerico } from '@prisma/client';
+
 import { Categoria } from 'src/core/entities/categoria/categoria.entity';
 
 export interface CategoriaRepository {
@@ -7,5 +7,5 @@ export interface CategoriaRepository {
   findAllActive(): Promise<Categoria[]>;
   save(categoria: Categoria): Promise<Categoria>;
   update(id: string, categoria: Partial<Categoria>): Promise<Categoria>;
-  delete(id: string, estado: EstadoGenerico): Promise<Categoria>;
+  delete(id: string, estado: boolean): Promise<Categoria>;
 }

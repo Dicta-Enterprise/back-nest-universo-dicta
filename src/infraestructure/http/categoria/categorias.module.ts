@@ -10,6 +10,9 @@ import { GetAllCategoriaUseCase } from 'src/application/uses-cases/categoria/get
 import { GetOneCategoriaUseCase } from 'src/application/uses-cases/categoria/get-one-categoria.use-case';
 import { UpdateCategoriaUseCase } from 'src/application/uses-cases/categoria/update-categoria.use-case';
 import { DeleteCategoriaUseCase } from 'src/application/uses-cases/categoria/delete-categoria.use-case';
+import { SaveImageStorageUseCase } from 'src/application/uses-cases/azure/save-image-storage.use.case';
+import { AzureStorageService } from 'src/core/services/azure/azure-storage.service';
+import { DeleteImageStorageUseCase } from 'src/application/uses-cases/azure/delete-image-storage.use.case';
 
 @Module({
   imports: [SharedModule, PrismaModule],
@@ -25,6 +28,9 @@ import { DeleteCategoriaUseCase } from 'src/application/uses-cases/categoria/del
     GetOneCategoriaUseCase,
     UpdateCategoriaUseCase,
     DeleteCategoriaUseCase,
+    SaveImageStorageUseCase,
+    DeleteImageStorageUseCase,
+    AzureStorageService
   ],
   exports: [CategoriaService],
 })

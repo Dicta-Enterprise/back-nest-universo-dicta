@@ -1,5 +1,4 @@
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { EstadoGenerico } from '@prisma/client';
 import {
   CreateCategoriaDto,
   UpdateCategoriaDto,
@@ -31,14 +30,14 @@ export class CategoriaService {
           codigoError: 'CATEGORIA_DUPLICADA',
         },
       );
-
     }
 
     const categoria = new Categoria(
       null,
       dto.nombre,
       dto.descripcion || '',
-      'ACTIVO',
+      dto.imagenUrl || '',
+      true,
       new Date(),
       new Date(),
     );
@@ -51,7 +50,7 @@ export class CategoriaService {
   }
 
   async obtenerUnaCategoria(id: string): Promise<Categoria> {
-    const existe = this.repository.findById(id);
+    const existe = await this.repository.findById(id);
 
     if (!existe) {
       throw new BussinesRuleException(
@@ -77,7 +76,8 @@ export class CategoriaService {
       null,
       dto.nombre,
       dto.descripcion || '',
-      'ACTIVO',
+      dto.imagenUrl || '',
+      true,
       new Date(),
       new Date(),
     );
@@ -88,10 +88,7 @@ export class CategoriaService {
   async eliminarCategoria(id: string): Promise<Categoria> {
     const categoria = await this.obtenerUnaCategoria(id);
 
-    const estado: EstadoGenerico =
-      categoria.estado === EstadoGenerico.INACTIVO
-        ? EstadoGenerico.ACTIVO
-        : EstadoGenerico.INACTIVO;
+    const estado: boolean = categoria.estado === true ? false : true; // Cambia el estado a false si ya está en false
 
     return this.repository.delete(id, estado);
   }
