@@ -12,9 +12,9 @@ export class GetAllIdiomaUseCase {
   ) {}
 async execute(): Promise<Result<Idioma[]>> {
     try {
-      const categorias = await this.idiomaService.listarIdiomas();
+      const Idioma = await this.idiomaService.listarIdiomas();
 
-      return Result.okList(categorias);
+      return Result.okList(Idioma);
     } catch (error) {
       return Result.fail(error);
     }

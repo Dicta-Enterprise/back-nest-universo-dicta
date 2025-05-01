@@ -13,7 +13,7 @@ import {
   CreateGalaxiaUseCase,
   DeleteGalaxiaUseCase,
   GetOneGalaxiaUseCase,
-  UpdateGalaxiaUseCase,
+  ActualizarGalaxiaCasoDeUso,
 } from 'src/application/uses-cases/galaxias';
 import { CategoriaService } from 'src/core/services/categoria/categoria.service';
 import { CategoriaPrismaRepository } from 'src/infraestructure/persistence/categoria/categoria.prisma.respository';
@@ -35,7 +35,7 @@ import { CategoriaPrismaRepository } from 'src/infraestructure/persistence/categ
     GetAllGalaxiaUseCase,
     CreateGalaxiaUseCase,
     GetOneGalaxiaUseCase,
-    UpdateGalaxiaUseCase,
+    ActualizarGalaxiaCasoDeUso,
     DeleteGalaxiaUseCase,
   ],
   exports: [GalaxiasService],

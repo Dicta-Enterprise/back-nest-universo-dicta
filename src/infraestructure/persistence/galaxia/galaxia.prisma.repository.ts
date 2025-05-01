@@ -28,9 +28,12 @@ export class GalaxiaPrismaRepository implements GalaxiaRepository {
     return Galaxia.fromPrisma(data);
   }
 
-  findById(id: string): Promise<Galaxia | null> {
-    console.log(id);
-    throw new Error('Method not implementedddddddd.');
+  async findById(id: string): Promise<Galaxia | null> {
+    const data = await this.prisma.galaxia.findUnique({
+          where: { id },
+        });
+    
+        return data ? Galaxia.fromPrisma(data) : null;
   }
 
   async findByName(nombre: string): Promise<Galaxia | null> {
@@ -44,7 +47,7 @@ export class GalaxiaPrismaRepository implements GalaxiaRepository {
   async findAllActive(): Promise<Galaxia[]> {
     const galaxias = await this.prisma.galaxia.findMany({
       where: {
-        estado: 'ACTIVO',
+        estado: true,
       },
       include: {
         categorias: true,
@@ -62,8 +65,14 @@ export class GalaxiaPrismaRepository implements GalaxiaRepository {
     console.log(id, galaxia);
     throw new Error('Method not implemented.');
   }
-  delete(id: string, estado: Galaxia): Promise<Galaxia> {
-    console.log(id, estado);
-    throw new Error('Method not implemented.');
+  async delete(id: string, estado: boolean): Promise<Galaxia> {
+   const data = await this.prisma.galaxia.update({
+         where: { id },
+         data: {
+           estado: estado,
+         },
+       });
+   
+       return Galaxia.fromPrisma(data);
   }
 }

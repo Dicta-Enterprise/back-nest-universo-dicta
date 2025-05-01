@@ -1,4 +1,3 @@
-import {  EstadoGenerico } from '@prisma/client';
 import { Categoria } from '../categoria/categoria.entity';
 // import { ObjectId } from 'mongodb';
 
@@ -8,7 +7,7 @@ export class Galaxia {
     public nombre: string,
     public descripcion: string,
     public imagen: string,
-    public estado: EstadoGenerico,
+    public estado: boolean,
     public fechaCreacion: Date,
     public fechaActualizacion: Date,
     public categorias:Categoria[]

@@ -16,7 +16,7 @@ export class GetOneIdiomaUseCase {
         const Idioma = await this.idiomaService.obtenerUnIdioma(id);
   
         this.eventEmitter.emit(
-          'categoria.obtenida',
+          'idioma.obtenida',
           new IdiomaEvent(Idioma),
         );
   

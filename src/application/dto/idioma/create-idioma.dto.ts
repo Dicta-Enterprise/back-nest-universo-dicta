@@ -8,6 +8,6 @@ export class CreateIdiomaDto {
   nombre: string;
 
   @IsOptional()
-    @IsBoolean()
-    estado: boolean;
+  @IsBoolean()
+  estado: boolean;
 }

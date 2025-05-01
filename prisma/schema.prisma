@@ -127,7 +127,7 @@ model Galaxia {
   nombre             String         @unique
   descripcion        String
   imagen             String
-  estado             EstadoGenerico @default(ACTIVO)
+  estado             Boolean @default(true)
   fechaCreacion      DateTime       @default(now())
   fechaActualizacion DateTime       @updatedAt
   planetas           Planeta[]

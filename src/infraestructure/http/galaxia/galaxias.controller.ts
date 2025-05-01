@@ -24,13 +24,13 @@ export class GalaxiasController {
     private readonly getAllGalaxiaUseCase: useCase.GetAllGalaxiaUseCase,
     private readonly createUseCase: useCase.CreateGalaxiaUseCase,
     private readonly getOneGalaxiaUseCase: useCase.GetOneGalaxiaUseCase,
-    private readonly updateGalaxiaUseCase: useCase.UpdateGalaxiaUseCase,
+    private readonly updateGalaxiaUseCase: useCase.ActualizarGalaxiaCasoDeUso,
     private readonly deleteGalaxiaUseCase: useCase.DeleteGalaxiaUseCase,
-  ) {}
+  ) { }
 
   @Post()
   async create(@Body() createGalaxiaDto: CreateGalaxiaDto) {
-    
+
     const result = await this.createUseCase.execute(createGalaxiaDto);
 
     if (result.isFailure) {
@@ -58,20 +58,48 @@ export class GalaxiasController {
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseObjectIdPipe) id: string) {
-    return this.galaxiasService.findOne(id);
+  async findOne(@Param('id', ParseObjectIdPipe) id: string) {
+    const result = await this.getOneGalaxiaUseCase.execute(id);
+
+    if (result.isFailure) {
+      throw new HttpException(result.error.message, HttpStatus.BAD_REQUEST);
+    }
+
+    return {
+      data: result,
+      message: 'Galaxia obtenida',
+    };
   }
 
   @Patch(':id')
-  update(
+  async update(
     @Param('id', ParseObjectIdPipe) id: string,
     @Body() updateGalaxiaDto: UpdateGalaxiaDto,
   ) {
-    return this.galaxiasService.update(id, updateGalaxiaDto);
+    const result = await this.updateGalaxiaUseCase.execute(
+      id,
+      updateGalaxiaDto,
+    );
+
+    if (result.isFailure) {
+      throw new HttpException(result.error.message, HttpStatus.BAD_REQUEST);
+    }
+
+    return {
+      data: result,
+      message: 'Galaxia ACtulizado',
+    };
   }
 
   @Delete(':id')
-  remove(@Param('id', ParseObjectIdPipe) id: string) {
-    return this.galaxiasService.remove(id);
+  async remove(@Param('id', ParseObjectIdPipe) id: string) {
+    const result = await this.deleteGalaxiaUseCase.execute(id);
+    if (result.isFailure) {
+      throw new HttpException(result.error.message, HttpStatus.BAD_REQUEST);
+    }
+    return {
+      data: result,
+      message: 'Galaxia eliminada',
+    };
   }
 }

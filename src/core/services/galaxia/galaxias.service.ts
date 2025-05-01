@@ -26,7 +26,7 @@ export class GalaxiasService extends PrismaClient implements OnModuleInit {
     super();
   }
 
-  async createGalaxia(createGalaxiaDto: CreateGalaxiaDto) {
+  async crearGalaxia(createGalaxiaDto: CreateGalaxiaDto) {
     await this.validator.validate(createGalaxiaDto, CreateGalaxiaDto);
 
     const existe = await this.repository.findByName(createGalaxiaDto.nombre);
@@ -70,11 +70,11 @@ export class GalaxiasService extends PrismaClient implements OnModuleInit {
     );
   }
 
-  async findAll() {
+  async ListarGalaxia() {
     return this.repository.findAllActive();
   }
 
-  async findOne(id: string): Promise<Galaxia> {
+  async ObtenerGalaxia(id: string): Promise<Galaxia> {
     const existe =  await this.repository.findById(id);
 
     if (!existe) {
@@ -91,7 +91,7 @@ export class GalaxiasService extends PrismaClient implements OnModuleInit {
 
   }
 
-  async update(id: string, updateGalaxiaDto: UpdateGalaxiaDto) {
+  async ActualizarGalaxia(id: string, updateGalaxiaDto: UpdateGalaxiaDto) {
     try {
       const galaxia = await this.galaxia.update({
         where: {
@@ -118,32 +118,12 @@ export class GalaxiasService extends PrismaClient implements OnModuleInit {
     }
   }
 
-  async remove(id: string) {
-    try {
-      const galaxia = await this.galaxia.update({
-        where: {
-          id: id,
-        },
-        data: {
-          estado: 'INACTIVO',
-        },
-      });
-
-      if (!galaxia) {
-        throw new CustomError(
-          'No se encontró la galaxia',
-          'Not Found',
-          HttpStatus.NOT_FOUND,
-        );
-      }
-
-      return new GenericSingle(galaxia, HttpStatus.OK, 'Galaxia eliminada');
-    } catch (error) {
-      throw new CustomError(
-        'Error',
-        error.message,
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+  async eliminarGalaxia(id: string): Promise<Galaxia> {
+      const Galaxia = await this.ObtenerGalaxia(id);
+  
+      const estado: boolean = Galaxia.estado === true ? false : true; // Cambia el estado a false si ya está en false
+  
+      return this.repository.delete(id, estado);
     }
-  }
+  
 }
