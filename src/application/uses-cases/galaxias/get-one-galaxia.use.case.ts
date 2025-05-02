@@ -10,17 +10,14 @@ export class GetOneGalaxiaUseCase {
   constructor(
     private readonly galaxiaService: GalaxiasService,
     private readonly eventEmitter: EventEmitter2,
-    
   ) {}
 
   async execute(id: string): Promise<Result<Galaxia>> {
     try {
       const galaxia = await this.galaxiaService.ObtenerGalaxia(id);
 
-       this.eventEmitter.emit(
-                'isiomaObtenida.obtenida',
-                new GalaxiaEvent(galaxia),
-              );
+      this.eventEmitter.emit('galaxia.obtenida', new GalaxiaEvent(galaxia));
+      return Result.ok(galaxia);
     } catch (error) {
       return Result.fail(error);
     }

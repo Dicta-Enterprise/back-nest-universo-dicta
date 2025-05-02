@@ -9,7 +9,6 @@ import {
   HttpException,
   HttpStatus,
 } from '@nestjs/common';
-import { GalaxiasService } from '../../../core/services/galaxia/galaxias.service';
 
 import { ParseObjectIdPipe } from 'src/shared/pipes/parse-object-id.pipe';
 import { CreateGalaxiaDto } from 'src/application/dto/galaxia/create-galaxia.dto';
@@ -19,8 +18,6 @@ import * as useCase from 'src/application/uses-cases/galaxias';
 @Controller('galaxias')
 export class GalaxiasController {
   constructor(
-    private readonly galaxiasService: GalaxiasService,
-
     private readonly getAllGalaxiaUseCase: useCase.GetAllGalaxiaUseCase,
     private readonly createUseCase: useCase.CreateGalaxiaUseCase,
     private readonly getOneGalaxiaUseCase: useCase.GetOneGalaxiaUseCase,

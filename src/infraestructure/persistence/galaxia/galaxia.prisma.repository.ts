@@ -28,22 +28,6 @@ export class GalaxiaPrismaRepository implements GalaxiaRepository {
     return Galaxia.fromPrisma(data);
   }
 
-  async findById(id: string): Promise<Galaxia | null> {
-    const data = await this.prisma.galaxia.findUnique({
-          where: { id },
-        });
-    
-        return data ? Galaxia.fromPrisma(data) : null;
-  }
-
-  async findByName(nombre: string): Promise<Galaxia | null> {
-    const data = await this.prisma.galaxia.findUnique({
-      where: { nombre },
-    });
-
-    return data ? Galaxia.fromPrisma(data) : null;
-  }
-
   async findAllActive(): Promise<Galaxia[]> {
     const galaxias = await this.prisma.galaxia.findMany({
       where: {
@@ -61,18 +45,37 @@ export class GalaxiaPrismaRepository implements GalaxiaRepository {
     return res;
   }
 
+  async findById(id: string): Promise<Galaxia | null> {
+    const data = await this.prisma.galaxia.findUnique({
+      where: { id },
+      include: {
+        categorias: true,
+      },
+    });
+
+    return data ? Galaxia.fromPrisma(data) : null;
+  }
+
+  async findByName(nombre: string): Promise<Galaxia | null> {
+    const data = await this.prisma.galaxia.findUnique({
+      where: { nombre },
+    });
+
+    return data ? Galaxia.fromPrisma(data) : null;
+  }
+
   update(id: string, galaxia: Partial<Galaxia>): Promise<Galaxia> {
     console.log(id, galaxia);
     throw new Error('Method not implemented.');
   }
   async delete(id: string, estado: boolean): Promise<Galaxia> {
-   const data = await this.prisma.galaxia.update({
-         where: { id },
-         data: {
-           estado: estado,
-         },
-       });
-   
-       return Galaxia.fromPrisma(data);
+    const data = await this.prisma.galaxia.update({
+      where: { id },
+      data: {
+        estado: estado,
+      },
+    });
+
+    return Galaxia.fromPrisma(data);
   }
 }

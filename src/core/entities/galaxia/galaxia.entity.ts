@@ -1,5 +1,4 @@
 import { Categoria } from '../categoria/categoria.entity';
-// import { ObjectId } from 'mongodb';
 
 export class Galaxia {
   constructor(
@@ -20,7 +19,6 @@ export class Galaxia {
 
 
     static fromPrisma(data: any): Galaxia {
-      console.log(data);
         return new Galaxia(
             data.id,
             data.nombre,
@@ -29,7 +27,7 @@ export class Galaxia {
             data.estado,
             data.fechaCreacion,
             data.fechaActualizacion,
-            Categoria.fromPrismaList(data.categorias)
+            data.categorias ? Categoria.fromPrismaList(data.categorias) : [],
         );
     }
 

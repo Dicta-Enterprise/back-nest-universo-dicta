@@ -1,29 +1,24 @@
-import { HttpStatus, Inject, Injectable, OnModuleInit } from '@nestjs/common';
+import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 
-import { PrismaClient } from '@prisma/client';
 import { CreateGalaxiaDto } from 'src/application/dto/galaxia/create-galaxia.dto';
 import { UpdateGalaxiaDto } from 'src/application/dto/galaxia/update-galaxia.dto';
 import { GALAXIA_REPOSITORY } from 'src/core/constants/constants';
 import { Galaxia } from 'src/core/entities/galaxia/galaxia.entity';
 import { GalaxiaRepository } from 'src/core/repositories/galaxia/galaxia.repository';
 import { ValidatorService } from 'src/shared/application/validation/validator.service';
-import { CustomError } from 'src/shared/class/Error.Class';
-import { GenericSingle } from 'src/shared/class/Generic.Class';
 import { BussinesRuleException } from 'src/shared/domain/exceptions/business-rule.exception';
 import { CategoriaService } from '../categoria/categoria.service';
 
 @Injectable()
-export class GalaxiasService extends PrismaClient implements OnModuleInit {
-  async onModuleInit() {
-    await this.$connect();
-  }
+export class GalaxiasService {
 
   constructor(
-    @Inject(GALAXIA_REPOSITORY) private repository: GalaxiaRepository,
+    @Inject(GALAXIA_REPOSITORY) 
+    private repository: GalaxiaRepository,
     private categoriaService: CategoriaService,
     private readonly validator: ValidatorService,
   ) {
-    super();
+  
   }
 
   async crearGalaxia(createGalaxiaDto: CreateGalaxiaDto) {
@@ -75,7 +70,7 @@ export class GalaxiasService extends PrismaClient implements OnModuleInit {
   }
 
   async ObtenerGalaxia(id: string): Promise<Galaxia> {
-    const existe =  await this.repository.findById(id);
+    const existe = await this.repository.findById(id);
 
     if (!existe) {
       throw new BussinesRuleException(
@@ -87,43 +82,44 @@ export class GalaxiasService extends PrismaClient implements OnModuleInit {
         },
       );
     }
-    return existe;
 
+    return existe;
   }
 
   async ActualizarGalaxia(id: string, updateGalaxiaDto: UpdateGalaxiaDto) {
-    try {
-      const galaxia = await this.galaxia.update({
-        where: {
-          id: id,
-        },
-        data: updateGalaxiaDto,
-      });
+    console.log(id);
+    console.log(updateGalaxiaDto);
+    // try {
+    //   const galaxia = await this.galaxia.update({
+    //     where: {
+    //       id: id,
+    //     },
+    //     data: updateGalaxiaDto,
+    //   });
 
-      if (!galaxia) {
-        throw new CustomError(
-          'No se encontró la galaxia',
-          'Not Found',
-          HttpStatus.NOT_FOUND,
-        );
-      }
+    //   if (!galaxia) {
+    //     throw new CustomError(
+    //       'No se encontró la galaxia',
+    //       'Not Found',
+    //       HttpStatus.NOT_FOUND,
+    //     );
+    //   }
 
-      return new GenericSingle(galaxia, HttpStatus.OK, 'Galaxia actualizada');
-    } catch (error) {
-      throw new CustomError(
-        'Error',
-        error.message,
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
+    //   return new GenericSingle(galaxia, HttpStatus.OK, 'Galaxia actualizada');
+    // } catch (error) {
+    //   throw new CustomError(
+    //     'Error',
+    //     error.message,
+    //     HttpStatus.INTERNAL_SERVER_ERROR,
+    //   );
+    // }
   }
 
   async eliminarGalaxia(id: string): Promise<Galaxia> {
-      const Galaxia = await this.ObtenerGalaxia(id);
-  
-      const estado: boolean = Galaxia.estado === true ? false : true; // Cambia el estado a false si ya está en false
-  
-      return this.repository.delete(id, estado);
-    }
-  
+    const Galaxia = await this.ObtenerGalaxia(id);
+
+    const estado: boolean = Galaxia.estado === true ? false : true; // Cambia el estado a false si ya está en false
+
+    return this.repository.delete(id, estado);
+  }
 }
