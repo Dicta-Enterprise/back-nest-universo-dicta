@@ -86,35 +86,35 @@ export class GalaxiasService {
     return existe;
   }
 
-  async ActualizarGalaxia(id: string, updateGalaxiaDto: UpdateGalaxiaDto) {
-    console.log(id);
-    console.log(updateGalaxiaDto);
-    // try {
-    //   const galaxia = await this.galaxia.update({
-    //     where: {
-    //       id: id,
-    //     },
-    //     data: updateGalaxiaDto,
-    //   });
-
-    //   if (!galaxia) {
-    //     throw new CustomError(
-    //       'No se encontró la galaxia',
-    //       'Not Found',
-    //       HttpStatus.NOT_FOUND,
-    //     );
-    //   }
-
-    //   return new GenericSingle(galaxia, HttpStatus.OK, 'Galaxia actualizada');
-    // } catch (error) {
-    //   throw new CustomError(
-    //     'Error',
-    //     error.message,
-    //     HttpStatus.INTERNAL_SERVER_ERROR,
-    //   );
-    // }
+  async ActualizarGalaxia(id: string, dto: UpdateGalaxiaDto): Promise<Galaxia> {
+    await this.validator.validate(dto, UpdateGalaxiaDto);
+  
+    const galaxiaExistente = await this.repository.findById(id);
+  
+    if (!galaxiaExistente) {
+      throw new BussinesRuleException(
+        'No se encontró la galaxia',
+        HttpStatus.NOT_FOUND,
+        {
+          id,
+          codigoError: 'GALAXIA_NO_ENCONTRADA',
+        },
+      );
+    }
+    const galaxiaActualizada = new Galaxia(
+      id,
+      dto.nombre ?? galaxiaExistente.nombre,
+      dto.descripcion ?? galaxiaExistente.descripcion,
+      dto.imagen ?? galaxiaExistente.imagen,
+      dto.estado ?? galaxiaExistente.estado,
+      galaxiaExistente.fechaCreacion,
+      new Date(), 
+      galaxiaExistente.categorias 
+    );
+  
+    return this.repository.update(id, galaxiaActualizada);
   }
-
+  
   async eliminarGalaxia(id: string): Promise<Galaxia> {
     const Galaxia = await this.ObtenerGalaxia(id);
 

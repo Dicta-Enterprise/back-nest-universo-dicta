@@ -64,10 +64,22 @@ export class GalaxiaPrismaRepository implements GalaxiaRepository {
     return data ? Galaxia.fromPrisma(data) : null;
   }
 
-  update(id: string, galaxia: Partial<Galaxia>): Promise<Galaxia> {
-    console.log(id, galaxia);
-    throw new Error('Method not implemented.');
+  async update(id: string, galaxia: Partial<Galaxia>): Promise<Galaxia> {
+    const data = await this.prisma.galaxia.update({
+      where: { id },
+      data: {
+        nombre: galaxia.nombre,
+        descripcion: galaxia.descripcion,
+        imagen: galaxia.imagen,
+        estado: galaxia.estado,
+        fechaCreacion: galaxia.fechaCreacion,
+        fechaActualizacion: galaxia.fechaActualizacion,
+      },
+    });
+  
+    return Galaxia.fromPrisma(data);
   }
+  
   async delete(id: string, estado: boolean): Promise<Galaxia> {
     const data = await this.prisma.galaxia.update({
       where: { id },
