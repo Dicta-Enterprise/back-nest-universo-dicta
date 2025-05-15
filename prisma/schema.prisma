@@ -122,35 +122,42 @@ model Curso {
 }
 
 model Galaxia {
-  id                 String         @id @default(auto()) @map("_id") @db.ObjectId
-  nombre             String         @unique
-  descripcion        String
-  imagen             String
-  estado             EstadoGenerico @default(ACTIVO)
-  fechaCreacion      DateTime       @default(now())
-  fechaActualizacion DateTime       @updatedAt
-  planetas           Planeta[]
-  categorias         Categoria[]    @relation(fields: [categoriaId], references: [id])
-  categoriaId        String[]       @db.ObjectId
+  id                  String              @id @default(auto()) @map("_id") @db.ObjectId
+  nombre              String              @unique
+  descripcion         String
+  estado              Boolean             @default(true)
+  fechaCreacion       DateTime            @default(now())
+  fechaActualizacion  DateTime            @updatedAt
+  planetas            Planeta[]
+  categorias          Categoria[]         @relation(fields: [categoriaId], references: [id])
+  categoriaId         String[]            @db.ObjectId
+  itemImagenesGalaxia ItemImagenGalaxia[]
+}
+
+model ItemImagenGalaxia {
+  id        String  @id @default(auto()) @map("_id") @db.ObjectId
+  imagenUrl String
+  galaxia   Galaxia @relation(fields: [galaxiaId], references: [id])
+  galaxiaId String  @db.ObjectId
 }
 
 model LandingPage {
-  id                 String        @id @default(auto()) @map("_id") @db.ObjectId
-  titulo             String        @unique
-  descripcion        String
-  imagenPrincipal    String
-  contenido          String[]
-  estado             Boolean       @default(true)
-  slug               String
-  metaKeywords       String
-  landingUrl         String
-  fechaCreacion      DateTime      @default(now())
-  fechaActualizacion DateTime      @updatedAt
-  itemImagenes       ItemImagen[]
-  itemColores        ItemColores[]
+  id                  String             @id @default(auto()) @map("_id") @db.ObjectId
+  titulo              String             @unique
+  descripcion         String
+  imagenPrincipal     String
+  contenido           String[]
+  estado              Boolean            @default(true)
+  slug                String
+  metaKeywords        String
+  landingUrl          String
+  fechaCreacion       DateTime           @default(now())
+  fechaActualizacion  DateTime           @updatedAt
+  itemImagenesLanding ItemImagenLading[]
+  itemColores         ItemColores[]
 }
 
-model ItemImagen {
+model ItemImagenLading {
   id            String      @id @default(auto()) @map("_id") @db.ObjectId
   imagenUrl     String
   landingPage   LandingPage @relation(fields: [landingPageId], references: [id])

@@ -14,7 +14,6 @@ export class GalaxiaPrismaRepository implements GalaxiaRepository {
       data: {
         nombre: galaxia.nombre,
         descripcion: galaxia.descripcion,
-        imagen: galaxia.imagen,
         estado: galaxia.estado,
         categorias: {
           connect: categoriaIds.map((id) => ({ id })),
@@ -44,7 +43,7 @@ export class GalaxiaPrismaRepository implements GalaxiaRepository {
   async findAllActive(): Promise<Galaxia[]> {
     const galaxias = await this.prisma.galaxia.findMany({
       where: {
-        estado: 'ACTIVO',
+        estado: true,
       },
       include: {
         categorias: true,

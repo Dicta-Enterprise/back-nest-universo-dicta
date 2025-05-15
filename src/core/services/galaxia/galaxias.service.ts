@@ -57,7 +57,6 @@ export class GalaxiasService extends PrismaClient implements OnModuleInit {
       null,
       createGalaxiaDto.nombre,
       createGalaxiaDto.descripcion,
-      createGalaxiaDto.imagen,
       createGalaxiaDto.estado,
       createGalaxiaDto.fechaCreacion,
       createGalaxiaDto.fechaActualizacion,
@@ -75,7 +74,7 @@ export class GalaxiasService extends PrismaClient implements OnModuleInit {
   }
 
   async findOne(id: string): Promise<Galaxia> {
-    const existe =  await this.repository.findById(id);
+    const existe = await this.repository.findById(id);
 
     if (!existe) {
       throw new BussinesRuleException(
@@ -88,7 +87,6 @@ export class GalaxiasService extends PrismaClient implements OnModuleInit {
       );
     }
     return existe;
-
   }
 
   async update(id: string, updateGalaxiaDto: UpdateGalaxiaDto) {
@@ -125,7 +123,7 @@ export class GalaxiasService extends PrismaClient implements OnModuleInit {
           id: id,
         },
         data: {
-          estado: 'INACTIVO',
+          estado: false,
         },
       });
 

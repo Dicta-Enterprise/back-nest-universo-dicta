@@ -17,6 +17,8 @@ import {
 } from 'src/application/uses-cases/galaxias';
 import { CategoriaService } from 'src/core/services/categoria/categoria.service';
 import { CategoriaPrismaRepository } from 'src/infraestructure/persistence/categoria/categoria.prisma.respository';
+import { SaveImageStorageUseCase } from 'src/application/uses-cases/azure';
+import { AzureStorageService } from 'src/core/services/azure/azure-storage.service';
 
 @Module({
   imports: [SharedModule, PrismaModule],
@@ -37,6 +39,8 @@ import { CategoriaPrismaRepository } from 'src/infraestructure/persistence/categ
     GetOneGalaxiaUseCase,
     UpdateGalaxiaUseCase,
     DeleteGalaxiaUseCase,
+    SaveImageStorageUseCase,
+    AzureStorageService,
   ],
   exports: [GalaxiasService],
 })

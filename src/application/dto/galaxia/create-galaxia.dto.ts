@@ -1,12 +1,13 @@
-import { EstadoGenerico } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
 import {
+  IsArray,
   IsDate,
-  IsEnum,
   IsNotEmpty,
   IsOptional,
   IsString,
+  ValidateNested,
 } from 'class-validator';
+import { ItemImagen } from 'src/core/entities/estandar/item.imagen.entity';
 
 export class CreateGalaxiaDto {
   @IsString()
@@ -18,15 +19,8 @@ export class CreateGalaxiaDto {
   @IsNotEmpty()
   descripcion: string;
 
-  @IsString()
-  imagen: string;
-
   @IsOptional()
-  @IsEnum(EstadoGenerico, {
-    message:
-      'El estado proporcionado no es válido. Valores permitidos: ACTIVO, INACTIVO, PENDIENTE, ELIMINADO, DESHABILITADO.',
-  })
-  estado: EstadoGenerico;
+  estado: boolean;
 
   @IsDate()
   @IsOptional()
@@ -37,4 +31,9 @@ export class CreateGalaxiaDto {
   @IsOptional()
   @Type(() => Date)
   fechaActualizacion: Date;
+
+  @ValidateNested({ each: true })
+  @Type(() => ItemImagen)
+  @IsArray()
+  itemImagen: ItemImagen[];
 }
