@@ -1,7 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { ProfesorService } from '../../../core/services/profesor/profesor.service';
 import { EventEmitter2 } from "@nestjs/event-emitter";
-import { createProfesorDto } from "src/application/dto/profesor";
 import { Result } from "src/shared/domain/result/result";
 import { Profesor } from "src/core/entities/profesor/profesor.entity";
 import { profesorEvent } from "src/domain/events/profesor/profesor-creado.event";
@@ -13,11 +12,11 @@ export class DeleteProfesorUseCase{
         private readonly eventEmitter: EventEmitter2,
     ){}
 
-    async execute(id: string): Promise<Result<void>>{
+    async execute(id: string): Promise<Result<Profesor>>{
 
         try {
             const profesor = await this.profesorService.eliminarProfesor(id);
-            this.eventEmitter.emit('Profesor eliminado.');
+            this.eventEmitter.emit('Profesor eliminado.', new profesorEvent(profesor),);
             return Result.ok(profesor);
 
         } catch(error){
