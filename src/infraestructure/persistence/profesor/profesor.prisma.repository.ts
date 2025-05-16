@@ -7,8 +7,15 @@ import { PrismaService } from "src/core/services/prisma/prisma.service";
 export class ProfesorPrismaRepository implements ProfesorRepository{
 
     constructor(private prisma: PrismaService){}
-    
-    
+
+
+    async findByDni(dni: string): Promise<Profesor | null> {
+        const data = await this.prisma.profesor.findUnique({
+            where: { dni },
+        });
+        
+        return data ? Profesor.fromPrisma(data) : null;
+    }
 
     async findById(id: string): Promise<Profesor | null> {
         const data = await this.prisma.profesor.findUnique({
@@ -19,9 +26,9 @@ export class ProfesorPrismaRepository implements ProfesorRepository{
     }
 
 
-    async findByNameAndApellido(nombre: string, apellido: string): Promise<Profesor | null> {
+    async findByApellidos(apellido_paterno: string, apellido_materno: string): Promise<Profesor | null> {
         const data = await this.prisma.profesor.findFirst({
-            where: { nombre, apellido },
+            where: { apellido_paterno, apellido_materno },
         });
         
         return data ? Profesor.fromPrisma(data) : null;
@@ -40,7 +47,10 @@ export class ProfesorPrismaRepository implements ProfesorRepository{
         const data = await this.prisma.profesor.create({
             data: {
                 nombre: profesor.nombre,
-                apellido: profesor.apellido,
+                dni: profesor.dni,
+                apellido_paterno: profesor.apellido_paterno,
+                apellido_materno: profesor.apellido_materno,
+                estado_p: profesor.estado_p,
                 email: profesor.email,
               },
             });
@@ -48,18 +58,46 @@ export class ProfesorPrismaRepository implements ProfesorRepository{
         return Profesor.fromPrisma(data);
     }
 
-    async delete(id: string): Promise<void>{
-        await this.prisma.profesor.delete({
+    async delete(id: string, estado: boolean): Promise<Profesor>{
+        const data = await this.prisma.profesor.update({
             where: { id },
+            data: {
+                estado_p: estado,
+            }
         });
+
+        return Profesor.fromPrisma(data);
     }
     
     async update(id: string, profesor: Partial<Profesor>): Promise<Profesor> {
+
+        const uniquesCount = await this.prisma.profesor.findMany({
+            where: {
+                OR: [
+                    {email: profesor.email},
+                    {dni: profesor.dni},
+                    {
+                        AND: [
+                            { apellido_paterno: profesor.apellido_paterno },
+                            { apellido_materno: profesor.apellido_materno },
+                        ]
+                    }
+                ]
+            }
+        })
+
+        if (uniquesCount.length > 0){
+            throw new Error('Error, los valores unicos(Email y Apellidos) ya se encuentran registrados.');
+        }
+
         const data = await this.prisma.profesor.update({
             where: { id },
             data: {
                 nombre: profesor.nombre,
-                apellido: profesor.apellido,
+                dni: profesor.dni,
+                apellido_paterno: profesor.apellido_paterno,
+                apellido_materno: profesor.apellido_materno,
+                estado_p: profesor.estado_p,
                 email: profesor.email,
             },
         });
