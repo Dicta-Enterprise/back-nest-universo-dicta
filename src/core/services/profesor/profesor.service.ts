@@ -18,14 +18,14 @@ export class ProfesorService {
     async crearProfesor(dtoProfesor: createProfesorDto): Promise<Profesor>{
         await this.validator.validate(dtoProfesor, createProfesorDto);
 
-        const existe = await this.repository.findByNameAndApellido(dtoProfesor.nombre, dtoProfesor.apellido);
+        const existe = await this.repository.findByApellidos(dtoProfesor.apellido_paterno, dtoProfesor.apellido_materno);
         if(existe){
             throw new BussinesRuleException(
                 'El profesor ya existe',
                 HttpStatus.BAD_REQUEST,
                 {
-                    nombre: dtoProfesor.nombre,
-                    apellido: dtoProfesor.apellido,
+                    apellido_paterno: dtoProfesor.apellido_paterno,
+                    apellido_materno: dtoProfesor.apellido_materno,
                     codigoError: 'PROFESOR_DUPLICADO',
                 },
             );
@@ -34,7 +34,10 @@ export class ProfesorService {
         const profesor = new Profesor(
             null,
             dtoProfesor.nombre,
-            dtoProfesor.apellido,
+            dtoProfesor.dni,
+            dtoProfesor.apellido_paterno,
+            dtoProfesor.apellido_materno,
+            true,
             dtoProfesor.email
         )
 
@@ -62,22 +65,12 @@ export class ProfesorService {
           return existe;
     }
 
-    async eliminarProfesor(id:string):Promise<void>{
+    async eliminarProfesor(id:string):Promise<Profesor>{
+      const profesor = await this.listarUnProfesor(id);
 
-        const existe = await this.repository.findById(id);
+      const estado: boolean = profesor.estado_p === true ? false : true;
 
-        if (!existe) {
-            throw new BussinesRuleException(
-              'El profesor no existe.',
-              HttpStatus.NOT_FOUND,
-              {
-                id: id,
-                codigoError: 'PROFESOR_NO_ENCONTRADO',
-              },
-            );
-          }
-
-        await this.repository.delete(id);
+      return this.repository.delete(id, estado);
 
     }
 
@@ -87,7 +80,10 @@ export class ProfesorService {
       const profesor = new Profesor(
         null,
         dtoProfesor.nombre,
-        dtoProfesor.apellido,
+        dtoProfesor.dni,
+        dtoProfesor.apellido_paterno,
+        dtoProfesor.apellido_materno,
+        true,
         dtoProfesor.email,
       );
 
