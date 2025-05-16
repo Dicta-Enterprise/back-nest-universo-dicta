@@ -80,9 +80,14 @@ model Idioma {
 model Profesor {
   id       String  @id @default(auto()) @map("_id") @db.ObjectId
   nombre   String
-  apellido String  @unique
-  email    String
+  dni String? @unique
+  apellido_paterno String?
+  apellido_materno String?
+  email    String @unique
+  estado_p   Boolean @default(true)
   cursos   Curso[]
+
+  @@unique([apellido_paterno, apellido_materno])
 }
 
 model Planeta {
