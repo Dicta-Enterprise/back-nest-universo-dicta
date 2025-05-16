@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Transform } from "class-transformer";
-import { IsBoolean, IsEmail, IsInt, IsNotEmpty, IsOptional, IsString, Matches, MaxLength, MinLength } from "class-validator";
+import { IsBoolean, IsEmail, IsInt, IsNotEmpty, IsNumberString, IsOptional, IsString, Matches, MaxLength, MinLength } from "class-validator";
 
 
 export class createProfesorDto{
@@ -21,8 +21,8 @@ export class createProfesorDto{
         description: "Documento de Identidad del profesor"
     })
     @MinLength(8, {message: 'El dni debe tener mas de 7 caracteres.'})
-    @MaxLength(14, {message: 'El dni debe tener menos de 14 caracteres.'})
-    @IsString()
+    @MaxLength(20, {message: 'El dni debe tener menos de 14 caracteres.'})
+    @IsNumberString()
     @IsNotEmpty()
     @Transform(({ value }) => (value as string).trim().toLowerCase().replaceAll(' ',''))
     dni: string;
