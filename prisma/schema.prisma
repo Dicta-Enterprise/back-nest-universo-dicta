@@ -59,18 +59,22 @@ enum TipoUsuario {
 }
 
 model Categoria {
-  id                 String         @id @default(auto()) @map("_id") @db.ObjectId
-  nombre             String         @unique
-  estado             EstadoGenerico @default(ACTIVO)
-  fechaCreacion      DateTime       @default(now())
-  fechaActualizacion DateTime       @updatedAt
- 
+  id                 String    @id @default(auto()) @map("_id") @db.ObjectId
+  nombre             String    @unique
+  descripcion        String
+  imagenUrl          String
+  estado             Boolean   @default(true)
+  fechaCreacion      DateTime  @default(now())
+  fechaActualizacion DateTime  @updatedAt
+  cursos             Curso[]
+  galaxias           Galaxia[] @relation(fields: [galaxiaId], references: [id])
+  galaxiaId          String[]  @db.ObjectId
 }
 
 model Idioma {
   id     String  @id @default(auto()) @map("_id") @db.ObjectId
   nombre String
-
+  cursos Curso[]
 }
 
 model Profesor {
@@ -78,20 +82,20 @@ model Profesor {
   nombre   String
   apellido String  @unique
   email    String
- 
+  cursos   Curso[]
 }
 
 model Planeta {
-  id          String  @id @default(auto()) @map("_id") @db.ObjectId
-  nombre      String  @unique
-  descripcion String
-  imagen      String
-  estado     EstadoGenerico  @default(ACTIVO)
-  fechaCreacion  DateTime @default(now())
-  fechaActualizacion  DateTime  @updatedAt
-  galaxiaId   String  @db.ObjectId 
-  galaxia     Galaxia        @relation(fields: [galaxiaId], references: [id])
- 
+  id                 String         @id @default(auto()) @map("_id") @db.ObjectId
+  nombre             String         @unique
+  descripcion        String
+  imagen             String
+  estado             EstadoGenerico @default(ACTIVO)
+  fechaCreacion      DateTime       @default(now())
+  fechaActualizacion DateTime       @updatedAt
+  galaxia            Galaxia?       @relation(fields: [galaxiaId], references: [id])
+  galaxiaId          String?        @db.ObjectId
+  cursos             Curso[]
 }
 
 model Curso {
@@ -103,34 +107,18 @@ model Curso {
   fechaFinalizacion DateTime
   cantidadAlumnos   Int
   precio            Float
+  profesor          Profesor       @relation(fields: [profesorId], references: [id])
+  profesorId        String         @db.ObjectId
   estado            EstadoGenerico
   imagen            String
   video             String
   duracion          Float
-  
-}
-
-model SubMenu {
-  id      String         @id @default(auto()) @map("_id") @db.ObjectId // Identificador único para cada submenú
-  nombre  String         @unique
-  padreId String?        @db.ObjectId // Referencia al ID del padre (opcional)
-  ruta    String         @unique
-  estado  EstadoGenerico @default(ACTIVO)
-  icono   String // Icono del submenú
-  color   String // Color del submenú
-  menuId  String?        @db.ObjectId // Referencia al menú al que pertenece
-  menu    Menu?          @relation(fields: [id], references: [id]) // Relación con el menú
-}
-
-model Menu {
-  id       String         @id @default(auto()) @map("_id") @db.ObjectId // Identificador único para cada menú
-  nombre   String         @unique
-  padreId  String?        @db.ObjectId
-  ruta     String
-  icono    String
-  estado   EstadoGenerico @default(ACTIVO)
-  color    String
-  submenus SubMenu[]
+  categoria         Categoria      @relation(fields: [categoriaId], references: [id])
+  categoriaId       String         @db.ObjectId
+  idioma            Idioma?        @relation(fields: [idiomaId], references: [id])
+  idiomaId          String?        @db.ObjectId
+  planeta           Planeta        @relation(fields: [planetaId], references: [id])
+  planetaId         String         @db.ObjectId
 }
 
 model Galaxia {
@@ -142,4 +130,6 @@ model Galaxia {
   fechaCreacion      DateTime       @default(now())
   fechaActualizacion DateTime       @updatedAt
   planetas           Planeta[]
+  categorias         Categoria[]    @relation(fields: [categoriaId], references: [id])
+  categoriaId        String[]       @db.ObjectId
 }
