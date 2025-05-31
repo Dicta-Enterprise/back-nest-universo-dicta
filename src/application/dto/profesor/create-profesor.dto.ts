@@ -11,8 +11,8 @@ export class createProfesorDto{
     })
     @MinLength(1, {message: 'El nombre debe tener mas de 1 caracter.'})
     @MaxLength(50, {message: 'El nombre debe tener menos de 50 caracteres.'})
-    @IsString()
-    @IsNotEmpty()
+    @IsString({message: 'El nombre debe ser un dato de tipo String.'})
+    @IsNotEmpty({message: 'El nombre no debe estar vacio.'})
     @Transform(({ value }) => (value as string).trim().toLowerCase().replaceAll(' ',''))
     nombre: string;
 
@@ -22,8 +22,8 @@ export class createProfesorDto{
     })
     @MinLength(8, {message: 'El dni debe tener mas de 7 caracteres.'})
     @MaxLength(20, {message: 'El dni debe tener menos de 14 caracteres.'})
-    @IsNumberString()
-    @IsNotEmpty()
+    @IsNumberString({},{message: 'El dni debe ser un dato de tipo Number(Integer).'})
+    @IsNotEmpty({message: 'El dni no debe estar vacio.'})
     @Transform(({ value }) => (value as string).trim().toLowerCase().replaceAll(' ',''))
     dni: string;
 
@@ -33,8 +33,8 @@ export class createProfesorDto{
     })
     @MinLength(1, {message: 'El apellido paterno debe tener mas de 1 caracter.'})
     @MaxLength(50, {message: 'El apellido paterno debe tener menos de 50 caracteres.'})
-    @IsString()
-    @IsNotEmpty()
+    @IsString({message: 'El apellido paterno debe ser un dato de tipo String.'})
+    @IsNotEmpty({message: 'El apellido paterno no debe estar vacio.'})
     @Transform(({ value }) => (value as string).trim().toLowerCase().replaceAll(' ',''))
     apellido_paterno: string;
 
@@ -44,8 +44,8 @@ export class createProfesorDto{
     })
     @MinLength(1, {message: 'El apellido materno debe tener mas de 1 caracter.'})
     @MaxLength(50, {message: 'El apellido materno debe tener menos de 50 caracteres.'})
-    @IsString()
-    @IsNotEmpty()
+    @IsString({message: 'El apellido materno debe ser un dato de tipo String.'})
+    @IsNotEmpty({message: 'El apellido materno no debe estar vacio.'})
     @Transform(({ value }) => (value as string).trim().toLowerCase().replaceAll(' ',''))
     apellido_materno: string;
 
@@ -54,7 +54,7 @@ export class createProfesorDto{
         description: "Estado del profesor"
     })
     @IsOptional()
-    @IsBoolean()
+    @IsBoolean({message: 'El estado debe ser un valor de tipo boolean.'})
     estado_p: boolean;
 
     @ApiProperty({ 
@@ -64,8 +64,11 @@ export class createProfesorDto{
     @MinLength(1, {message: 'El email debe tener mas de 1 caracter.'})
     @MaxLength(100, {message: 'El email debe tener menos de 100 caracteres.'})
     @IsEmail({},{message: 'Debe ingresar un correo electronico valido.'})
-    @IsNotEmpty()
+    @IsNotEmpty({message: 'El email no debe estar vacio.'})
     @Transform(({ value }) => (value as string).trim().toLowerCase().replaceAll(' ',''))
     email:string;
+
+    
+    cursos:string[];
     
 }
