@@ -38,7 +38,8 @@ export class ProfesorService {
             dtoProfesor.apellido_paterno,
             dtoProfesor.apellido_materno,
             true,
-            dtoProfesor.email
+            dtoProfesor.email,
+            dtoProfesor.cursos
         )
 
         return this.repository.save(profesor);
@@ -85,6 +86,7 @@ export class ProfesorService {
         dtoProfesor.apellido_materno,
         true,
         dtoProfesor.email,
+        dtoProfesor.cursos
       );
 
       return this.repository.update(id, profesor);
