@@ -7,6 +7,7 @@ export class Profesor {
     public apellido_materno: string,
     public estado_p: boolean,
     public email: string,
+    public cursos: string[],
   ) {}
 
   public cambiarEstado(): void {
@@ -22,6 +23,6 @@ export class Profesor {
   }
 
   static fromPrisma(data: any): Profesor {
-    return new Profesor(data.id, data.nombre, data.dni, data.apellido_paterno, data.apellido_materno, data.estado_p, data.email);
+    return new Profesor(data.id, data.nombre, data.dni, data.apellido_paterno, data.apellido_materno, data.estado_p, data.email, data.cursos);
   }
 }
