@@ -12,6 +12,13 @@ export class ProfesorPrismaRepository implements ProfesorRepository{
     async findByDni(dni: string): Promise<Profesor | null> {
         const data = await this.prisma.profesor.findUnique({
             where: { dni },
+            include: {
+            cursos: {
+                select: {
+                nombre: true,
+                },
+              },
+            },
         });
         
         return data ? Profesor.fromPrisma(data) : null;
@@ -20,6 +27,13 @@ export class ProfesorPrismaRepository implements ProfesorRepository{
     async findById(id: string): Promise<Profesor | null> {
         const data = await this.prisma.profesor.findUnique({
             where: { id },
+            include: {
+            cursos: {
+                select: {
+                nombre: true,
+                },
+              },
+            },
         });
         
         return data ? Profesor.fromPrisma(data) : null;
@@ -29,13 +43,28 @@ export class ProfesorPrismaRepository implements ProfesorRepository{
     async findByApellidos(apellido_paterno: string, apellido_materno: string): Promise<Profesor | null> {
         const data = await this.prisma.profesor.findFirst({
             where: { apellido_paterno, apellido_materno },
+            include: {
+            cursos: {
+                select: {
+                nombre: true,
+                },
+              },
+            },
         });
         
         return data ? Profesor.fromPrisma(data) : null;
     }
     
     async findAllActive(): Promise<Profesor[]> {
-        const profesores = await this.prisma.profesor.findMany();
+        const profesores = await this.prisma.profesor.findMany({
+            include: {
+            cursos: {
+                select: {
+                nombre: true,
+                },
+              },
+            },
+        });
         
         const respuesta = Profesor.fromPrismaList(profesores);
         
