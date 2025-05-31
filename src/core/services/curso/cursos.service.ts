@@ -1,94 +1,108 @@
-import { HttpStatus, Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { HttpStatus, Inject, Injectable, Logger, OnModuleInit } from '@nestjs/common';
 
-import { PrismaClient } from '@prisma/client';
 import { CreateCursoDto } from 'src/application/dto/curso/create-curso.dto';
 import { UpdateCursoDto } from 'src/application/dto/curso/update-curso.dto';
+import { CURSO_REPOSITORY } from 'src/core/constants/constants';
 import { CustomError } from 'src/shared/class/Error.Class';
+import { CursoRepository } from '../../repositories/curso/curso.respository';
+import { ValidatorService } from 'src/shared/application/validation/validator.service';
+import { Curso } from 'src/core/entities/curso/curso.entity';
+import { BussinesRuleException } from 'src/shared/domain/exceptions/business-rule.exception';
+import * as dto from 'src/application/dto/curso';
 
 @Injectable()
-export class CursosService extends PrismaClient implements OnModuleInit {
-  private readonly logger = new Logger('Cursos Service');
+export class CursosService{
 
-  onModuleInit() {
-    this.$connect();
-    this.logger.log('Connected to MongoDb');
+  constructor(
+    @Inject(CURSO_REPOSITORY)
+    private repository: CursoRepository,
+    private readonly validator: ValidatorService,
+    ) {}
+
+  async crearCurso(dtoCurso: CreateCursoDto): Promise<Curso>{
+
+    await this.validator.validate(dtoCurso, CreateCursoDto);
+
+    const existe = await this.repository.findByName(dtoCurso.nombre);
+
+    if(existe){
+      throw new BussinesRuleException(
+        'El curso ya existe',
+        HttpStatus.BAD_REQUEST,
+        {
+          nombre: dtoCurso.nombre,
+          codigoError: 'CURSO_DUPLICADO',
+        }
+      );
+    }
+
+    const curso = new Curso(
+      null,
+      dtoCurso.nombre,
+      dtoCurso.descripcion || '',
+      new Date(),
+      new Date() || null,
+      new Date() || null,
+      dtoCurso.precio,
+      true,
+      dtoCurso.imagen || '',
+      dtoCurso.duracionSemanas,
+      dtoCurso.profesorId,
+      dtoCurso.categoriaId,
+    )
+
+    return this.repository.save(curso);
   }
 
-  constructor() {
-    super();
+  async listarCursos(): Promise<Curso[]> {
+
+    return this.repository.findAllActive();
   }
 
-  async create(createCursoDto: CreateCursoDto) {
-    try {
-      const curso = await this.curso.create({
-        data: {
-          nombre: createCursoDto.nombre,
-          descripcion: createCursoDto.descripcion,
-          fechaCreacion: createCursoDto.fechaCreacion,
-          fechaInicio: createCursoDto.fechaInicio,
-          fechaFinalizacion: createCursoDto.fechaFinalizacion,
-          cantidadAlumnos: createCursoDto.cantidadAlumnos,
-          precio: createCursoDto.precio,
-          profesor: {
-            connect: {
-              id: createCursoDto.profesor,
-            },
-          },
-          estado: createCursoDto.estado,
-          imagen: createCursoDto.imagen,
-          video: createCursoDto.video,
-          duracion: createCursoDto.duracion,
-          categoria: {
-            connect: {
-              id: createCursoDto.categoria,
-            },
-          },
-          idioma: {
-            connect: {
-              id: createCursoDto.idioma,
-            },
-          },
-          planeta: {
-            connect: {
-              id: createCursoDto.planetas,
-            },
-          },
+  async obtenerUnCurso(id: string): Promise<Curso> {
+    const existe = await this.repository.findById(id);
+
+    if (!existe) {
+      throw new BussinesRuleException(
+        'El curso no existe',
+        HttpStatus.NOT_FOUND,
+        {
+          id: id,
+          codigoError: 'CURSO_NO_ENCONTRADO',
         },
-      });
-
-      return curso;
-    } catch (error) {
-      throw new CustomError(
-        null,
-        error.message,
-        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
+
+    return existe;
   }
 
-  async findAll() {
-    try {
-      const cursos = await this.curso.findMany();
-      return cursos;
-    } catch (error) {
-      throw new CustomError(
-        null,
-        error.message,
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
+  async actualizarCurso(id: string, dtoCurso: UpdateCursoDto): Promise<Curso> {
+    await this.validator.validate(dtoCurso, UpdateCursoDto);
+
+    const curso = new Curso(
+      null,
+      dtoCurso.nombre,
+      dtoCurso.descripcion || '',
+      new Date(),
+      new Date() || null,
+      new Date() || null,
+      dtoCurso.precio,
+      true,
+      dtoCurso.imagen || '',
+      dtoCurso.duracionSemanas,
+      dtoCurso.profesorId,
+      dtoCurso.categoriaId,
+    )
+
+    return this.repository.update(id, curso);
+
   }
 
-  findOne(id: string) {
-    return `This action returns a #${id} curso`;
-  }
+  async eliminarCurso(id: string): Promise<Curso> {
+    const curso = await this.obtenerUnCurso(id);
 
-  update(id: string, updateCursoDto: UpdateCursoDto) {
-    console.log(updateCursoDto);
-    return `This action updates a #${id} curso`;
-  }
+    const estado: boolean = curso.estado === true ? false : true; 
 
-  remove(id: string) {
-    return `This action removes a #${id} curso`;
+    return this.repository.delete(id, estado);
   }
 }
