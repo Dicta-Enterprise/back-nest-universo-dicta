@@ -88,7 +88,7 @@ export class CursosService{
       new Date() || null,
       dtoCurso.precio,
       true,
-      dtoCurso.imagen || '',
+      dtoCurso.imagen,
       dtoCurso.duracionSemanas,
       dtoCurso.profesorId,
       dtoCurso.categoriaId,
