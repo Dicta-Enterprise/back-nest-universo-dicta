@@ -9,6 +9,7 @@ import { Categoria } from 'src/core/entities/categoria/categoria.entity';
 import { CategoriaRepository } from 'src/core/repositories/categoria/categoria.respository';
 import { ValidatorService } from 'src/shared/application/validation/validator.service';
 import { BussinesRuleException } from 'src/shared/domain/exceptions/business-rule.exception';
+
 @Injectable()
 export class CategoriaService {
   constructor(

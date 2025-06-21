@@ -26,4 +26,6 @@ export class CreateLandingPageDto {
 
   @IsString()
   landingUrl: string;
+  itemImagenesLanding: any[];
+  itemColores: any[];
 }
