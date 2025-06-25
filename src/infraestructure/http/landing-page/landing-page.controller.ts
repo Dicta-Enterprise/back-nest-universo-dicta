@@ -33,13 +33,13 @@ export class LandingPageController {
   async create(@Body() createDto: CreateLandingPageDto) {
     const result = await this.createUseCase.execute(createDto, 'landing-page');
 
-    if ('error' in result) {
+    if (result.isFailure) {
       throw new HttpException(
-        (result.error as { message: string }).message,
+        result.error.message,
         HttpStatus.BAD_REQUEST
       );
     }
-
+    
     return {
       data: result,
       message: 'Landing page creada',
