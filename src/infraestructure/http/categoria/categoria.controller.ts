@@ -19,6 +19,7 @@ import * as azureCase from 'src/application/uses-cases/azure';
 
 @Controller('categorias')
 export class CategoriaController {
+    deleteUseCase: any;
   constructor(
     private createUseCase: useCase.CreateCategoriaUseCase,
     private getAllCategoriaUseCase: useCase.GetAllCategoriaUseCase,
