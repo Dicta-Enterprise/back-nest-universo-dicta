@@ -15,8 +15,8 @@ import { CreateGalaxiaDto } from 'src/application/dto/galaxia/create-galaxia.dto
 import { UpdateGalaxiaDto } from 'src/application/dto/galaxia/update-galaxia.dto';
 import * as useCase from 'src/application/uses-cases/galaxias';
 import * as azureCase from 'src/application/uses-cases/azure';
-import { randomUUID } from 'crypto';
-import { createFakeMulterFileAdapter } from 'src/application/adapters/buffer-file.adapter';
+// import { randomUUID } from 'crypto';
+// import { createFakeMulterFileAdapter } from 'src/application/adapters/buffer-file.adapter';
 @Controller('galaxias')
 export class GalaxiasController {
   constructor(
@@ -32,22 +32,9 @@ export class GalaxiasController {
 
 @Post()
 async create(@Body() createGalaxiaDto: CreateGalaxiaDto) {
-  if (createGalaxiaDto.imagen?.startsWith('data:')) {
-    const { buffer, mimetype, extension } = this.decodeBase64Image(createGalaxiaDto.imagen);
-    const filename = `${randomUUID()}.${extension}`;
-    const fakeFile = createFakeMulterFileAdapter(buffer, filename, mimetype);
-
-    const uploadResult = await this.saveImageStorageUseCase.execute(fakeFile, 'galaxias');
-
-    if (uploadResult.isFailure) {
-      throw new HttpException(uploadResult.error.message, HttpStatus.BAD_REQUEST);
-    }
-
-    createGalaxiaDto.imagen = uploadResult.getValue(); // Reemplaza Base64 por URL
-  }
 
   const result = await this.createUseCase.execute(createGalaxiaDto);
-
+console.log("ATRIBUTOS:", JSON.stringify(createGalaxiaDto, null, 2));
   if (result.isFailure) {
     throw new HttpException(result.error.message, HttpStatus.BAD_REQUEST);
   }

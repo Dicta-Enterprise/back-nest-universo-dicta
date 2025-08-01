@@ -67,7 +67,7 @@ model Categoria {
   fechaCreacion      DateTime  @default(now())
   fechaActualizacion DateTime  @updatedAt
   cursos             Curso[]
-  galaxias           Galaxia[] @relation(fields: [galaxiaId], references: [id])
+  galaxias           Galaxia[] 
   galaxiaId          String[]  @db.ObjectId
 }
 
@@ -127,16 +127,37 @@ model Curso {
 }
 
 model Galaxia {
-  id                  String              @id @default(auto()) @map("_id") @db.ObjectId
-  nombre              String              @unique
+  id                  String     @id @default(auto()) @map("_id") @db.ObjectId
+  nombre              String     
   descripcion         String
-  estado              Boolean             @default(true)
-   imagen             String?
-  fechaCreacion       DateTime            @default(now())
-  fechaActualizacion  DateTime            @updatedAt
+  estado              Boolean    @default(true)
+  imagen              String?
+  url                 String?
+  textura             String?
+  fechaCreacion       DateTime   @default(now())
+  fechaActualizacion  DateTime   @updatedAt
   planetas            Planeta[]
-  categorias          Categoria[]         @relation(fields: [categoriaId], references: [id])
-  categoriaId         String[]            @db.ObjectId
+  categoria           Categoria  @relation(fields: [categoriaId], references: [id]) 
+  categoriaId         String     @db.ObjectId
+  atributos           Item[]   
+}
+model Item {
+  id         String     @id @default(auto()) @map("_id") @db.ObjectId
+  galaxia    Galaxia    @relation(fields: [galaxiaId], references: [id])
+  galaxiaId  String     @db.ObjectId
+
+  posicion   Posicion?
+  colores    Color[]
+}
+
+type Posicion {
+  x Int
+  y Int
+}
+
+type Color {
+  type  String
+  value String
 }
 
 // model ItemImagenGalaxia {
