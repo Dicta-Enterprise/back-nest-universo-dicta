@@ -3,6 +3,7 @@ import {
   IsArray,
   IsDate,
   IsNotEmpty,
+  IsBoolean,
   IsOptional,
   IsString,
   ValidateNested,
@@ -20,6 +21,7 @@ export class CreateGalaxiaDto {
   descripcion: string;
 
   @IsOptional()
+  @IsBoolean()
   estado: boolean;
 
   @IsDate()

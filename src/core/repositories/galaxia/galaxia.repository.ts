@@ -6,5 +6,5 @@ export interface GalaxiaRepository {
   findAllActive(): Promise<Galaxia[]>;
   save(galaxia: Galaxia, categoriaId:string[]): Promise<Galaxia>;
   update(id: string, galaxia: Partial<Galaxia>): Promise<Galaxia>;
-  delete(id: string, estado: Galaxia): Promise<Galaxia>;
+  delete(id: string, estado: boolean): Promise<Galaxia>;
 }

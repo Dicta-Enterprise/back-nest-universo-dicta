@@ -1,4 +1,4 @@
-import { EstadoGenerico } from '@prisma/client';
+
 import { Curso } from 'src/core/entities/curso/curso.entity';
 
 export interface CursoRepository {
@@ -7,5 +7,5 @@ export interface CursoRepository {
   findAllActive(): Promise<Curso[]>;
   save(curso: Curso): Promise<Curso>;
   update(id: string, curso: Partial<Curso>): Promise<Curso>;
-  delete(id: string, estado: EstadoGenerico): Promise<Curso>;
+  delete(id: string, estado: boolean): Promise<Curso>;
 }

@@ -11,10 +11,10 @@ export class CreateGalaxiaUseCase {
 
   async execute(createGalaxiaDto: CreateGalaxiaDto): Promise<Result<Galaxia>> {
     try {
-      const categoria =
-        await this.galaxiaService.createGalaxia(createGalaxiaDto);
+      const galaxia =
+        await this.galaxiaService.crearGalaxia(createGalaxiaDto);
 
-      return Result.ok(categoria);
+      return Result.ok(galaxia);
     } catch (error) {
       return Result.fail(error);
     }

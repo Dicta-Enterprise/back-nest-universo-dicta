@@ -1,30 +1,73 @@
 import { Injectable } from '@nestjs/common';
-import { Estandar } from 'src/core/entities/estandar/estandar.entity';
+import { Idioma } from 'src/core/entities/idioma/idioma.entity';
 import { IdiomaRepository } from 'src/core/repositories/idioma/idioma.repostitory';
+import { PrismaService } from 'src/core/services/prisma/prisma.service';
 
 @Injectable()
 export class IdiomaPrismaRepository implements IdiomaRepository {
-  findById(id: string): Promise<Estandar | null> {
-    console.log('id', id);
-    throw new Error('Method not implemented.');
+
+  constructor(private prisma: PrismaService) {}
+
+  async findById(id: string): Promise<Idioma | null> {
+    const data = await this.prisma.idioma.findUnique({
+         where: { id },
+       });
+   
+       return data ? Idioma.fromPrisma(data) : null;
   }
-  findByName(nombre: string): Promise<Estandar | null> {
-    console.log('nombre', nombre);
-    throw new Error('Method not implemented.');
+
+
+
+  async findByName(nombre: string): Promise<Idioma | null> {
+    const data = await this.prisma.idioma.findUnique({
+      where: { nombre },
+    })
+
+    return data ? Idioma.fromPrisma(data) : null;
   }
-  findAllActive(): Promise<Estandar[]> {
-    throw new Error('Method not implemented.');
+
+
+  async findAllActive(): Promise<Idioma[]> {
+    const idiomas = await this.prisma.idioma.findMany(); 
+    const result = Idioma.fromPrismaList(idiomas);  
+    return result;  
   }
-  save(idioma: Estandar): Promise<Estandar> {
-    console.log('idioma', idioma);
-    throw new Error('Method not implemented.');
+  
+
+  
+  async save(idioma: Idioma): Promise<Idioma> {
+    
+    const data = await this.prisma.idioma.create({
+      data: {
+        nombre: idioma.nombre,
+        estado: idioma.estado,
+      },
+    })
+
+    return Idioma.fromPrisma(data);
   }
-  update(id: string, idioma: Partial<Estandar>): Promise<Estandar> {
-    console.log('idioma', idioma);
-    throw new Error('Method not implemented.');
+
+
+  async update(id: string, idioma: Partial<Idioma>): Promise<Idioma> {
+    const data = await this.prisma.idioma.update({
+      where: { id }, 
+      data: {
+        nombre: idioma.nombre, 
+        estado: idioma.estado,
+      },
+    });
+
+    return Idioma.fromPrisma(data);
   }
-  delete(id: string, estado: Estandar): Promise<Estandar> {
-    console.log('id', id, estado);
-    throw new Error('Method not implemented.');
+
+  async delete(id: string, estado: boolean): Promise<Idioma> {
+    console.log("Metodo delete")
+         const data = await this.prisma.idioma.update({
+          where: { id },
+          data: {
+            estado: estado,
+          },
+        });
+        return Idioma.fromPrisma(data);
   }
 }
