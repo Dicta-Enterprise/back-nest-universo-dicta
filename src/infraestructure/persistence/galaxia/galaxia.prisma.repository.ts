@@ -27,19 +27,6 @@ export class GalaxiaPrismaRepository implements GalaxiaRepository {
     return Galaxia.fromPrisma(data);
   }
 
-  findById(id: string): Promise<Galaxia | null> {
-    console.log(id);
-    throw new Error('Method not implementedddddddd.');
-  }
-
-  async findByName(nombre: string): Promise<Galaxia | null> {
-    const data = await this.prisma.galaxia.findUnique({
-      where: { nombre },
-    });
-
-    return data ? Galaxia.fromPrisma(data) : null;
-  }
-
   async findAllActive(): Promise<Galaxia[]> {
     const galaxias = await this.prisma.galaxia.findMany({
       where: {
@@ -57,12 +44,49 @@ export class GalaxiaPrismaRepository implements GalaxiaRepository {
     return res;
   }
 
-  update(id: string, galaxia: Partial<Galaxia>): Promise<Galaxia> {
-    console.log(id, galaxia);
-    throw new Error('Method not implemented.');
+  async findById(id: string): Promise<Galaxia | null> {
+    const data = await this.prisma.galaxia.findUnique({
+      where: { id },
+      include: {
+        categorias: true,
+      },
+    });
+
+    return data ? Galaxia.fromPrisma(data) : null;
   }
-  delete(id: string, estado: Galaxia): Promise<Galaxia> {
-    console.log(id, estado);
-    throw new Error('Method not implemented.');
+
+  async findByName(nombre: string): Promise<Galaxia | null> {
+    const data = await this.prisma.galaxia.findUnique({
+      where: { nombre },
+    });
+
+    return data ? Galaxia.fromPrisma(data) : null;
+  }
+
+  async update(id: string, galaxia: Partial<Galaxia>): Promise<Galaxia> {
+    const data = await this.prisma.galaxia.update({
+      where: { id },
+      data: {
+        nombre: galaxia.nombre,
+        descripcion: galaxia.descripcion,
+        imagen: galaxia.imagen,
+        estado: galaxia.estado,
+        fechaCreacion: galaxia.fechaCreacion,
+        fechaActualizacion: galaxia.fechaActualizacion,
+      },
+    });
+  
+    return Galaxia.fromPrisma(data);
+  }
+  
+  async delete(id: string, estado: boolean): Promise<Galaxia> {
+    const data = await this.prisma.galaxia.update({
+      where: { id },
+      data: {
+        estado: estado,
+      },
+    });
+
+    return Galaxia.fromPrisma(data);
   }
 }

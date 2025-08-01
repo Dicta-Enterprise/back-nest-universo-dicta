@@ -88,7 +88,7 @@ export class CategoriaService {
   async eliminarCategoria(id: string): Promise<Categoria> {
     const categoria = await this.obtenerUnaCategoria(id);
 
-    const estado: boolean = categoria.estado === true ? false : true; // Cambia el estado a false si ya está en false
+    const estado: boolean = categoria.estado === true ? false : true; 
 
     return this.repository.delete(id, estado);
   }
