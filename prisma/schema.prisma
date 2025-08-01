@@ -81,9 +81,14 @@ model Idioma {
 model Profesor {
   id       String  @id @default(auto()) @map("_id") @db.ObjectId
   nombre   String
-  apellido String  @unique
-  email    String
+  dni String? @unique
+  apellido_paterno String?
+  apellido_materno String?
+  email    String @unique
+  estado_p   Boolean @default(true)
   cursos   Curso[]
+
+  @@unique([apellido_paterno, apellido_materno])
 }
 
 model Planeta {
@@ -103,34 +108,70 @@ model Curso {
   id                String         @id @default(auto()) @map("_id") @db.ObjectId
   nombre            String         @unique
   descripcion       String
-  fechaCreacion     DateTime
-  fechaInicio       DateTime
-  fechaFinalizacion DateTime
-  cantidadAlumnos   Int
+  fechaCreacion     DateTime       @default(now())
+  fechaInicio       DateTime?
+  fechaFinal        DateTime?
   precio            Float
-  profesor          Profesor       @relation(fields: [profesorId], references: [id])
-  profesorId        String         @db.ObjectId
-  estado            EstadoGenerico
-  imagen            String
-  video             String
-  duracion          Float
-  categoria         Categoria      @relation(fields: [categoriaId], references: [id])
-  categoriaId       String         @db.ObjectId
+  estado            Boolean @default(true)
+  imagen            String @unique
+  duracionSemanas   Float?
+
+  profesor          Profesor?      @relation(fields: [profesorId], references: [id])
+  profesorId        String?         @db.ObjectId
+  categoria         Categoria?      @relation(fields: [categoriaId], references: [id])
+  categoriaId       String?         @db.ObjectId
   idioma            Idioma?        @relation(fields: [idiomaId], references: [id])
   idiomaId          String?        @db.ObjectId
-  planeta           Planeta        @relation(fields: [planetaId], references: [id])
-  planetaId         String         @db.ObjectId
+  planeta           Planeta?        @relation(fields: [planetaId], references: [id])
+  planetaId         String?         @db.ObjectId
 }
 
 model Galaxia {
-  id                 String         @id @default(auto()) @map("_id") @db.ObjectId
-  nombre             String         @unique
-  descripcion        String
-  imagen             String
-  estado             Boolean @default(true)
-  fechaCreacion      DateTime       @default(now())
-  fechaActualizacion DateTime       @updatedAt
-  planetas           Planeta[]
-  categorias         Categoria[]    @relation(fields: [categoriaId], references: [id])
-  categoriaId        String[]       @db.ObjectId
+  id                  String              @id @default(auto()) @map("_id") @db.ObjectId
+  nombre              String              @unique
+  descripcion         String
+  estado              Boolean             @default(true)
+  fechaCreacion       DateTime            @default(now())
+  fechaActualizacion  DateTime            @updatedAt
+  planetas            Planeta[]
+  categorias          Categoria[]         @relation(fields: [categoriaId], references: [id])
+  categoriaId         String[]            @db.ObjectId
+  itemImagenesGalaxia ItemImagenGalaxia[]
+}
+
+model ItemImagenGalaxia {
+  id        String  @id @default(auto()) @map("_id") @db.ObjectId
+  imagenUrl String
+  galaxia   Galaxia @relation(fields: [galaxiaId], references: [id])
+  galaxiaId String  @db.ObjectId
+}
+
+model LandingPage {
+  id                  String             @id @default(auto()) @map("_id") @db.ObjectId
+  titulo              String             @unique
+  descripcion         String
+  imagenPrincipal     String
+  contenido           String[]
+  estado              Boolean            @default(true)
+  slug                String
+  metaKeywords        String
+  landingUrl          String
+  fechaCreacion       DateTime           @default(now())
+  fechaActualizacion  DateTime           @updatedAt
+  itemImagenesLanding ItemImagenLading[]
+  itemColores         ItemColores[]
+}
+
+model ItemImagenLading {
+  id            String      @id @default(auto()) @map("_id") @db.ObjectId
+  imagenUrl     String
+  landingPage   LandingPage @relation(fields: [landingPageId], references: [id])
+  landingPageId String      @db.ObjectId
+}
+
+model ItemColores {
+  id            String      @id @default(auto()) @map("_id") @db.ObjectId
+  color         String
+  landingPage   LandingPage @relation(fields: [landingPageId], references: [id])
+  landingPageId String      @db.ObjectId
 }

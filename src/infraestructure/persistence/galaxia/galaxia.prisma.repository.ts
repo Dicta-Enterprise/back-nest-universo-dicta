@@ -14,7 +14,6 @@ export class GalaxiaPrismaRepository implements GalaxiaRepository {
       data: {
         nombre: galaxia.nombre,
         descripcion: galaxia.descripcion,
-        imagen: galaxia.imagen,
         estado: galaxia.estado,
         categorias: {
           connect: categoriaIds.map((id) => ({ id })),

@@ -9,9 +9,12 @@ export class Galaxia {
     public estado: boolean,
     public fechaCreacion: Date,
     public fechaActualizacion: Date,
-    public categorias:Categoria[]
+    public categorias: Categoria[],
   ) {}
 
+  static fromPrismaList(data: any[]): Galaxia[] {
+    return data.map((item) => Galaxia.fromPrisma(item));
+  }
 
     static fromPrismaList(data: any[]): Galaxia[] {
         return data.map((item) => Galaxia.fromPrisma(item));
@@ -31,5 +34,16 @@ export class Galaxia {
         );
     }
 
-
+  static fromPrisma(data: any): Galaxia {
+    console.log(data);
+    return new Galaxia(
+      data.id,
+      data.nombre,
+      data.descripcion,
+      data.estado,
+      data.fechaCreacion,
+      data.fechaActualizacion,
+      Categoria.fromPrismaList(data.categorias),
+    );
+  }
 }

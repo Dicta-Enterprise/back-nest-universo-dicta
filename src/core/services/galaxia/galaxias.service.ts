@@ -52,7 +52,6 @@ export class GalaxiasService {
       null,
       createGalaxiaDto.nombre,
       createGalaxiaDto.descripcion,
-      createGalaxiaDto.imagen,
       createGalaxiaDto.estado,
       createGalaxiaDto.fechaCreacion,
       createGalaxiaDto.fechaActualizacion,
@@ -82,7 +81,6 @@ export class GalaxiasService {
         },
       );
     }
-
     return existe;
   }
 
@@ -118,8 +116,32 @@ export class GalaxiasService {
   async eliminarGalaxia(id: string): Promise<Galaxia> {
     const Galaxia = await this.ObtenerGalaxia(id);
 
-    const estado: boolean = Galaxia.estado === true ? false : true; // Cambia el estado a false si ya está en false
+  async remove(id: string) {
+    try {
+      const galaxia = await this.galaxia.update({
+        where: {
+          id: id,
+        },
+        data: {
+          estado: false,
+        },
+      });
 
-    return this.repository.delete(id, estado);
+      if (!galaxia) {
+        throw new CustomError(
+          'No se encontró la galaxia',
+          'Not Found',
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
+      return new GenericSingle(galaxia, HttpStatus.OK, 'Galaxia eliminada');
+    } catch (error) {
+      throw new CustomError(
+        'Error',
+        error.message,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 }

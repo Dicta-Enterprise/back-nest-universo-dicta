@@ -3,7 +3,7 @@ import { AppModule } from './app.module';
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { envs } from './config/envs';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-
+// import * as bodyParser from 'body-parser';
 async function bootstrap() {
   const logger = new Logger('API');
 
@@ -31,6 +31,13 @@ async function bootstrap() {
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
+
+
+  //   // Aumenta el límite del body (ejemplo: 10mb)
+  // app.use(bodyParser.json({ limit: '10mb' }));
+  // app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));
+
+
   await app.listen(envs.port);
 
   logger.log(`api corriendo en el puerto ${envs.port}`);
