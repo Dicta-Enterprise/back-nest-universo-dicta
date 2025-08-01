@@ -8,6 +8,7 @@ import { CategoriaModule } from './infraestructure/http/categoria/categorias.mod
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { MenuModule } from './infraestructure/http/menu/menu.module';
 import { AzureModule } from './infraestructure/http/azure/azure.module';
+import { ProfesorModule } from './infraestructure/http/profesor/profesor.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { AzureModule } from './infraestructure/http/azure/azure.module';
     MenuModule,
     PlanetasModule,
     CategoriaModule,
+    ProfesorModule,
     AzureModule
   ],
   controllers: [AppController],

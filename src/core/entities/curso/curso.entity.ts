@@ -11,17 +11,18 @@ export class Curso {
     public descripcion: string,
     public fechaCreacion: Date,
     public fechaInicio: Date,
-    public fechaFinalizacion: Date,
-    public cantidadAlumnos: number,
+    public fechaFinal: Date,
     public precio: number,
-    public profesor: Profesor,
-    public estado: EstadoGenerico,
+    public estado: boolean,
     public imagen: string,
-    public video: string,
-    public duracion: number,
-    public categoria: Categoria,
+    public duracionSemanas: number,
+    public profesorId: string,
+    public categoriaId: string,
+    public profesor?: Profesor,
+    public categoria?: Categoria,
+    /*
     public idioma: Estandar,
-    public planetas: Planeta,
+    public planetas: Planeta,*/
   ) {}
 
   static fromPrismaList(data: any[]): Curso[] {
@@ -35,17 +36,18 @@ export class Curso {
       data.descripcion,
       data.fechaCreacion,
       data.fechaInicio,
-      data.fechaFinalizacion,
-      data.cantidadAlumnos,
+      data.fechaFinal,
       data.precio,
-      data.profesor,
       data.estado,
       data.imagen,
-      data.video,
-      data.duracion,
+      data.duracionSemanas,
+      data.profesorId,
+      data.categoriaId,
+      data.profesor,
       data.categoria,
+      /*
       data.idioma,
-      data.planetas,
+      data.planetas,*/
     );
   }
 }
