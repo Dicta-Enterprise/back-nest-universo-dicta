@@ -8,6 +8,7 @@ import { GalaxiaRepository } from 'src/core/repositories/galaxia/galaxia.reposit
 import { ValidatorService } from 'src/shared/application/validation/validator.service';
 import { BussinesRuleException } from 'src/shared/domain/exceptions/business-rule.exception';
 import { CategoriaService } from '../categoria/categoria.service';
+import { CustomError } from 'src/shared/class/Error.Class';
 
 @Injectable()
 export class GalaxiasService {
@@ -52,6 +53,7 @@ export class GalaxiasService {
       null,
       createGalaxiaDto.nombre,
       createGalaxiaDto.descripcion,
+      createGalaxiaDto.imagen,
       createGalaxiaDto.estado,
       createGalaxiaDto.fechaCreacion,
       createGalaxiaDto.fechaActualizacion,
@@ -111,37 +113,25 @@ export class GalaxiasService {
     );
   
     return this.repository.update(id, galaxiaActualizada);
+
+
+
+    
   }
-  
-  async eliminarGalaxia(id: string): Promise<Galaxia> {
-    const Galaxia = await this.ObtenerGalaxia(id);
+async eliminarGalaxia(id: string): Promise<Galaxia> {
+  // Verifica que la galaxia exista
+  await this.ObtenerGalaxia(id); // lanza excepción si no existe
 
-  async remove(id: string) {
-    try {
-      const galaxia = await this.galaxia.update({
-        where: {
-          id: id,
-        },
-        data: {
-          estado: false,
-        },
-      });
-
-      if (!galaxia) {
-        throw new CustomError(
-          'No se encontró la galaxia',
-          'Not Found',
-          HttpStatus.NOT_FOUND,
-        );
-      }
-
-      return new GenericSingle(galaxia, HttpStatus.OK, 'Galaxia eliminada');
-    } catch (error) {
-      throw new CustomError(
-        'Error',
-        error.message,
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
+  try {
+    const galaxia = await this.repository.delete(id, false); // ✅ forma correcta
+    return galaxia;
+  } catch (error) {
+    throw new CustomError(
+      'Error al eliminar la galaxia',
+      error.message,
+      HttpStatus.INTERNAL_SERVER_ERROR,
+    );
   }
+}
+
 }

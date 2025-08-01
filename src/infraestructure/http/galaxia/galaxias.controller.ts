@@ -25,49 +25,38 @@ export class GalaxiasController {
     private readonly getOneGalaxiaUseCase: useCase.GetOneGalaxiaUseCase,
     private readonly updateGalaxiaUseCase: useCase.ActualizarGalaxiaCasoDeUso,
     private readonly deleteGalaxiaUseCase: useCase.DeleteGalaxiaUseCase,
+     private readonly saveImageStorageUseCase: azureCase.SaveImageStorageUseCase,
+
   ) { }
 
-  @Post()
-  async create(@Body() createGalaxiaDto: CreateGalaxiaDto) {
-    private readonly saveImageStorageUseCase: azureCase.SaveImageStorageUseCase,
-  ) {}
 
-  @Post()
-  async create(@Body() createGalaxiaDto: CreateGalaxiaDto) {
-    for (const imagen of createGalaxiaDto.itemImagen) {
-      const { buffer, mimetype, extension } = this.decodeBase64Image(
-        imagen.url,
-      ); // ajusta para que retorne extensión
-      const filename = `${randomUUID()}.${extension}`;
+@Post()
+async create(@Body() createGalaxiaDto: CreateGalaxiaDto) {
+  if (createGalaxiaDto.imagen?.startsWith('data:')) {
+    const { buffer, mimetype, extension } = this.decodeBase64Image(createGalaxiaDto.imagen);
+    const filename = `${randomUUID()}.${extension}`;
+    const fakeFile = createFakeMulterFileAdapter(buffer, filename, mimetype);
 
-      const fakeFile = createFakeMulterFileAdapter(buffer, filename, mimetype);
+    const uploadResult = await this.saveImageStorageUseCase.execute(fakeFile, 'galaxias');
 
-      const uploadResult = await this.saveImageStorageUseCase.execute(
-        fakeFile,
-        'galaxias',
-      );
-
-      if (uploadResult.isFailure) {
-        throw new HttpException(
-          uploadResult.error.message,
-          HttpStatus.BAD_REQUEST,
-        );
-      }
-
-      imagen.url = uploadResult.getValue(); // Reemplaza base64 por URL
+    if (uploadResult.isFailure) {
+      throw new HttpException(uploadResult.error.message, HttpStatus.BAD_REQUEST);
     }
 
-    const result = await this.createUseCase.execute(createGalaxiaDto);
-
-    if (result.isFailure) {
-      throw new HttpException(result.error.message, HttpStatus.BAD_REQUEST);
-    }
-
-    return {
-      data: result,
-      message: 'Galaxia creada',
-    };
+    createGalaxiaDto.imagen = uploadResult.getValue(); // Reemplaza Base64 por URL
   }
+
+  const result = await this.createUseCase.execute(createGalaxiaDto);
+
+  if (result.isFailure) {
+    throw new HttpException(result.error.message, HttpStatus.BAD_REQUEST);
+  }
+
+  return {
+    data: result,
+    message: 'Galaxia creada',
+  };
+}
 
   decodeBase64Image(base64String: string): {
     buffer: Buffer;

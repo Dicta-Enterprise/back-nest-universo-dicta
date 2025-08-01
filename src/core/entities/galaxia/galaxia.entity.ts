@@ -16,10 +16,7 @@ export class Galaxia {
     return data.map((item) => Galaxia.fromPrisma(item));
   }
 
-    static fromPrismaList(data: any[]): Galaxia[] {
-        return data.map((item) => Galaxia.fromPrisma(item));
-    }
-
+  
 
     static fromPrisma(data: any): Galaxia {
         return new Galaxia(
@@ -34,16 +31,5 @@ export class Galaxia {
         );
     }
 
-  static fromPrisma(data: any): Galaxia {
-    console.log(data);
-    return new Galaxia(
-      data.id,
-      data.nombre,
-      data.descripcion,
-      data.estado,
-      data.fechaCreacion,
-      data.fechaActualizacion,
-      Categoria.fromPrismaList(data.categorias),
-    );
-  }
+ 
 }

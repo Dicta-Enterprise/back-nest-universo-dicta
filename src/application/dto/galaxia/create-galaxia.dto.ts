@@ -1,14 +1,11 @@
 import { Transform, Type } from 'class-transformer';
 import {
-  IsArray,
   IsDate,
   IsNotEmpty,
   IsBoolean,
   IsOptional,
   IsString,
-  ValidateNested,
 } from 'class-validator';
-import { ItemImagen } from 'src/core/entities/estandar/item.imagen.entity';
 
 export class CreateGalaxiaDto {
   @IsString()
@@ -19,6 +16,9 @@ export class CreateGalaxiaDto {
   @IsString()
   @IsNotEmpty()
   descripcion: string;
+  @IsOptional()
+  @IsString()
+  imagen?: string;
 
   @IsOptional()
   @IsBoolean()
@@ -34,8 +34,4 @@ export class CreateGalaxiaDto {
   @Type(() => Date)
   fechaActualizacion: Date;
 
-  @ValidateNested({ each: true })
-  @Type(() => ItemImagen)
-  @IsArray()
-  itemImagen: ItemImagen[];
 }
