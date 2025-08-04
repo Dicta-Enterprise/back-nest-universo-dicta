@@ -34,7 +34,6 @@ export class GalaxiasController {
 async create(@Body() createGalaxiaDto: CreateGalaxiaDto) {
 
   const result = await this.createUseCase.execute(createGalaxiaDto);
-console.log("ATRIBUTOS:", JSON.stringify(createGalaxiaDto, null, 2));
   if (result.isFailure) {
     throw new HttpException(result.error.message, HttpStatus.BAD_REQUEST);
   }

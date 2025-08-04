@@ -67,7 +67,7 @@ model Categoria {
   fechaCreacion      DateTime  @default(now())
   fechaActualizacion DateTime  @updatedAt
   cursos             Curso[]
-  galaxias           Galaxia[] 
+  galaxias           Galaxia[]
   galaxiaId          String[]  @db.ObjectId
 }
 
@@ -79,14 +79,14 @@ model Idioma {
 }
 
 model Profesor {
-  id       String  @id @default(auto()) @map("_id") @db.ObjectId
-  nombre   String
-  dni String? @unique
+  id               String  @id @default(auto()) @map("_id") @db.ObjectId
+  nombre           String
+  dni              String? @unique
   apellido_paterno String?
   apellido_materno String?
-  email    String @unique
-  estado_p   Boolean @default(true)
-  cursos   Curso[]
+  email            String  @unique
+  estado_p         Boolean @default(true)
+  cursos           Curso[]
 
   @@unique([apellido_paterno, apellido_materno])
 }
@@ -105,51 +105,47 @@ model Planeta {
 }
 
 model Curso {
-  id                String         @id @default(auto()) @map("_id") @db.ObjectId
-  nombre            String         @unique
-  descripcion       String
-  fechaCreacion     DateTime       @default(now())
-  fechaInicio       DateTime?
-  fechaFinal        DateTime?
-  precio            Float
-  estado            Boolean @default(true)
-  imagen            String @unique
-  duracionSemanas   Float?
+  id              String    @id @default(auto()) @map("_id") @db.ObjectId
+  nombre          String    @unique
+  descripcion     String
+  fechaCreacion   DateTime  @default(now())
+  fechaInicio     DateTime?
+  fechaFinal      DateTime?
+  precio          Float
+  estado          Boolean   @default(true)
+  imagen          String    @unique
+  duracionSemanas Float?
 
-  profesor          Profesor?      @relation(fields: [profesorId], references: [id])
-  profesorId        String?         @db.ObjectId
-  categoria         Categoria?      @relation(fields: [categoriaId], references: [id])
-  categoriaId       String?         @db.ObjectId
-  idioma            Idioma?        @relation(fields: [idiomaId], references: [id])
-  idiomaId          String?        @db.ObjectId
-  planeta           Planeta?        @relation(fields: [planetaId], references: [id])
-  planetaId         String?         @db.ObjectId
+  profesor    Profesor?  @relation(fields: [profesorId], references: [id])
+  profesorId  String?    @db.ObjectId
+  categoria   Categoria? @relation(fields: [categoriaId], references: [id])
+  categoriaId String?    @db.ObjectId
+  idioma      Idioma?    @relation(fields: [idiomaId], references: [id])
+  idiomaId    String?    @db.ObjectId
+  planeta     Planeta?   @relation(fields: [planetaId], references: [id])
+  planetaId   String?    @db.ObjectId
 }
 
 model Galaxia {
-  id                  String     @id @default(auto()) @map("_id") @db.ObjectId
-  nombre              String     
-  descripcion         String
-  estado              Boolean    @default(true)
-  imagen              String?
-  url                 String?
-  textura             String?
-  fechaCreacion       DateTime   @default(now())
-  fechaActualizacion  DateTime   @updatedAt
-  planetas            Planeta[]
-  categoria           Categoria  @relation(fields: [categoriaId], references: [id]) 
-  categoriaId         String     @db.ObjectId
-  atributos           Item[]   
-}
-model Item {
-  id         String     @id @default(auto()) @map("_id") @db.ObjectId
-  galaxia    Galaxia    @relation(fields: [galaxiaId], references: [id])
-  galaxiaId  String     @db.ObjectId
-
-  posicion   Posicion?
-  colores    Color[]
+  id                 String    @id @default(auto()) @map("_id") @db.ObjectId
+  nombre             String
+  descripcion        String
+  estado             Boolean   @default(true)
+  imagen             String?
+  url                String?
+  textura            String?
+  fechaCreacion      DateTime  @default(now())
+  fechaActualizacion DateTime  @updatedAt
+  planetas           Planeta[]
+  categoria          Categoria @relation(fields: [categoriaId], references: [id])
+  categoriaId        String    @db.ObjectId
+  atributos          Atributo[]
 }
 
+type Atributo {
+  posicion Posicion?
+  colores  Color[]
+}
 type Posicion {
   x Int
   y Int

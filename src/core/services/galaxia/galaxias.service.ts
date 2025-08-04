@@ -76,7 +76,7 @@ const galaxia = new Galaxia(
   createGalaxiaDto.fechaActualizacion ?? new Date(),
   null,
   createGalaxiaDto.categoriaId,
-  atributos, // ✅ ahora pasas los atributos correctamente
+  atributos, 
 );
 
     return this.repository.save(galaxia);
