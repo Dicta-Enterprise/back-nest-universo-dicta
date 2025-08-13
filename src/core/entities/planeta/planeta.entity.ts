@@ -1,4 +1,5 @@
 import { EstadoGenerico } from '@prisma/client';
+import { Galaxia } from '../galaxia/galaxia.entity';
 import { InfoPlaneta } from './InfoPlaneta/infoPlaneta.entity';
 
 export class Planeta {
@@ -13,6 +14,8 @@ export class Planeta {
     public info: InfoPlaneta,
     public fechaCreacion: Date,
     public fechaActualizacion: Date,
+    public galaxia: Galaxia,
+    public galaxiaId: string,
   ) {}
 
   static fromPrismaList(data: any[]): Planeta[] {
@@ -31,6 +34,8 @@ export class Planeta {
       InfoPlaneta.fromPrisma(data.info),
       data.fechaCreacion,
       data.fechaActualizacion,
+      data.galaxia ? Galaxia.fromPrisma(data.galaxia) : null,
+      data.galaxiaId,
     );
   }
 }

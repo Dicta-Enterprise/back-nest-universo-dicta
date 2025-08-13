@@ -2,6 +2,7 @@ import { Transform, Type } from 'class-transformer';
 import {
   IsBoolean,
   IsDate,
+  IsMongoId,
   IsNotEmpty,
   IsOptional,
   IsString,
@@ -53,4 +54,7 @@ export class CreatePlanetaDto {
   @IsOptional()
   @Type(() => Date)
   fechaActualizacion: Date;
+  @IsMongoId({ message: 'El campo GalaxiaId debe ser un ID de Mongo válido' })
+  @IsNotEmpty({ message: 'La Galaxia es obligatoria' })
+  galaxiaId: string;
 }

@@ -17,43 +17,45 @@ export class PlanetasService {
     private readonly validator: ValidatorService,
   ) {}
 
-  async crearPlaneta(dto: CreatePlanetaDto): Promise<Planeta> {
-    await this.validator.validate(dto, CreatePlanetaDto);
+  async crearPlaneta(dtoPlaneta: CreatePlanetaDto): Promise<Planeta> {
+    await this.validator.validate(dtoPlaneta, CreatePlanetaDto);
 
-    const existe = await this.repository.findByName(dto.nombre);
+    const existe = await this.repository.findByName(dtoPlaneta.nombre);
     if (existe) {
       throw new BussinesRuleException(
         'El planeta ya existe',
         HttpStatus.BAD_REQUEST,
         {
-          nombre: dto.nombre,
+          nombre: dtoPlaneta.nombre,
           codigoError: 'PLANETA_DUPLICADO',
         },
       );
     }
 
     const info = new InfoPlaneta(
-      dto.info.tipoRiesgo,
-      dto.info.tamano,
-      dto.info.composicion,
-      dto.info.riesgo,
-      dto.info.nivel,
-      dto.info.ambiente,
-      dto.info.temperatura,
-      dto.info.villano,
+      dtoPlaneta.info.tipoRiesgo,
+      dtoPlaneta.info.tamano,
+      dtoPlaneta.info.composicion,
+      dtoPlaneta.info.riesgo,
+      dtoPlaneta.info.nivel,
+      dtoPlaneta.info.ambiente,
+      dtoPlaneta.info.temperatura,
+      dtoPlaneta.info.villano,
     );
 
     const planeta = new Planeta(
       null,
-      dto.grupo,
-      dto.nombre,
-      dto.tema,
-      dto.textura,
-      dto.url,
+      dtoPlaneta.grupo,
+      dtoPlaneta.nombre,
+      dtoPlaneta.tema,
+      dtoPlaneta.textura,
+      dtoPlaneta.url,
       EstadoGenerico.ACTIVO,
       info,
       new Date(),
       new Date(),
+      null,
+      dtoPlaneta.galaxiaId,
     );
 
     return this.repository.save(planeta);
@@ -98,33 +100,38 @@ export class PlanetasService {
     return planeta;
   }
 
-  async actualizarPlaneta(id: string, dto: UpdatePlanetaDto): Promise<Planeta> {
-    await this.validator.validate(dto, UpdatePlanetaDto);
+  async actualizarPlaneta(
+    id: string,
+    dtoPlaneta: UpdatePlanetaDto,
+  ): Promise<Planeta> {
+    await this.validator.validate(dtoPlaneta, UpdatePlanetaDto);
 
-    const info = dto.info
+    const info = dtoPlaneta.info
       ? new InfoPlaneta(
-          dto.info.tipoRiesgo,
-          dto.info.tamano,
-          dto.info.composicion,
-          dto.info.riesgo,
-          dto.info.nivel,
-          dto.info.ambiente,
-          dto.info.temperatura,
-          dto.info.villano,
+          dtoPlaneta.info.tipoRiesgo,
+          dtoPlaneta.info.tamano,
+          dtoPlaneta.info.composicion,
+          dtoPlaneta.info.riesgo,
+          dtoPlaneta.info.nivel,
+          dtoPlaneta.info.ambiente,
+          dtoPlaneta.info.temperatura,
+          dtoPlaneta.info.villano,
         )
       : undefined;
 
     const planeta = new Planeta(
       null,
-      dto.grupo,
-      dto.nombre,
-      dto.tema,
-      dto.textura,
-      dto.url,
-      dto.estado ? EstadoGenerico.ACTIVO : EstadoGenerico.INACTIVO,
+      dtoPlaneta.grupo,
+      dtoPlaneta.nombre,
+      dtoPlaneta.tema,
+      dtoPlaneta.textura,
+      dtoPlaneta.url,
+      dtoPlaneta.estado ? EstadoGenerico.ACTIVO : EstadoGenerico.INACTIVO,
       info,
       new Date(),
       new Date(),
+      null,
+      dtoPlaneta.galaxiaId,
     );
 
     return this.repository.update(id, planeta);

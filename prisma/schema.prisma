@@ -96,8 +96,8 @@ model Planeta {
   info               InfoPlaneta?    // <-- tipo embebido
   fechaCreacion      DateTime       @default(now())
   fechaActualizacion DateTime       @updatedAt
-  galaxia            Galaxia?       @relation(fields: [galaxiaId], references: [id])
-  galaxiaId          String?        @db.ObjectId
+  galaxia            Galaxia       @relation(fields: [galaxiaId], references: [id])
+  galaxiaId          String        @db.ObjectId
   cursos             Curso[]
 }
 type InfoPlaneta {
