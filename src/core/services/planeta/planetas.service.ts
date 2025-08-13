@@ -3,6 +3,7 @@ import { EstadoGenerico } from '@prisma/client';
 import { CreatePlanetaDto } from 'src/application/dto/planeta/create-planeta.dto';
 import { UpdatePlanetaDto } from 'src/application/dto/planeta/update-planeta.dto';
 import { PLANETA_REPOSITORY } from 'src/core/constants/constants';
+import { InfoPlaneta } from 'src/core/entities/planeta/InfoPlaneta/infoPlaneta.entity';
 import { Planeta } from 'src/core/entities/planeta/planeta.entity';
 import { PlanetaRepository } from 'src/core/repositories/planeta/planeta.respository';
 import { ValidatorService } from 'src/shared/application/validation/validator.service';
@@ -13,7 +14,7 @@ export class PlanetasService {
   constructor(
     @Inject(PLANETA_REPOSITORY)
     private repository: PlanetaRepository,
-    private readonly validator: ValidatorService
+    private readonly validator: ValidatorService,
   ) {}
 
   async crearPlaneta(dto: CreatePlanetaDto): Promise<Planeta> {
@@ -31,14 +32,28 @@ export class PlanetasService {
       );
     }
 
+    const info = new InfoPlaneta(
+      dto.info.tipoRiesgo,
+      dto.info.tamano,
+      dto.info.composicion,
+      dto.info.riesgo,
+      dto.info.nivel,
+      dto.info.ambiente,
+      dto.info.temperatura,
+      dto.info.villano,
+    );
+
     const planeta = new Planeta(
       null,
+      dto.grupo,
       dto.nombre,
-      dto.descripcion,
-      dto.imagen,
-      'ACTIVO',
+      dto.tema,
+      dto.textura,
+      dto.url,
+      EstadoGenerico.ACTIVO,
+      info,
       new Date(),
-      new Date()
+      new Date(),
     );
 
     return this.repository.save(planeta);
@@ -86,14 +101,30 @@ export class PlanetasService {
   async actualizarPlaneta(id: string, dto: UpdatePlanetaDto): Promise<Planeta> {
     await this.validator.validate(dto, UpdatePlanetaDto);
 
+    const info = dto.info
+      ? new InfoPlaneta(
+          dto.info.tipoRiesgo,
+          dto.info.tamano,
+          dto.info.composicion,
+          dto.info.riesgo,
+          dto.info.nivel,
+          dto.info.ambiente,
+          dto.info.temperatura,
+          dto.info.villano,
+        )
+      : undefined;
+
     const planeta = new Planeta(
       null,
+      dto.grupo,
       dto.nombre,
-      dto.descripcion,
-      dto.imagen,
-      dto.estado ? 'ACTIVO' : 'INACTIVO',
-      new Date(), 
-      new Date()
+      dto.tema,
+      dto.textura,
+      dto.url,
+      dto.estado ? EstadoGenerico.ACTIVO : EstadoGenerico.INACTIVO,
+      info,
+      new Date(),
+      new Date(),
     );
 
     return this.repository.update(id, planeta);

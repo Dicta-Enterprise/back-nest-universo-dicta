@@ -87,15 +87,28 @@ model Profesor {
 
 model Planeta {
   id                 String         @id @default(auto()) @map("_id") @db.ObjectId
+  grupo             String
   nombre             String         @unique
-  descripcion        String
-  imagen             String
   estado             EstadoGenerico @default(ACTIVO)
+  tema               String
+  textura         String
+  url                String
+  info               InfoPlaneta?    // <-- tipo embebido
   fechaCreacion      DateTime       @default(now())
   fechaActualizacion DateTime       @updatedAt
   galaxia            Galaxia?       @relation(fields: [galaxiaId], references: [id])
   galaxiaId          String?        @db.ObjectId
   cursos             Curso[]
+}
+type InfoPlaneta {
+  tipoRiesgo   String
+  tamano       String   
+  composicion  String   
+  riesgo       String
+  nivel        String
+  ambiente     String
+  temperatura  String
+  villano      String
 }
 
 model Curso {

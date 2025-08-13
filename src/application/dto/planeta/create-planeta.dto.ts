@@ -5,7 +5,9 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
+  ValidateNested,
 } from 'class-validator';
+import { InfoPlanetaDto } from './Informacion/InfoPlanetaDto'; // ruta al archivo del DTO anidado
 
 export class CreatePlanetaDto {
   @IsString()
@@ -16,16 +18,31 @@ export class CreatePlanetaDto {
   @IsString()
   @IsNotEmpty()
   @Transform(({ value }) => value.trim())
-  descripcion: string;
+  grupo: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @Transform(({ value }) => value.trim())
+  tema: string;
 
   @IsString()
   @IsOptional()
   @Transform(({ value }) => value.trim())
-  imagen: string; 
+  textura: string;
+
+  @IsString()
+  @IsOptional()
+  @Transform(({ value }) => value.trim())
+  url: string;
 
   @IsBoolean()
   @IsOptional()
   estado: boolean;
+
+  @ValidateNested()
+  @Type(() => InfoPlanetaDto)
+  @IsNotEmpty()
+  info: InfoPlanetaDto;
 
   @IsDate()
   @IsOptional()
