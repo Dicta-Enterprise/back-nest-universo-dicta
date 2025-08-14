@@ -5,5 +5,6 @@ export enum FolderEnum {
     EMPLEADOS = 'empleados',
     GALAXIAS = 'galaxias',
     PLANETAS = 'planetas',
+    LANDING_PAGE = 'landing-page',
   }
   
