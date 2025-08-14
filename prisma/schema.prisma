@@ -170,7 +170,7 @@ model LandingPage {
   imagenPrincipal     String
   contenido           String[]
   estado              Boolean            @default(true)
-  slug                String
+  slug                String @unique
   metaKeywords        String
   landingUrl          String
   fechaCreacion       DateTime           @default(now())
