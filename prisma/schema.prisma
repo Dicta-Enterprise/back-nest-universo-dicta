@@ -62,13 +62,19 @@ model Categoria {
   id                 String    @id @default(auto()) @map("_id") @db.ObjectId
   nombre             String    @unique
   descripcion        String
-  imagenUrl          String
+
   estado             Boolean   @default(true)
   fechaCreacion      DateTime  @default(now())
   fechaActualizacion DateTime  @updatedAt
   cursos             Curso[]
   galaxias           Galaxia[]
   galaxiaId          String[]  @db.ObjectId
+   // Campos extra para la visualización tipo cohetes
+  x                  Float?    // posición horizontal
+  y                  Float?    // posición vertical
+  z                  Float?    // profundidad
+  url                String?   // ruta amigable
+  modelo             String?   // ruta del modelo 3D
 }
 
 model Idioma {
@@ -93,16 +99,31 @@ model Profesor {
 
 model Planeta {
   id                 String         @id @default(auto()) @map("_id") @db.ObjectId
+  grupo             String
   nombre             String         @unique
-  descripcion        String
-  imagen             String
   estado             EstadoGenerico @default(ACTIVO)
+  tema               String
+  textura         String
+  url                String
+  info               InfoPlaneta?    // <-- tipo embebido
   fechaCreacion      DateTime       @default(now())
   fechaActualizacion DateTime       @updatedAt
-  galaxia            Galaxia?       @relation(fields: [galaxiaId], references: [id])
-  galaxiaId          String?        @db.ObjectId
+  galaxia            Galaxia       @relation(fields: [galaxiaId], references: [id])
+  galaxiaId          String        @db.ObjectId
   cursos             Curso[]
+  
 }
+type InfoPlaneta {
+  tipoRiesgo   String
+  tamano       String   
+  composicion  String   
+  riesgo       String
+  nivel        String
+  ambiente     String
+  temperatura  String
+  villano      String
+}
+
 
 model Curso {
   id              String    @id @default(auto()) @map("_id") @db.ObjectId
@@ -139,9 +160,17 @@ model Galaxia {
   planetas           Planeta[]
   categoria          Categoria @relation(fields: [categoriaId], references: [id])
   categoriaId        String    @db.ObjectId
-  atributos          Atributo[]
+  // atributos          Atributo[]
+   color    String
+   posicion           Vector3?
+   rotacion           Vector3?
 }
-
+// Tipos embebidos
+type Vector3 {
+  x  Float
+  y  Float
+  z  Float
+}
 type Atributo {
   posicion Posicion?
   colores  Color[]

@@ -6,12 +6,9 @@ import { GALAXIA_REPOSITORY } from 'src/core/constants/constants';
 import { Galaxia } from 'src/core/entities/galaxia/galaxia.entity';
 import { GalaxiaRepository } from 'src/core/repositories/galaxia/galaxia.repository';
 import { ValidatorService } from 'src/shared/application/validation/validator.service';
+import { CustomError } from 'src/shared/class/Error.Class';
 import { BussinesRuleException } from 'src/shared/domain/exceptions/business-rule.exception';
 import { CategoriaService } from '../categoria/categoria.service';
-import { CustomError } from 'src/shared/class/Error.Class';
-import { Posicion } from 'src/core/entities/galaxia/atributos/posicion/posicion.entity';
-import { Color } from 'src/core/entities/galaxia/atributos/color/color.entity';
-import { Atributos } from 'src/core/entities/galaxia/atributos/atributos.entity';
 
 @Injectable()
 export class GalaxiasService {
@@ -55,29 +52,22 @@ export class GalaxiasService {
       );
     }
 
-    const atributos = createGalaxiaDto.atributos?.map((attr) => new Atributos(
-  '', // id temporal
-  '', // galaxiaId aún no existe
-  attr.posicion
-    ? new Posicion('', attr.posicion.x, attr.posicion.y)
-    : null,
-  attr.colores?.map(c => new Color('', c.type, c.value)) ?? []
-)) ?? [];
-
-const galaxia = new Galaxia(
-  null,
-  createGalaxiaDto.nombre,
-  createGalaxiaDto.descripcion,
-  createGalaxiaDto.imagen ?? null,
-  createGalaxiaDto.url ?? null,
-  createGalaxiaDto.textura ?? null,
-  createGalaxiaDto.estado ?? true,
-  createGalaxiaDto.fechaCreacion ?? new Date(),
-  createGalaxiaDto.fechaActualizacion ?? new Date(),
-  null,
-  createGalaxiaDto.categoriaId,
-  atributos, 
-);
+    const galaxia = new Galaxia(
+      null,
+      createGalaxiaDto.nombre,
+      createGalaxiaDto.descripcion,
+      createGalaxiaDto.imagen ?? null,
+      createGalaxiaDto.url ?? null,
+      createGalaxiaDto.textura ?? null,
+      createGalaxiaDto.estado ?? true,
+      createGalaxiaDto.fechaCreacion ?? new Date(),
+      createGalaxiaDto.fechaActualizacion ?? new Date(),
+      null,
+      createGalaxiaDto.categoriaId,
+      createGalaxiaDto.color ?? null,
+      createGalaxiaDto.posicion ?? null,
+      createGalaxiaDto.rotacion ?? null,
+    );
 
     return this.repository.save(galaxia);
   }
@@ -94,7 +84,7 @@ const galaxia = new Galaxia(
         'No se encontró la galaxia',
         HttpStatus.NOT_FOUND,
         {
-          id: id,
+          id,
           codigoError: 'GALAXIA_NO_ENCONTRADA',
         },
       );
@@ -117,6 +107,7 @@ const galaxia = new Galaxia(
         },
       );
     }
+
     const galaxiaActualizada = new Galaxia(
       id,
       dto.nombre ?? galaxiaExistente.nombre,
@@ -128,19 +119,20 @@ const galaxia = new Galaxia(
       galaxiaExistente.fechaCreacion,
       new Date(),
       galaxiaExistente.categoria,
-      galaxiaExistente.categoriaId,
-      galaxiaExistente.atributos,
+      dto.categoriaId ?? galaxiaExistente.categoriaId,
+      dto.color ?? galaxiaExistente.color,
+      dto.posicion ?? galaxiaExistente.posicion,
+      dto.rotacion ?? galaxiaExistente.rotacion,
     );
 
     return this.repository.update(id, galaxiaActualizada);
   }
+
   async eliminarGalaxia(id: string): Promise<Galaxia> {
-    // Verifica que la galaxia exista
     await this.ObtenerGalaxia(id); // lanza excepción si no existe
 
     try {
-      const galaxia = await this.repository.delete(id, false);
-      return galaxia;
+      return await this.repository.delete(id, false);
     } catch (error) {
       throw new CustomError(
         'Error al eliminar la galaxia',

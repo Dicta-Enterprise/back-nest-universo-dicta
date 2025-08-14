@@ -8,18 +8,15 @@ import {
   Param,
   Patch,
   Post,
-  UseInterceptors,
 } from '@nestjs/common';
-import { ParseObjectIdPipe } from 'src/shared/pipes/parse-object-id.pipe';
-import * as useCase from 'src/application/uses-cases/categoria';
 import * as dto from 'src/application/dto/categoria';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { RequiredFile } from 'src/shared/decorator/required-file.decorator';
 import * as azureCase from 'src/application/uses-cases/azure';
+import * as useCase from 'src/application/uses-cases/categoria';
+import { ParseObjectIdPipe } from 'src/shared/pipes/parse-object-id.pipe';
 
 @Controller('categorias')
 export class CategoriaController {
-    deleteUseCase: any;
+  deleteUseCase: any;
   constructor(
     private createUseCase: useCase.CreateCategoriaUseCase,
     private getAllCategoriaUseCase: useCase.GetAllCategoriaUseCase,
@@ -31,24 +28,26 @@ export class CategoriaController {
   ) {}
 
   @Post()
-  @UseInterceptors(FileInterceptor('file'))
+  // @UseInterceptors(FileInterceptor('file'))  <-- comentado para no requerir archivo
   async create(
-    @RequiredFile() file: Express.Multer.File,
+    // @RequiredFile() file: Express.Multer.File, <-- comentado
     @Body() dto: dto.CreateCategoriaDto,
   ) {
-    const imageResult = await this.saveImageStorageUseCase.execute(file, 'categorias');
+    // Si quieres subir imagen opcionalmente, podrías usar algo así:
+    // let imageResult;
+    // if (file) {
+    //   imageResult = await this.saveImageStorageUseCase.execute(file, 'categorias');
+    //   if (imageResult.isFailure) {
+    //     throw new HttpException(imageResult.error.message, HttpStatus.BAD_REQUEST);
+    //   }
+    // }
 
-    if (imageResult.isFailure) {
-      throw new HttpException(
-        imageResult.error.message,
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-
-    const result = await this.createUseCase.execute(dto,imageResult.getValue());
+    const result = await this.createUseCase.execute(
+      dto /*, imageResult?.getValue() */,
+    );
 
     if (result.isFailure) {
-      await this.deleteImageStorageUseCase.execute(imageResult.getValue());
+      // if (imageResult) await this.deleteImageStorageUseCase.execute(imageResult.getValue());
       throw new HttpException(result.error.message, HttpStatus.BAD_REQUEST);
     }
 

@@ -1,43 +1,23 @@
 import { Transform, Type } from 'class-transformer';
 import {
-  IsDate,
-  IsNotEmpty,
   IsBoolean,
+  IsDate,
+  IsMongoId,
+  IsNotEmpty,
+  IsNumber,
   IsOptional,
   IsString,
-  IsMongoId,
-  IsInt,
-  ValidateNested,
-  IsArray,
 } from 'class-validator';
 
-class ColorDto {
-  @IsString()
-  @IsNotEmpty()
-  type: string;
-
-  @IsString()
-  @IsNotEmpty()
-  value: string;
-}
-
-class PosicionDto {
-  @IsInt()
+class Vector3Dto {
+  @IsNumber()
   x: number;
 
-  @IsInt()
+  @IsNumber()
   y: number;
-}
 
-class AtributoDto {
-  @ValidateNested()
-  @Type(() => PosicionDto)
-  posicion: PosicionDto;
-
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => ColorDto)
-  colores: ColorDto[];
+  @IsNumber()
+  z: number;
 }
 
 export class CreateGalaxiaDto {
@@ -63,25 +43,32 @@ export class CreateGalaxiaDto {
   textura?: string;
 
   @IsBoolean()
+  @IsOptional()
   estado: boolean;
 
   @IsDate()
   @IsOptional()
   @Type(() => Date)
-  fechaCreacion: Date;
+  fechaCreacion?: Date;
 
   @IsDate()
   @IsOptional()
   @Type(() => Date)
-  fechaActualizacion: Date;
+  fechaActualizacion?: Date;
 
   @IsMongoId({ message: 'El campo categoriaId debe ser un ID de Mongo válido' })
   @IsNotEmpty({ message: 'La categoría es obligatoria' })
   categoriaId: string;
 
+  @IsString()
+  @IsNotEmpty()
+  color: string;
+
   @IsOptional()
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => AtributoDto)
-  atributos?: AtributoDto[];
+  @Type(() => Vector3Dto)
+  posicion?: Vector3Dto;
+
+  @IsOptional()
+  @Type(() => Vector3Dto)
+  rotacion?: Vector3Dto;
 }

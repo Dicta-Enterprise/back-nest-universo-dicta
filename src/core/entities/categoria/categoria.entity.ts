@@ -3,10 +3,16 @@ export class Categoria {
     public id: string,
     public nombre: string,
     public descripcion: string,
-    public imagenUrl: string,
+
     public estado: boolean,
     public fechaCreacion: Date,
     public fechaActualizacion: Date,
+    // Campos opcionales para visualización tipo cohetes
+    public x?: number,
+    public y?: number,
+    public z?: number,
+    public url?: string,
+    public modelo?: string,
   ) {}
 
   public desactivar(): void {
@@ -22,10 +28,15 @@ export class Categoria {
       data.id,
       data.nombre,
       data.descripcion,
-      data.imagenUrl,
+
       data.estado,
-      data.createdAt,
-      data.updatedAt,
+      data.fechaCreacion ?? data.createdAt,
+      data.fechaActualizacion ?? data.updatedAt,
+      data.x,
+      data.y,
+      data.z,
+      data.url,
+      data.modelo,
     );
   }
 }
