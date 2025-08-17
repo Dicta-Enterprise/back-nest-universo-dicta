@@ -28,8 +28,12 @@ export class CategoriaPrismaRepository implements CategoriaRepository {
       data: {
         nombre: categoria.nombre,
         descripcion: categoria.descripcion,
-        imagenUrl: categoria.imagenUrl,
         estado: categoria.estado,
+        x: categoria.x,
+        y: categoria.y,
+        z: categoria.z,
+        url: categoria.url,
+        modelo: categoria.modelo,
       },
     });
 
@@ -37,9 +41,10 @@ export class CategoriaPrismaRepository implements CategoriaRepository {
   }
 
   async findAllActive(): Promise<Categoria[]> {
-    const categorias = await this.prisma.categoria.findMany();
-    const res = Categoria.fromPrismaList(categorias);
-    return res;
+    const categorias = await this.prisma.categoria.findMany({
+      where: { estado: true },
+    });
+    return Categoria.fromPrismaList(categorias);
   }
 
   async update(id: string, categoria: Partial<Categoria>): Promise<Categoria> {
@@ -49,6 +54,11 @@ export class CategoriaPrismaRepository implements CategoriaRepository {
         nombre: categoria.nombre,
         descripcion: categoria.descripcion,
         estado: categoria.estado,
+        x: categoria.x,
+        y: categoria.y,
+        z: categoria.z,
+        url: categoria.url,
+        modelo: categoria.modelo,
       },
     });
     return Categoria.fromPrisma(data);
@@ -57,9 +67,7 @@ export class CategoriaPrismaRepository implements CategoriaRepository {
   async delete(id: string, estado: boolean): Promise<Categoria> {
     const data = await this.prisma.categoria.update({
       where: { id },
-      data: {
-        estado: estado,
-      },
+      data: { estado },
     });
 
     return Categoria.fromPrisma(data);

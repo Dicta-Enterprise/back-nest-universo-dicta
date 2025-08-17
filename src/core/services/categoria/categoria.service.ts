@@ -37,10 +37,14 @@ export class CategoriaService {
       null,
       dto.nombre,
       dto.descripcion || '',
-      dto.imagenUrl || '',
       true,
       new Date(),
       new Date(),
+      dto.x,
+      dto.y,
+      dto.z,
+      dto.url,
+      dto.modelo,
     );
 
     return this.repository.save(categoria);
@@ -77,10 +81,14 @@ export class CategoriaService {
       null,
       dto.nombre,
       dto.descripcion || '',
-      dto.imagenUrl || '',
       true,
       new Date(),
       new Date(),
+      dto.x,
+      dto.y,
+      dto.z,
+      dto.url,
+      dto.modelo,
     );
 
     return this.repository.update(id, categoria);
@@ -89,7 +97,7 @@ export class CategoriaService {
   async eliminarCategoria(id: string): Promise<Categoria> {
     const categoria = await this.obtenerUnaCategoria(id);
 
-    const estado: boolean = categoria.estado === true ? false : true; 
+    const estado: boolean = categoria.estado === true ? false : true;
 
     return this.repository.delete(id, estado);
   }

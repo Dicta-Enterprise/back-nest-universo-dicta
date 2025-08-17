@@ -15,10 +15,10 @@ export class CreateCategoriaUseCase {
 
   async execute(
     dto: CreateCategoriaDto,
-    imagenResult: string,
+    // imagenResult: string,
   ): Promise<Result<Categoria>> {
-    
-    const createDto = {...dto, imagenUrl: imagenResult };
+    // const createDto = {...dto, imagenUrl: imagenResult }; <-- comentado
+    const createDto = { ...dto };
 
     try {
       const categoria = await this.categoriaService.crearCategoria(createDto);

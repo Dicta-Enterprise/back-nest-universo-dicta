@@ -6,44 +6,48 @@ import { GALAXIA_REPOSITORY } from 'src/core/constants/constants';
 import { Galaxia } from 'src/core/entities/galaxia/galaxia.entity';
 import { GalaxiaRepository } from 'src/core/repositories/galaxia/galaxia.repository';
 import { ValidatorService } from 'src/shared/application/validation/validator.service';
+import { CustomError } from 'src/shared/class/Error.Class';
 import { BussinesRuleException } from 'src/shared/domain/exceptions/business-rule.exception';
 import { CategoriaService } from '../categoria/categoria.service';
 
 @Injectable()
 export class GalaxiasService {
-
   constructor(
-    @Inject(GALAXIA_REPOSITORY) 
+    @Inject(GALAXIA_REPOSITORY)
     private repository: GalaxiaRepository,
     private categoriaService: CategoriaService,
     private readonly validator: ValidatorService,
-  ) {
-  
-  }
+  ) {}
 
   async crearGalaxia(createGalaxiaDto: CreateGalaxiaDto) {
     await this.validator.validate(createGalaxiaDto, CreateGalaxiaDto);
 
-    const existe = await this.repository.findByName(createGalaxiaDto.nombre);
+    const existe = await this.repository.findByNombreYCategoria(
+      createGalaxiaDto.nombre,
+      createGalaxiaDto.categoriaId,
+    );
+
     if (existe) {
       throw new BussinesRuleException(
-        'Ya existe una galaxia con ese nombre',
+        'Ya existe una galaxia con ese nombre en la misma categoría',
         HttpStatus.BAD_REQUEST,
         {
           nombre: createGalaxiaDto.nombre,
-          codigoError: 'GALAXIA_DUPLICADA',
+          categoriaId: createGalaxiaDto.categoriaId,
+          codigoError: 'GALAXIA_DUPLICADA_EN_CATEGORIA',
         },
       );
     }
 
-    const categorias = await this.categoriaService.listarCategorias();
-
-    if (!categorias || categorias.length === 0) {
+    const categoria = await this.categoriaService.obtenerUnaCategoria(
+      createGalaxiaDto.categoriaId,
+    );
+    if (!categoria) {
       throw new BussinesRuleException(
-        'No hay categorías disponibles',
+        'La categoría seleccionada no existe',
         HttpStatus.BAD_REQUEST,
         {
-          codigoError: 'CATEGORIAS_NO_ENCONTRADAS',
+          codigoError: 'CATEGORIA_NO_ENCONTRADA',
         },
       );
     }
@@ -52,16 +56,20 @@ export class GalaxiasService {
       null,
       createGalaxiaDto.nombre,
       createGalaxiaDto.descripcion,
-      createGalaxiaDto.estado,
-      createGalaxiaDto.fechaCreacion,
-      createGalaxiaDto.fechaActualizacion,
-      [],
+      createGalaxiaDto.imagen ?? null,
+      createGalaxiaDto.url ?? null,
+      createGalaxiaDto.textura ?? null,
+      createGalaxiaDto.estado ?? true,
+      createGalaxiaDto.fechaCreacion ?? new Date(),
+      createGalaxiaDto.fechaActualizacion ?? new Date(),
+      null,
+      createGalaxiaDto.categoriaId,
+      createGalaxiaDto.color ?? null,
+      createGalaxiaDto.posicion ?? null,
+      createGalaxiaDto.rotacion ?? null,
     );
 
-    return this.repository.save(
-      galaxia,
-      categorias.map((cat) => cat.id),
-    );
+    return this.repository.save(galaxia);
   }
 
   async ListarGalaxia() {
@@ -76,7 +84,7 @@ export class GalaxiasService {
         'No se encontró la galaxia',
         HttpStatus.NOT_FOUND,
         {
-          id: id,
+          id,
           codigoError: 'GALAXIA_NO_ENCONTRADA',
         },
       );
@@ -86,9 +94,9 @@ export class GalaxiasService {
 
   async ActualizarGalaxia(id: string, dto: UpdateGalaxiaDto): Promise<Galaxia> {
     await this.validator.validate(dto, UpdateGalaxiaDto);
-  
+
     const galaxiaExistente = await this.repository.findById(id);
-  
+
     if (!galaxiaExistente) {
       throw new BussinesRuleException(
         'No se encontró la galaxia',
@@ -99,46 +107,35 @@ export class GalaxiasService {
         },
       );
     }
+
     const galaxiaActualizada = new Galaxia(
       id,
       dto.nombre ?? galaxiaExistente.nombre,
       dto.descripcion ?? galaxiaExistente.descripcion,
       dto.imagen ?? galaxiaExistente.imagen,
+      dto.url ?? galaxiaExistente.url,
+      dto.textura ?? galaxiaExistente.textura,
       dto.estado ?? galaxiaExistente.estado,
       galaxiaExistente.fechaCreacion,
-      new Date(), 
-      galaxiaExistente.categorias 
+      new Date(),
+      galaxiaExistente.categoria,
+      dto.categoriaId ?? galaxiaExistente.categoriaId,
+      dto.color ?? galaxiaExistente.color,
+      dto.posicion ?? galaxiaExistente.posicion,
+      dto.rotacion ?? galaxiaExistente.rotacion,
     );
-  
+
     return this.repository.update(id, galaxiaActualizada);
   }
-  
+
   async eliminarGalaxia(id: string): Promise<Galaxia> {
-    const Galaxia = await this.ObtenerGalaxia(id);
+    await this.ObtenerGalaxia(id); // lanza excepción si no existe
 
-  async remove(id: string) {
     try {
-      const galaxia = await this.galaxia.update({
-        where: {
-          id: id,
-        },
-        data: {
-          estado: false,
-        },
-      });
-
-      if (!galaxia) {
-        throw new CustomError(
-          'No se encontró la galaxia',
-          'Not Found',
-          HttpStatus.NOT_FOUND,
-        );
-      }
-
-      return new GenericSingle(galaxia, HttpStatus.OK, 'Galaxia eliminada');
+      return await this.repository.delete(id, false);
     } catch (error) {
       throw new CustomError(
-        'Error',
+        'Error al eliminar la galaxia',
         error.message,
         HttpStatus.INTERNAL_SERVER_ERROR,
       );

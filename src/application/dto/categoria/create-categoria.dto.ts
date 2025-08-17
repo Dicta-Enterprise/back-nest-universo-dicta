@@ -3,6 +3,7 @@ import {
   IsBoolean,
   IsDate,
   IsNotEmpty,
+  IsNumber,
   IsOptional,
   IsString,
 } from 'class-validator';
@@ -31,6 +32,22 @@ export class CreateCategoriaDto {
   fechaActualizacion: Date;
 
   @IsOptional()
+  @IsNumber()
+  x?: number;
+
+  @IsOptional()
+  @IsNumber()
+  y?: number;
+
+  @IsOptional()
+  @IsNumber()
+  z?: number;
+
+  @IsOptional()
   @IsString()
-  imagenUrl: string;
+  url?: string;
+
+  @IsOptional()
+  @IsString()
+  modelo?: string;
 }

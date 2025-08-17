@@ -62,13 +62,19 @@ model Categoria {
   id                 String    @id @default(auto()) @map("_id") @db.ObjectId
   nombre             String    @unique
   descripcion        String
-  imagenUrl          String
+
   estado             Boolean   @default(true)
   fechaCreacion      DateTime  @default(now())
   fechaActualizacion DateTime  @updatedAt
   cursos             Curso[]
-  galaxias           Galaxia[] @relation(fields: [galaxiaId], references: [id])
+  galaxias           Galaxia[]
   galaxiaId          String[]  @db.ObjectId
+   // Campos extra para la visualización tipo cohetes
+  x                  Float?    // posición horizontal
+  y                  Float?    // posición vertical
+  z                  Float?    // profundidad
+  url                String?   // ruta amigable
+  modelo             String?   // ruta del modelo 3D
 }
 
 model Idioma {
@@ -79,72 +85,112 @@ model Idioma {
 }
 
 model Profesor {
-  id       String  @id @default(auto()) @map("_id") @db.ObjectId
-  nombre   String
-  dni String? @unique
+  id               String  @id @default(auto()) @map("_id") @db.ObjectId
+  nombre           String
+  dni              String? @unique
   apellido_paterno String?
   apellido_materno String?
-  email    String @unique
-  estado_p   Boolean @default(true)
-  cursos   Curso[]
+  email            String  @unique
+  estado_p         Boolean @default(true)
+  cursos           Curso[]
 
   @@unique([apellido_paterno, apellido_materno])
 }
 
 model Planeta {
   id                 String         @id @default(auto()) @map("_id") @db.ObjectId
+  grupo             String
   nombre             String         @unique
-  descripcion        String
-  imagen             String
   estado             EstadoGenerico @default(ACTIVO)
+  tema               String
+  textura         String
+  url                String
+  info               InfoPlaneta?    // <-- tipo embebido
   fechaCreacion      DateTime       @default(now())
   fechaActualizacion DateTime       @updatedAt
-  galaxia            Galaxia?       @relation(fields: [galaxiaId], references: [id])
-  galaxiaId          String?        @db.ObjectId
+  galaxia            Galaxia       @relation(fields: [galaxiaId], references: [id])
+  galaxiaId          String        @db.ObjectId
   cursos             Curso[]
+  
+}
+type InfoPlaneta {
+  tipoRiesgo   String
+  tamano       String   
+  composicion  String   
+  riesgo       String
+  nivel        String
+  ambiente     String
+  temperatura  String
+  villano      String
 }
 
-model Curso {
-  id                String         @id @default(auto()) @map("_id") @db.ObjectId
-  nombre            String         @unique
-  descripcion       String
-  fechaCreacion     DateTime       @default(now())
-  fechaInicio       DateTime?
-  fechaFinal        DateTime?
-  precio            Float
-  estado            Boolean @default(true)
-  imagen            String @unique
-  duracionSemanas   Float?
 
-  profesor          Profesor?      @relation(fields: [profesorId], references: [id])
-  profesorId        String?         @db.ObjectId
-  categoria         Categoria?      @relation(fields: [categoriaId], references: [id])
-  categoriaId       String?         @db.ObjectId
-  idioma            Idioma?        @relation(fields: [idiomaId], references: [id])
-  idiomaId          String?        @db.ObjectId
-  planeta           Planeta?        @relation(fields: [planetaId], references: [id])
-  planetaId         String?         @db.ObjectId
+model Curso {
+  id              String    @id @default(auto()) @map("_id") @db.ObjectId
+  nombre          String    @unique
+  descripcion     String
+  fechaCreacion   DateTime  @default(now())
+  fechaInicio     DateTime?
+  fechaFinal      DateTime?
+  precio          Float
+  estado          Boolean   @default(true)
+  imagen          String    @unique
+  duracionSemanas Float?
+
+  profesor    Profesor?  @relation(fields: [profesorId], references: [id])
+  profesorId  String?    @db.ObjectId
+  categoria   Categoria? @relation(fields: [categoriaId], references: [id])
+  categoriaId String?    @db.ObjectId
+  idioma      Idioma?    @relation(fields: [idiomaId], references: [id])
+  idiomaId    String?    @db.ObjectId
+  planeta     Planeta?   @relation(fields: [planetaId], references: [id])
+  planetaId   String?    @db.ObjectId
 }
 
 model Galaxia {
-  id                  String              @id @default(auto()) @map("_id") @db.ObjectId
-  nombre              String              @unique
-  descripcion         String
-  estado              Boolean             @default(true)
-  fechaCreacion       DateTime            @default(now())
-  fechaActualizacion  DateTime            @updatedAt
-  planetas            Planeta[]
-  categorias          Categoria[]         @relation(fields: [categoriaId], references: [id])
-  categoriaId         String[]            @db.ObjectId
-  itemImagenesGalaxia ItemImagenGalaxia[]
+  id                 String    @id @default(auto()) @map("_id") @db.ObjectId
+  nombre             String
+  descripcion        String
+  estado             Boolean   @default(true)
+  imagen             String?
+  url                String?
+  textura            String?
+  fechaCreacion      DateTime  @default(now())
+  fechaActualizacion DateTime  @updatedAt
+  planetas           Planeta[]
+  categoria          Categoria @relation(fields: [categoriaId], references: [id])
+  categoriaId        String    @db.ObjectId
+  // atributos          Atributo[]
+   color    String
+   posicion           Vector3?
+   rotacion           Vector3?
+}
+// Tipos embebidos
+type Vector3 {
+  x  Float
+  y  Float
+  z  Float
+}
+type Atributo {
+  posicion Posicion?
+  colores  Color[]
+}
+type Posicion {
+  x Int
+  y Int
 }
 
-model ItemImagenGalaxia {
-  id        String  @id @default(auto()) @map("_id") @db.ObjectId
-  imagenUrl String
-  galaxia   Galaxia @relation(fields: [galaxiaId], references: [id])
-  galaxiaId String  @db.ObjectId
+type Color {
+  type  String
+  value String
 }
+
+// model ItemImagenGalaxia {
+//   id        String  @id @default(auto()) @map("_id") @db.ObjectId
+//   imagenUrl String
+//   galaxia   Galaxia @relation(fields: [galaxiaId], references: [id])
+//   galaxiaId String  @db.ObjectId
+// }
 
 model LandingPage {
   id                  String             @id @default(auto()) @map("_id") @db.ObjectId
@@ -153,7 +199,7 @@ model LandingPage {
   imagenPrincipal     String
   contenido           String[]
   estado              Boolean            @default(true)
-  slug                String
+  slug                String @unique
   metaKeywords        String
   landingUrl          String
   fechaCreacion       DateTime           @default(now())

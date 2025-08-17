@@ -1,14 +1,24 @@
 import { Transform, Type } from 'class-transformer';
 import {
-  IsArray,
-  IsDate,
-  IsNotEmpty,
   IsBoolean,
+  IsDate,
+  IsMongoId,
+  IsNotEmpty,
+  IsNumber,
   IsOptional,
   IsString,
-  ValidateNested,
 } from 'class-validator';
-import { ItemImagen } from 'src/core/entities/estandar/item.imagen.entity';
+
+class Vector3Dto {
+  @IsNumber()
+  x: number;
+
+  @IsNumber()
+  y: number;
+
+  @IsNumber()
+  z: number;
+}
 
 export class CreateGalaxiaDto {
   @IsString()
@@ -21,21 +31,44 @@ export class CreateGalaxiaDto {
   descripcion: string;
 
   @IsOptional()
+  @IsString()
+  imagen?: string;
+
+  @IsOptional()
+  @IsString()
+  url?: string;
+
+  @IsOptional()
+  @IsString()
+  textura?: string;
+
   @IsBoolean()
+  @IsOptional()
   estado: boolean;
 
   @IsDate()
   @IsOptional()
   @Type(() => Date)
-  fechaCreacion: Date;
+  fechaCreacion?: Date;
 
   @IsDate()
   @IsOptional()
   @Type(() => Date)
-  fechaActualizacion: Date;
+  fechaActualizacion?: Date;
 
-  @ValidateNested({ each: true })
-  @Type(() => ItemImagen)
-  @IsArray()
-  itemImagen: ItemImagen[];
+  @IsMongoId({ message: 'El campo categoriaId debe ser un ID de Mongo válido' })
+  @IsNotEmpty({ message: 'La categoría es obligatoria' })
+  categoriaId: string;
+
+  @IsString()
+  @IsNotEmpty()
+  color: string;
+
+  @IsOptional()
+  @Type(() => Vector3Dto)
+  posicion?: Vector3Dto;
+
+  @IsOptional()
+  @Type(() => Vector3Dto)
+  rotacion?: Vector3Dto;
 }
