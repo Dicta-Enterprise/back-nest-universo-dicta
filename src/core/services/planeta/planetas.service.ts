@@ -3,7 +3,7 @@ import { EstadoGenerico } from '@prisma/client';
 import { CreatePlanetaDto } from 'src/application/dto/planeta/create-planeta.dto';
 import { UpdatePlanetaDto } from 'src/application/dto/planeta/update-planeta.dto';
 import { PLANETA_REPOSITORY } from 'src/core/constants/constants';
-import { InfoPlaneta } from 'src/core/entities/planeta/InfoPlaneta/infoPlaneta.entity';
+import { InfoPlaneta } from 'src/core/entities/planeta/infoPlaneta/infoPlaneta.entity';
 import { Planeta } from 'src/core/entities/planeta/planeta.entity';
 import { PlanetaRepository } from 'src/core/repositories/planeta/planeta.respository';
 import { ValidatorService } from 'src/shared/application/validation/validator.service';
@@ -23,7 +23,7 @@ export class PlanetasService {
     const existe = await this.repository.findByName(dtoPlaneta.nombre);
     if (existe) {
       throw new BussinesRuleException(
-        'El planeta ya existe',
+        `El planeta con el nombre ${dtoPlaneta.nombre} ya existe en esta galaxia `,
         HttpStatus.BAD_REQUEST,
         {
           nombre: dtoPlaneta.nombre,
@@ -32,29 +32,36 @@ export class PlanetasService {
       );
     }
 
-    const info = new InfoPlaneta(
-      dtoPlaneta.info.tipoRiesgo,
-      dtoPlaneta.info.tamano,
-      dtoPlaneta.info.composicion,
-      dtoPlaneta.info.riesgo,
-      dtoPlaneta.info.nivel,
-      dtoPlaneta.info.ambiente,
-      dtoPlaneta.info.temperatura,
-      dtoPlaneta.info.villano,
-    );
+    const info = dtoPlaneta.info
+      ? new InfoPlaneta(
+          dtoPlaneta.info.tipoRiesgo,
+          dtoPlaneta.info.tamano,
+          dtoPlaneta.info.composicion,
+          dtoPlaneta.info.riesgo,
+          dtoPlaneta.info.nivel,
+          dtoPlaneta.info.ambiente,
+          dtoPlaneta.info.temperatura,
+          dtoPlaneta.info.villano,
+        )
+      : null;
 
     const planeta = new Planeta(
-      null,
-      dtoPlaneta.grupo,
+      null, // id
       dtoPlaneta.nombre,
+      dtoPlaneta.grupo,
+      dtoPlaneta.planetaNombre,
       dtoPlaneta.tema,
       dtoPlaneta.textura,
       dtoPlaneta.url,
-      EstadoGenerico.ACTIVO,
+      dtoPlaneta.imagenResumen,
+      dtoPlaneta.imagenBeneficios,
+      dtoPlaneta.resumenCurso,
+      dtoPlaneta.estado ?? EstadoGenerico.ACTIVO,
       info,
+      dtoPlaneta.peligros ?? [],
+      dtoPlaneta.beneficios ?? [],
       new Date(),
       new Date(),
-      null,
       dtoPlaneta.galaxiaId,
     );
 
@@ -105,7 +112,17 @@ export class PlanetasService {
     dtoPlaneta: UpdatePlanetaDto,
   ): Promise<Planeta> {
     await this.validator.validate(dtoPlaneta, UpdatePlanetaDto);
-
+    const existe = await this.repository.findByName(dtoPlaneta.nombre);
+    if (existe) {
+      throw new BussinesRuleException(
+        `No puedes editar el planeta. Ya existe otro con el nombre ${dtoPlaneta.nombre} en esta galaxia`,
+        HttpStatus.BAD_REQUEST,
+        {
+          nombre: dtoPlaneta.nombre,
+          codigoError: 'PLANETA_DUPLICADO',
+        },
+      );
+    }
     const info = dtoPlaneta.info
       ? new InfoPlaneta(
           dtoPlaneta.info.tipoRiesgo,
@@ -117,20 +134,25 @@ export class PlanetasService {
           dtoPlaneta.info.temperatura,
           dtoPlaneta.info.villano,
         )
-      : undefined;
+      : null;
 
     const planeta = new Planeta(
-      null,
-      dtoPlaneta.grupo,
+      null, // id (lo maneja Prisma)
       dtoPlaneta.nombre,
+      dtoPlaneta.grupo,
+      dtoPlaneta.planetaNombre,
       dtoPlaneta.tema,
       dtoPlaneta.textura,
       dtoPlaneta.url,
-      dtoPlaneta.estado ? EstadoGenerico.ACTIVO : EstadoGenerico.INACTIVO,
+      dtoPlaneta.imagenResumen,
+      dtoPlaneta.imagenBeneficios,
+      dtoPlaneta.resumenCurso,
+      dtoPlaneta.estado ?? EstadoGenerico.ACTIVO,
       info,
+      dtoPlaneta.peligros ?? [],
+      dtoPlaneta.beneficios ?? [],
       new Date(),
       new Date(),
-      null,
       dtoPlaneta.galaxiaId,
     );
 

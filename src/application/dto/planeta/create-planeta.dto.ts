@@ -1,59 +1,101 @@
 import { Transform, Type } from 'class-transformer';
 import {
-  IsBoolean,
   IsDate,
   IsMongoId,
   IsNotEmpty,
   IsOptional,
   IsString,
   ValidateNested,
+  IsArray,
+  IsEnum,
 } from 'class-validator';
-import { InfoPlanetaDto } from './Informacion/infoPlanetaDto'; // ruta al archivo del DTO anidado
+import { InfoPlanetaDto } from './Informacion/infoPlanetaDto';
+import { PeligroDto } from './Peligros/peligroDto';
+import { BeneficioDto } from './Beneficio/beneficioDto';
+import { EstadoGenerico } from '@prisma/client';
+
+const trim = ({ value }: { value: any }) =>
+  typeof value === 'string' ? value.trim() : value;
 
 export class CreatePlanetaDto {
   @IsString()
   @IsNotEmpty()
-  @Transform(({ value }) => value.trim())
+  @Transform(trim)
   nombre: string;
 
   @IsString()
   @IsNotEmpty()
-  @Transform(({ value }) => value.trim())
+  @Transform(trim)
   grupo: string;
 
   @IsString()
   @IsNotEmpty()
-  @Transform(({ value }) => value.trim())
+  @Transform(trim)
+  planetaNombre: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @Transform(trim)
   tema: string;
 
   @IsString()
-  @IsOptional()
-  @Transform(({ value }) => value.trim())
+  @IsNotEmpty()
+  @Transform(trim)
   textura: string;
 
   @IsString()
-  @IsOptional()
-  @Transform(({ value }) => value.trim())
+  @IsNotEmpty()
+  @Transform(trim)
   url: string;
 
-  @IsBoolean()
+  @IsString()
+  @IsNotEmpty()
+  @Transform(trim)
+  imagenResumen: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @Transform(trim)
+  imagenBeneficios: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @Transform(trim)
+  resumenCurso: string;
+
+  @IsEnum(EstadoGenerico, {
+    message: `El estado debe ser uno de los siguientes valores: ${Object.values(EstadoGenerico).join(', ')}`,
+  })
   @IsOptional()
-  estado: boolean;
+  estado?: EstadoGenerico;
 
   @ValidateNested()
   @Type(() => InfoPlanetaDto)
   @IsNotEmpty()
   info: InfoPlanetaDto;
 
-  @IsDate()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => PeligroDto)
   @IsOptional()
-  @Type(() => Date)
-  fechaCreacion: Date;
+  peligros?: PeligroDto[];
+
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => BeneficioDto)
+  @IsOptional()
+  beneficios?: BeneficioDto[];
 
   @IsDate()
   @IsOptional()
   @Type(() => Date)
-  fechaActualizacion: Date;
+  fechaCreacion?: Date;
+
+  @IsDate()
+  @IsOptional()
+  @Type(() => Date)
+  fechaActualizacion?: Date;
+
   @IsMongoId({ message: 'El campo GalaxiaId debe ser un ID de Mongo válido' })
   @IsNotEmpty({ message: 'La Galaxia es obligatoria' })
   galaxiaId: string;
