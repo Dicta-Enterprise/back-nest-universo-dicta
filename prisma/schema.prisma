@@ -59,9 +59,9 @@ enum TipoUsuario {
 }
 
 model Categoria {
-  id                 String    @id @default(auto()) @map("_id") @db.ObjectId
-  nombre             String    @unique
-  descripcion        String
+  id          String @id @default(auto()) @map("_id") @db.ObjectId
+  nombre      String @unique
+  descripcion String
 
   estado             Boolean   @default(true)
   fechaCreacion      DateTime  @default(now())
@@ -69,12 +69,12 @@ model Categoria {
   cursos             Curso[]
   galaxias           Galaxia[]
   galaxiaId          String[]  @db.ObjectId
-   // Campos extra para la visualización tipo cohetes
-  x                  Float?    // posición horizontal
-  y                  Float?    // posición vertical
-  z                  Float?    // profundidad
-  url                String?   // ruta amigable
-  modelo             String?   // ruta del modelo 3D
+  // Campos extra para la visualización tipo cohetes
+  x                  Float? // posición horizontal
+  y                  Float? // posición vertical
+  z                  Float? // profundidad
+  url                String? // ruta amigable
+  modelo             String? // ruta del modelo 3D
 }
 
 model Idioma {
@@ -99,31 +99,52 @@ model Profesor {
 
 model Planeta {
   id                 String         @id @default(auto()) @map("_id") @db.ObjectId
-  grupo             String
+  grupo              String
   nombre             String         @unique
+  planetaNombre      String
   estado             EstadoGenerico @default(ACTIVO)
   tema               String
-  textura         String
+  textura            String
   url                String
-  info               InfoPlaneta?    // <-- tipo embebido
+  imagenResumen      String
+  imagenBeneficios   String
+  resumenCurso       String
+  info               InfoPlaneta?
+  peligros           Peligro[]
+  beneficios         Beneficio[]
   fechaCreacion      DateTime       @default(now())
   fechaActualizacion DateTime       @updatedAt
-  galaxia            Galaxia       @relation(fields: [galaxiaId], references: [id])
-  galaxiaId          String        @db.ObjectId
+  galaxia            Galaxia        @relation(fields: [galaxiaId], references: [id])
+  galaxiaId          String         @db.ObjectId
   cursos             Curso[]
-  
-}
-type InfoPlaneta {
-  tipoRiesgo   String
-  tamano       String   
-  composicion  String   
-  riesgo       String
-  nivel        String
-  ambiente     String
-  temperatura  String
-  villano      String
+
+  @@unique([nombre, galaxiaId])
 }
 
+type InfoPlaneta {
+  tipoRiesgo  String
+  tamano      String
+  composicion String
+  riesgo      String
+  nivel       String
+  ambiente    String
+  temperatura String
+  villano     String
+}
+
+type Peligro {
+  nombre      String
+  descripcion String
+  nivelRiesgo String
+  temperatura String
+  villano     String
+  cta         String
+}
+
+type Beneficio {
+  titulo      String
+  descripcion String
+}
 
 model Curso {
   id              String    @id @default(auto()) @map("_id") @db.ObjectId
@@ -161,20 +182,23 @@ model Galaxia {
   categoria          Categoria @relation(fields: [categoriaId], references: [id])
   categoriaId        String    @db.ObjectId
   // atributos          Atributo[]
-   color    String
-   posicion           Vector3?
-   rotacion           Vector3?
+  color              String
+  posicion           Vector3?
+  rotacion           Vector3?
 }
+
 // Tipos embebidos
 type Vector3 {
-  x  Float
-  y  Float
-  z  Float
+  x Float
+  y Float
+  z Float
 }
+
 type Atributo {
   posicion Posicion?
   colores  Color[]
 }
+
 type Posicion {
   x Int
   y Int
@@ -199,7 +223,7 @@ model LandingPage {
   imagenPrincipal     String
   contenido           String[]
   estado              Boolean            @default(true)
-  slug                String @unique
+  slug                String             @unique
   metaKeywords        String
   landingUrl          String
   fechaCreacion       DateTime           @default(now())
