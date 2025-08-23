@@ -46,11 +46,55 @@ export class GalaxiaPrismaRepository implements GalaxiaRepository {
 
     return Galaxia.fromPrisma(data);
   }
+async saveMultiple(galaxias: Galaxia[]): Promise<Galaxia[]> {
+  return await this.prisma.$transaction(async (prisma) => {
+    const results: Galaxia[] = [];
+    
+    for (const galaxia of galaxias) {
+      const createData: Prisma.GalaxiaCreateInput = {
+        nombre: galaxia.nombre,
+        descripcion: galaxia.descripcion,
+        imagen: galaxia.imagen,
+        url: galaxia.url,
+        textura: galaxia.textura,
+        estado: galaxia.estado ?? true,
+        fechaCreacion: galaxia.fechaCreacion ?? new Date(),
+        fechaActualizacion: galaxia.fechaActualizacion ?? new Date(),
+        categoria: {
+          connect: { id: galaxia.categoriaId },
+        },
+        color: galaxia.color,
+        posicion: galaxia.posicion
+          ? {
+              x: galaxia.posicion.x,
+              y: galaxia.posicion.y,
+              z: galaxia.posicion.z,
+            }
+          : undefined,
+        rotacion: galaxia.rotacion
+          ? {
+              x: galaxia.rotacion.x,
+              y: galaxia.rotacion.y,
+              z: galaxia.rotacion.z,
+            }
+          : undefined,
+      };
 
+      const data = await prisma.galaxia.create({
+        data: createData,
+        include: { categoria: true },
+      });
+
+      results.push(Galaxia.fromPrisma(data));
+    }
+    
+    return results;
+  });
+}
   async findAllActive(): Promise<Galaxia[]> {
     const galaxias = await this.prisma.galaxia.findMany({
       where: { estado: true },
-      include: { categoria: true },
+      
       orderBy: { fechaCreacion: 'desc' },
     });
 
