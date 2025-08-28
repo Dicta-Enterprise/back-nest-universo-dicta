@@ -1,6 +1,7 @@
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { EstadoGenerico } from '@prisma/client';
 import { CreatePlanetaDto } from 'src/application/dto/planeta/create-planeta.dto';
+import { PlanetaPaginationDto } from 'src/application/dto/planeta/PlanetaPagination.dto';
 import { UpdatePlanetaDto } from 'src/application/dto/planeta/update-planeta.dto';
 import { PLANETA_REPOSITORY } from 'src/core/constants/constants';
 import { InfoPlaneta } from 'src/core/entities/planeta/infoPlaneta/infoPlaneta.entity';
@@ -68,8 +69,8 @@ export class PlanetasService {
     return this.repository.save(planeta);
   }
 
-  async listarPlanetas(): Promise<Planeta[]> {
-    return this.repository.findAllActive();
+  async listarPlanetas(planetaPaginationDto: PlanetaPaginationDto): Promise<Planeta[]> {
+    return this.repository.findAllActive(planetaPaginationDto);
   }
 
   async listarUnPlaneta(id: string): Promise<Planeta> {

@@ -8,14 +8,17 @@ import {
   Param,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
 import {
   ApiBody,
   ApiOperation,
   ApiParam,
+  ApiQuery,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { GalaxiaPaginationDto } from 'src/application/dto/galaxia';
 
 import { CreateGalaxiaDto } from 'src/application/dto/galaxia/create-galaxia.dto';
 import { CreateMultipleGalaxiasDto } from 'src/application/dto/galaxia/create-multiple-galaxias.dto';
@@ -169,8 +172,31 @@ export class GalaxiasController {
     description: 'Lista de galaxias obtenida correctamente',
   })
   @ApiResponse({ status: 400, description: 'Error al obtener las galaxias' })
-  async findAll() {
-    const result = await this.getAllGalaxiaUseCase.execute();
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    type: Number,
+    description: 'Número de página para la paginación',
+    example: 1,
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    description: 'Cantidad de resultados por página',
+    example: 10,
+  })
+  @ApiQuery({
+    name: 'categoriaId',
+    required: false,
+    type: String,
+    description:
+      'ID de la categoría para filtrar galaxias (ObjectId de MongoDB)',
+    example: '64e4d67c9f1b1468a8f6c7d2',
+  })
+  async findAll(@Query() galaxiaPaginationDto: GalaxiaPaginationDto) {
+    const result =
+      await this.getAllGalaxiaUseCase.execute(galaxiaPaginationDto);
     if (result.isFailure) {
       throw new HttpException(result.error.message, HttpStatus.BAD_REQUEST);
     }

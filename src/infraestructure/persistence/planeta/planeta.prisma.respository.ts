@@ -1,5 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { EstadoGenerico } from '@prisma/client';
+import { PlanetaPaginationDto } from 'src/application/dto/planeta/PlanetaPagination.dto';
 import { Planeta } from 'src/core/entities/planeta/planeta.entity';
 import { PlanetaRepository } from 'src/core/repositories/planeta/planeta.respository';
 import { PrismaService } from 'src/core/services/prisma/prisma.service';
@@ -68,10 +69,26 @@ export class PlanetaPrismaRepository implements PlanetaRepository {
     return Planeta.fromPrisma(data);
   }
 
-  async findAllActive(): Promise<Planeta[]> {
+  async findAllActive(
+    planetaPaginationDto: PlanetaPaginationDto,
+  ): Promise<Planeta[]> {
+    const { page, limit, galaxiaId } = planetaPaginationDto;
+
     const planetas = await this.prisma.planeta.findMany({
-      where: { estado: EstadoGenerico.ACTIVO },
+      skip: (page - 1) * limit,
+      take: limit,
+      where: {
+        estado: EstadoGenerico.ACTIVO,
+        ...(galaxiaId && { galaxiaId: galaxiaId }),
+      },
     });
+    if(!planetas || planetas.length === 0){
+      throw new NotFoundException(
+        galaxiaId
+          ? `No existen planetas activos en la galaxia ${galaxiaId}`
+          : 'No existen planetas activos',
+      );
+    }
     return Planeta.fromPrismaList(planetas);
   }
 

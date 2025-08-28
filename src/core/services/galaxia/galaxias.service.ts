@@ -10,6 +10,7 @@ import { CustomError } from 'src/shared/class/Error.Class';
 import { BussinesRuleException } from 'src/shared/domain/exceptions/business-rule.exception';
 import { CategoriaService } from '../categoria/categoria.service';
 import { CreateMultipleGalaxiasDto } from 'src/application/dto/galaxia/create-multiple-galaxias.dto';
+import { GalaxiaPaginationDto } from 'src/application/dto/galaxia';
 
 @Injectable()
 export class GalaxiasService {
@@ -73,8 +74,8 @@ export class GalaxiasService {
     return this.repository.save(galaxia);
   }
 
-  async ListarGalaxia() {
-    return this.repository.findAllActive();
+  async ListarGalaxia(galaxiaPaginationDto: GalaxiaPaginationDto) {
+    return this.repository.findAllActive(galaxiaPaginationDto);
   }
 
   async crearMultiplesGalaxias(dto: CreateMultipleGalaxiasDto): Promise<Galaxia[]> {
