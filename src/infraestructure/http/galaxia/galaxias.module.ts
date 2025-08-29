@@ -11,6 +11,7 @@ import { SharedModule } from 'src/shared/shared.module';
 import { PrismaModule } from 'src/core/services/prisma/prisma.module';
 import {
   CreateGalaxiaUseCase,
+  CreateMultipleGalaxiasUseCase,
   DeleteGalaxiaUseCase,
   GetOneGalaxiaUseCase,
   ActualizarGalaxiaCasoDeUso,
@@ -36,6 +37,7 @@ import { AzureStorageService } from 'src/core/services/azure/azure-storage.servi
     CategoriaService,
     GetAllGalaxiaUseCase,
     CreateGalaxiaUseCase,
+    CreateMultipleGalaxiasUseCase,
     GetOneGalaxiaUseCase,
     ActualizarGalaxiaCasoDeUso,
     DeleteGalaxiaUseCase,

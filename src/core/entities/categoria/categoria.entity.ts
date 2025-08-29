@@ -7,7 +7,7 @@ export class Categoria {
     public estado: boolean,
     public fechaCreacion: Date,
     public fechaActualizacion: Date,
-    // Campos opcionales para visualización tipo cohetes
+  
     public x?: number,
     public y?: number,
     public z?: number,

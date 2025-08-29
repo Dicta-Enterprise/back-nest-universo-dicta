@@ -1,21 +1,29 @@
 import { EstadoGenerico } from '@prisma/client';
 import { Galaxia } from '../galaxia/galaxia.entity';
 import { InfoPlaneta } from './infoPlaneta/infoPlaneta.entity';
+import { Peligro } from './peligro/peligro.entity';
+import { Beneficio } from './beneficio/beneficio.entity';
 
 export class Planeta {
   constructor(
     public id: string,
-    public grupo: string,
     public nombre: string,
+    public grupo: string,
+    public planetaNombre: string,
     public tema: string,
     public textura: string,
     public url: string,
+    public imagenResumen: string,
+    public imagenBeneficios: string,
+    public resumenCurso: string,
     public estado: EstadoGenerico,
     public info: InfoPlaneta,
+   public peligros: Peligro[],         
+    public beneficios: Beneficio[], 
     public fechaCreacion: Date,
     public fechaActualizacion: Date,
-    public galaxia: Galaxia,
     public galaxiaId: string,
+    public galaxia?: Galaxia | null,
   ) {}
 
   static fromPrismaList(data: any[]): Planeta[] {
@@ -25,17 +33,23 @@ export class Planeta {
   static fromPrisma(data: any): Planeta {
     return new Planeta(
       data.id,
-      data.grupo,
       data.nombre,
+      data.grupo,
+      data.planetaNombre,
       data.tema,
       data.textura,
       data.url,
+      data.imagenResumen,
+      data.imagenBeneficios,
+      data.resumenCurso,
       data.estado,
-      InfoPlaneta.fromPrisma(data.info),
+      data.info ? InfoPlaneta.fromPrisma(data.info) : null,
+      data.peligros ? data.peligros.map((p: any) => Peligro.fromPrisma(p)) : [],       
+      data.beneficios ? data.beneficios.map((b: any) => Beneficio.fromPrisma(b)) : [], 
       data.fechaCreacion,
       data.fechaActualizacion,
-      data.galaxia ? Galaxia.fromPrisma(data.galaxia) : null,
       data.galaxiaId,
+      data.galaxia ? Galaxia.fromPrisma(data.galaxia) : null,
     );
   }
 }

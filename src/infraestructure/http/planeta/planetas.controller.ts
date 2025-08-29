@@ -8,9 +8,17 @@ import {
   Param,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
-import { ApiBody, ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+  ApiResponse,
+} from '@nestjs/swagger';
 import * as dto from 'src/application/dto/planeta/';
+import { PlanetaPaginationDto } from 'src/application/dto/planeta/PlanetaPagination.dto';
 import * as useCase from 'src/application/uses-cases/planeta';
 import { ParseObjectIdPipe } from 'src/shared/pipes/parse-object-id.pipe';
 
@@ -51,8 +59,30 @@ export class planetasController {
     status: 200,
     description: 'Lista de planetas obtenida correctamente.',
   })
-  async getAll() {
-    const result = await this.getAllPlanetaUseCase.execute();
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    type: Number,
+    description: 'Número de página para la paginación (por defecto: 1)',
+    example: 1,
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    description: 'Cantidad de resultados por página (por defecto: 10)',
+    example: 10,
+  })
+  @ApiQuery({
+    name: 'galaxiaId',
+    required: false,
+    type: String,
+    description: 'Id de la galaxia (ObjectId de Mongo) para filtrar planetas',
+    example: '66cf2c6a2df0a0135b7c0c1e',
+  })
+  async getAll(@Query() planetaPaginationDto: PlanetaPaginationDto) {
+    const result =
+      await this.getAllPlanetaUseCase.execute(planetaPaginationDto);
 
     if (result.isFailure) {
       throw new HttpException(result.error.message, HttpStatus.BAD_REQUEST);

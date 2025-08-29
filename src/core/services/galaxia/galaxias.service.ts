@@ -9,6 +9,8 @@ import { ValidatorService } from 'src/shared/application/validation/validator.se
 import { CustomError } from 'src/shared/class/Error.Class';
 import { BussinesRuleException } from 'src/shared/domain/exceptions/business-rule.exception';
 import { CategoriaService } from '../categoria/categoria.service';
+import { CreateMultipleGalaxiasDto } from 'src/application/dto/galaxia/create-multiple-galaxias.dto';
+import { GalaxiaPaginationDto } from 'src/application/dto/galaxia';
 
 @Injectable()
 export class GalaxiasService {
@@ -72,9 +74,74 @@ export class GalaxiasService {
     return this.repository.save(galaxia);
   }
 
-  async ListarGalaxia() {
-    return this.repository.findAllActive();
+  async ListarGalaxia(galaxiaPaginationDto: GalaxiaPaginationDto) {
+    return this.repository.findAllActive(galaxiaPaginationDto);
   }
+
+  async crearMultiplesGalaxias(dto: CreateMultipleGalaxiasDto): Promise<Galaxia[]> {
+  await this.validator.validate(dto, CreateMultipleGalaxiasDto);
+
+  const { nombre, descripcion, galaxias: galaxiasData } = dto;
+  
+  // Validar que todas las categorías existan
+  const categoriasIds = [...new Set(galaxiasData.map(g => g.categoriaId))];
+  
+  for (const categoriaId of categoriasIds) {
+    const categoria = await this.categoriaService.obtenerUnaCategoria(categoriaId);
+    if (!categoria) {
+      throw new BussinesRuleException(
+        `La categoría con ID ${categoriaId} no existe`,
+        HttpStatus.BAD_REQUEST,
+        {
+          categoriaId,
+          codigoError: 'CATEGORIA_NO_ENCONTRADA',
+        },
+      );
+    }
+  }
+
+  // Verificar duplicados por nombre y categoría
+  for (const galaxiaData of galaxiasData) {
+    const existe = await this.repository.findByNombreYCategoria(
+      nombre,
+      galaxiaData.categoriaId,
+    );
+
+    if (existe) {
+      throw new BussinesRuleException(
+        `Ya existe una galaxia con el mismo nombre ${nombre} en la categoría ${galaxiaData.categoriaId}`,
+        HttpStatus.BAD_REQUEST,
+        {
+          nombre,
+          categoriaId: galaxiaData.categoriaId,
+          codigoError: 'GALAXIA_DUPLICADA_EN_CATEGORIA',
+        },
+      );
+    }
+  }
+
+  // Crear objetos Galaxia
+  const galaxias: Galaxia[] = galaxiasData.map(galaxiaData => 
+    new Galaxia(
+      null,
+      nombre,
+      descripcion,
+      galaxiaData.imagen ?? null,
+      galaxiaData.url,
+      galaxiaData.textura,
+      true, // estado
+      new Date(), // fechaCreacion
+      new Date(), // fechaActualizacion
+      null, // categoria (se llenará al guardar)
+      galaxiaData.categoriaId,
+      galaxiaData.color,
+      galaxiaData.posicion,
+      galaxiaData.rotacion,
+    )
+  );
+
+  return this.repository.saveMultiple(galaxias);
+}
 
   async ObtenerGalaxia(id: string): Promise<Galaxia> {
     const existe = await this.repository.findById(id);

@@ -4,21 +4,10 @@ import {
   IsDate,
   IsMongoId,
   IsNotEmpty,
-  IsNumber,
   IsOptional,
   IsString,
 } from 'class-validator';
-
-class Vector3Dto {
-  @IsNumber()
-  x: number;
-
-  @IsNumber()
-  y: number;
-
-  @IsNumber()
-  z: number;
-}
+import { Vector3Dto } from './vector/vector-galaxia.dto';
 
 export class CreateGalaxiaDto {
   @IsString()
