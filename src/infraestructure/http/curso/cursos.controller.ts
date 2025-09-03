@@ -16,12 +16,15 @@ import * as dto from 'src/application/dto/curso';
 import * as azureCase from 'src/application/uses-cases/azure';
 import { RequiredFile } from 'src/shared/decorator/required-file.decorator';
 import { ApiBody, ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
+import { CursoLiteDto } from 'src/application/dto/curso/curso-lite.dto';
+import { plainToInstance } from 'class-transformer';
 
 @Controller('cursos')
 export class CursosController {
   constructor(
       private createUseCase: useCase.CreateCursoUseCase,
       private getAllCursoUseCase: useCase.GetAllCursoUseCase,
+      private getAllCursoLiteUseCase: useCase.GetAllCursoLiteUseCase,
       private getOneCursoUseCase: useCase.GetOneCursoUseCase,
       private updateCursoUseCase: useCase.UpdateCursoUseCase,
       private deleteCursoUseCase: useCase.DeleteCursoUseCase,
@@ -72,6 +75,20 @@ export class CursosController {
       data: result,
       message: 'Cursos obtenidos.',
     };
+  }
+  @Get('lite')
+  @ApiOperation({ summary: 'Lista de cursos en formato ligero para el frontend.' })
+  @ApiResponse({ type: CursoLiteDto, isArray: true })
+  async findAllLite() {
+    const result = await this.getAllCursoLiteUseCase.execute();
+
+    if (result.isFailure) {
+      throw new HttpException(result.error.message, HttpStatus.BAD_REQUEST);
+    }
+
+    return plainToInstance(CursoLiteDto, result.getValue(), {
+      excludeExtraneousValues: true,
+    });
   }
 
   @Get(':id')

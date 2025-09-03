@@ -23,6 +23,7 @@ import { PrismaModule } from 'src/core/services/prisma/prisma.module';
   useCase.GetAllCursoUseCase,
   useCase.GetOneCursoUseCase,
   useCase.UpdateCursoUseCase,
+  useCase.GetAllCursoLiteUseCase,
   azureCase.SaveImageStorageUseCase,
   azureCase.DeleteImageStorageUseCase,
   AzureStorageService

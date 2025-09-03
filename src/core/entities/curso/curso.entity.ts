@@ -1,4 +1,4 @@
-import { EstadoGenerico } from '@prisma/client';
+import { Beneficio } from './../planeta/beneficio/beneficio.entity';
 import { Categoria } from '../categoria/categoria.entity';
 import { Profesor } from '../profesor/profesor.entity';
 import { Estandar } from '../estandar/estandar.entity';
@@ -20,6 +20,7 @@ export class Curso {
     public categoriaId: string,
     public profesor?: Profesor,
     public categoria?: Categoria,
+    public beneficios?: Beneficio[],
     /*
     public idioma: Estandar,
     public planetas: Planeta,*/
@@ -45,6 +46,7 @@ export class Curso {
       data.categoriaId,
       data.profesor,
       data.categoria,
+      (data.beneficios ?? []).map((b: any) => Beneficio.fromPrisma(b)),
       /*
       data.idioma,
       data.planetas,*/

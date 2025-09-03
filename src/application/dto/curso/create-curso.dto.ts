@@ -1,7 +1,17 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
-import { IsBoolean, IsDate, IsMongoId, IsNotEmpty, IsNumber, IsOptional, IsString, IsUrl, Matches, Max, MaxLength, Min, MinLength } from 'class-validator';
+import {  IsArray,IsBoolean, IsDate, IsMongoId, IsNotEmpty, IsNumber, IsOptional, IsString, IsUrl, Matches, Max, MaxLength, Min, MinLength, ValidateNested, } from 'class-validator';
 
+
+class BeneficioDto {
+  @IsString()
+  @IsNotEmpty()
+  titulo: string;
+
+  @IsString()
+  @IsNotEmpty()
+  descripcion: string;
+}
 export class CreateCursoDto {
 
   @ApiProperty({ 
@@ -34,8 +44,8 @@ export class CreateCursoDto {
         example: "2025-05-31T05:11:55.496Z",
         description: "Fecha de creación del curso."
     })
-  @MinLength(0, {message: 'La fecha de creación debe tener mas de 0 caracteres.'})
-  @MaxLength(20, {message: 'La fecha de creación debe tener menos de 20 caracteres.'})
+  //@MinLength(0, {message: 'La fecha de creación debe tener mas de 0 caracteres.'}) // Innecesario con IsDate - Si se necesita limites con MinDate o MaxDate
+  //@MaxLength(20, {message: 'La fecha de creación debe tener menos de 20 caracteres.'}) // Innecesario con IsDate - Si se necesita limites con MinDate o MaxDate
   @IsDate({message: 'La fecha de creación debe cumplir con el formato de la fecha.'})
   @IsOptional()
   @Type(() => Date)
@@ -45,8 +55,8 @@ export class CreateCursoDto {
         example: "2025-05-31T05:11:55.496Z",
         description: "Fecha de inicio del curso."
     })
-  @MinLength(0, {message: 'La fecha de inicio debe tener mas de 0 caracteres.'})
-  @MaxLength(20, {message: 'La fecha de inicio debe tener menos de 20 caracteres.'})
+  //@MinLength(0, {message: 'La fecha de inicio debe tener mas de 0 caracteres.'}) // Innecesario con IsDate - Si se necesita limites con MinDate o MaxDate
+  //@MaxLength(20, {message: 'La fecha de inicio debe tener menos de 20 caracteres.'}) // Innecesario con IsDate - Si se necesita limites con MinDate o MaxDate
   @IsDate({message: 'La fecha de inicio debe cumplir con el formato de la fecha.'})
   @IsOptional()
   @Type(() => Date)
@@ -56,8 +66,8 @@ export class CreateCursoDto {
         example: "2025-05-31T05:11:55.496Z",
         description: "Fecha de finalización del curso."
     })
-  @MinLength(0, {message: 'La fecha final debe tener mas de 0 caracteres.'})
-  @MaxLength(20, {message: 'La fecha final debe tener menos de 20 caracteres.'})
+  //@MinLength(0, {message: 'La fecha final debe tener mas de 0 caracteres.'}) // Innecesario con IsDate - Si se necesita limites con MinDate o MaxDate
+  //@MaxLength(20, {message: 'La fecha final debe tener menos de 20 caracteres.'}) // Innecesario con IsDate - Si se necesita limites con MinDate o MaxDate
   @IsDate({message: 'La fecha final debe cumplir con el formato de la fecha.'})
   @IsOptional()
   @Type(() => Date)
@@ -71,15 +81,15 @@ export class CreateCursoDto {
   @Max(12000000, {message: 'El precio debe ser menor a 12 millones.'})
   @IsNumber({},{message: 'El precio debe ser un valor de tipo Number(Integer/Float/Decimal).'})
   @IsNotEmpty({message: 'El precio no debe estar vacío.'})
-  @Transform(({ value }) => value.trim().replace(/\s+/g, ' '))
+  @Transform(({ value }) => value !== null && value !== undefined ? parseFloat(String(value).trim()) : value)
   precio: number;
 
   @ApiProperty({ 
         example: "true",
         description: "Estado del curso."
     })
-  @MinLength(0, {message: 'El estado debe tener 1 o mas caracteres.'})
-  @MaxLength(15, {message: 'El estado debe tener menos de 15 caracteres.'})
+  //@MinLength(0, {message: 'El estado debe tener 1 o mas caracteres.'}) // Innecesario con IsBoolean
+  //@MaxLength(15, {message: 'El estado debe tener menos de 15 caracteres.'}) // Innecesario con IsBoolean
   @IsOptional()
   @IsBoolean({message: 'El estado debe ser un valor de tipo boolean.'})
   estado: boolean;
@@ -104,7 +114,7 @@ export class CreateCursoDto {
   @Max(101.0, {message: 'La duración debe ser menor a 101.'})
   @IsNumber({},{message: 'La duración debe ser un valor de tipo Number(Integer/Float/Decimal).'})
   @IsOptional()
-  @Transform(({ value }) => value.trim().replace(/\s+/g, ' '))
+  @Transform(({ value }) => value !== null && value !== undefined ? parseFloat(String(value).trim()) : value)
   duracionSemanas: number;
   
   @ApiProperty({ 
@@ -126,5 +136,27 @@ export class CreateCursoDto {
   @IsNotEmpty({message: 'categoriaId no debe estar vacío.'})
   @Transform(({ value }) => (value as string).trim().toLowerCase().replaceAll(' ',''))
   categoriaId: string;
-
+ @ApiProperty({
+    example: [
+      { titulo: 'Aprender sumas', descripcion: 'Sumar correctamente' },
+    ],
+    description: 'Lista de beneficios del curso.',
+    required: false,
+    type: [BeneficioDto],
+  })
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => BeneficioDto)
+  @Transform(
+    ({ value }) =>
+      Array.isArray(value)
+        ? value.map((item) =>
+            typeof item === 'string'
+              ? { titulo: item, descripcion: item }
+              : item
+          )
+        : [],
+    { toClassOnly: true }
+  )
+  beneficios: BeneficioDto[];
 }
