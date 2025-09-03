@@ -1,5 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
+import { GalaxiaPaginationDto } from 'src/application/dto/galaxia';
 
 import { Galaxia } from 'src/core/entities/galaxia/galaxia.entity';
 import { GalaxiaRepository } from 'src/core/repositories/galaxia/galaxia.repository';
@@ -46,58 +47,71 @@ export class GalaxiaPrismaRepository implements GalaxiaRepository {
 
     return Galaxia.fromPrisma(data);
   }
-async saveMultiple(galaxias: Galaxia[]): Promise<Galaxia[]> {
-  return await this.prisma.$transaction(async (prisma) => {
-    const results: Galaxia[] = [];
-    
-    for (const galaxia of galaxias) {
-      const createData: Prisma.GalaxiaCreateInput = {
-        nombre: galaxia.nombre,
-        descripcion: galaxia.descripcion,
-        imagen: galaxia.imagen,
-        url: galaxia.url,
-        textura: galaxia.textura,
-        estado: galaxia.estado ?? true,
-        fechaCreacion: galaxia.fechaCreacion ?? new Date(),
-        fechaActualizacion: galaxia.fechaActualizacion ?? new Date(),
-        categoria: {
-          connect: { id: galaxia.categoriaId },
-        },
-        color: galaxia.color,
-        posicion: galaxia.posicion
-          ? {
-              x: galaxia.posicion.x,
-              y: galaxia.posicion.y,
-              z: galaxia.posicion.z,
-            }
-          : undefined,
-        rotacion: galaxia.rotacion
-          ? {
-              x: galaxia.rotacion.x,
-              y: galaxia.rotacion.y,
-              z: galaxia.rotacion.z,
-            }
-          : undefined,
-      };
+  async saveMultiple(galaxias: Galaxia[]): Promise<Galaxia[]> {
+    return await this.prisma.$transaction(async (prisma) => {
+      const results: Galaxia[] = [];
 
-      const data = await prisma.galaxia.create({
-        data: createData,
-        include: { categoria: true },
-      });
+      for (const galaxia of galaxias) {
+        const createData: Prisma.GalaxiaCreateInput = {
+          nombre: galaxia.nombre,
+          descripcion: galaxia.descripcion,
+          imagen: galaxia.imagen,
+          url: galaxia.url,
+          textura: galaxia.textura,
+          estado: galaxia.estado ?? true,
+          fechaCreacion: galaxia.fechaCreacion ?? new Date(),
+          fechaActualizacion: galaxia.fechaActualizacion ?? new Date(),
+          categoria: {
+            connect: { id: galaxia.categoriaId },
+          },
+          color: galaxia.color,
+          posicion: galaxia.posicion
+            ? {
+                x: galaxia.posicion.x,
+                y: galaxia.posicion.y,
+                z: galaxia.posicion.z,
+              }
+            : undefined,
+          rotacion: galaxia.rotacion
+            ? {
+                x: galaxia.rotacion.x,
+                y: galaxia.rotacion.y,
+                z: galaxia.rotacion.z,
+              }
+            : undefined,
+        };
 
-      results.push(Galaxia.fromPrisma(data));
-    }
-    
-    return results;
-  });
-}
-  async findAllActive(): Promise<Galaxia[]> {
+        const data = await prisma.galaxia.create({
+          data: createData,
+          include: { categoria: true },
+        });
+
+        results.push(Galaxia.fromPrisma(data));
+      }
+
+      return results;
+    });
+  }
+  async findAllActive(
+    galaxiaPaginationDto: GalaxiaPaginationDto,
+  ): Promise<Galaxia[]> {
+    const { page, limit, categoriaId } = galaxiaPaginationDto;
+
     const galaxias = await this.prisma.galaxia.findMany({
-      where: { estado: true },
-      
+      skip: (page - 1) * limit,
+      take: limit,
+      where: { estado: true, ...(categoriaId && { categoriaId: categoriaId }) },
+
       orderBy: { fechaCreacion: 'desc' },
     });
-
+    // Validar si no hay resultados
+    if (!galaxias || galaxias.length === 0) {
+      throw new NotFoundException(
+        categoriaId
+          ? `No existen galaxias activas en la categoría ${categoriaId}`
+          : 'No existen galaxias activas',
+      );
+    }
     return Galaxia.fromPrismaList(galaxias);
   }
 
