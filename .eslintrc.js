@@ -21,6 +21,12 @@ module.exports = {
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
-    "prettier/prettier":0
+    'no-console': ['error', { allow: ['warn', 'error'] }],
+    '@typescript-eslint/no-unused-vars': 'error',
+    '@typescript-eslint/no-explicit-any': 'warn',
+    '@typescript-eslint/no-empty-function': 'error',
+    'quotes': ['error', 'single'],
+    'sort-imports': ['warn', { ignoreCase: true, ignoreDeclarationSort: true }],
+    'prettier/prettier': 0
   },
 };
