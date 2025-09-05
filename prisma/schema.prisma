@@ -150,6 +150,7 @@ model Curso {
   id              String    @id @default(auto()) @map("_id") @db.ObjectId
   nombre          String    @unique
   descripcion     String
+  beneficios      Beneficio[]
   fechaCreacion   DateTime  @default(now())
   fechaInicio     DateTime?
   fechaFinal      DateTime?

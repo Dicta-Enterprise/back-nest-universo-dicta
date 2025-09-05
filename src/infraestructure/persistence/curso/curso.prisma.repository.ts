@@ -68,7 +68,7 @@ export class CursoPrismaRepository implements CursoRepository {
   }
 
   async findAllActive(): Promise<Curso[]> {
-    const categorias = await this.prisma.curso.findMany({
+    const rows = await this.prisma.curso.findMany({
       include: {
         profesor: {
           select: {
@@ -92,21 +92,24 @@ export class CursoPrismaRepository implements CursoRepository {
         },
       },
     });
-    const res = Curso.fromPrismaList(categorias);
-    return res;
+
+    return Curso.fromPrismaList(rows);
   }
+ 
 
   async save(curso: Curso): Promise<Curso> {
     const data = await this.prisma.curso.create({
       data: {
         nombre: curso.nombre,
         descripcion: curso.descripcion,
+        beneficios: curso.beneficios?.map(b => ({ titulo: b.titulo, descripcion: b.descripcion })) ?? [],
         fechaInicio: curso.fechaInicio,
         fechaFinal: curso.fechaFinal,
         precio: curso.precio,
         estado: curso.estado,
         imagen: curso.imagen,
         duracionSemanas: curso.duracionSemanas,
+        
         profesor: {
           connect: {
             id: curso.profesorId,
@@ -148,7 +151,10 @@ export class CursoPrismaRepository implements CursoRepository {
   async update(id: string, curso: Partial<Curso>): Promise<Curso> {
     const dataUpdate: any = {
       nombre: curso.nombre,
+      
       descripcion: curso.descripcion,
+      beneficios: curso.beneficios?.map(b => ({ titulo: b.titulo, descripcion: b.descripcion })) ?? [],
+
       fechaInicio: curso.fechaInicio,
       fechaFinal: curso.fechaFinal,
       precio: curso.precio,
@@ -156,6 +162,9 @@ export class CursoPrismaRepository implements CursoRepository {
       imagen: curso.imagen,
       duracionSemanas: curso.duracionSemanas,
     };
+      if (curso.beneficios) {
+      dataUpdate.beneficios = curso.beneficios;
+    }
 
     if (curso.profesorId) {
       dataUpdate.profesor = {
@@ -212,4 +221,6 @@ export class CursoPrismaRepository implements CursoRepository {
 
     return Curso.fromPrisma(data);
   }
+
+
 }
