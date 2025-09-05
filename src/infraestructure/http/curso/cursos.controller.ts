@@ -9,6 +9,7 @@ import {
   HttpException,
   HttpStatus,
 } from '@nestjs/common';
+
 import { CursosService } from '../../../core/services/curso/cursos.service';
 import * as useCase from 'src/application/uses-cases/curso';
 import { ParseObjectIdPipe } from 'src/shared/pipes/parse-object-id.pipe';
@@ -16,15 +17,13 @@ import * as dto from 'src/application/dto/curso';
 import * as azureCase from 'src/application/uses-cases/azure';
 import { RequiredFile } from 'src/shared/decorator/required-file.decorator';
 import { ApiBody, ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
-import { CursoLiteDto } from 'src/application/dto/curso/curso-lite.dto';
 import { plainToInstance } from 'class-transformer';
-
+import { RequestListarCurso } from 'src/shared/enums/request-list-curso-enum';
 @Controller('cursos')
 export class CursosController {
   constructor(
       private createUseCase: useCase.CreateCursoUseCase,
       private getAllCursoUseCase: useCase.GetAllCursoUseCase,
-      private getAllCursoLiteUseCase: useCase.GetAllCursoLiteUseCase,
       private getOneCursoUseCase: useCase.GetOneCursoUseCase,
       private updateCursoUseCase: useCase.UpdateCursoUseCase,
       private deleteCursoUseCase: useCase.DeleteCursoUseCase,
@@ -62,33 +61,25 @@ export class CursosController {
 
   @Get()
   @ApiOperation({ summary: 'Recibe todos los cursos que se encuentren activos(estado = true).' })
-  @ApiResponse({ status: 200, description: 'Cursos obtenidos exitosamente.' })
-  @ApiResponse({ status: 404, description: 'No se encontraron cursos.' })
   async findAll() {
-    const result = await this.getAllCursoUseCase.execute();
-
+    const result = await this.getAllCursoUseCase.execute(RequestListarCurso.LISTAR_TODOS);
     if (result.isFailure) {
       throw new HttpException(result.error.message, HttpStatus.BAD_REQUEST);
     }
-
     return {
       data: result,
       message: 'Cursos obtenidos.',
     };
   }
+
   @Get('lite')
   @ApiOperation({ summary: 'Lista de cursos en formato ligero para el frontend.' })
-  @ApiResponse({ type: CursoLiteDto, isArray: true })
   async findAllLite() {
-    const result = await this.getAllCursoLiteUseCase.execute();
-
+    const result = await this.getAllCursoUseCase.execute(RequestListarCurso.LISTAR_LITE);
     if (result.isFailure) {
       throw new HttpException(result.error.message, HttpStatus.BAD_REQUEST);
     }
-
-    return plainToInstance(CursoLiteDto, result.getValue(), {
-      excludeExtraneousValues: true,
-    });
+    return result.getValue();
   }
 
   @Get(':id')

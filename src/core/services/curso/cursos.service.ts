@@ -63,9 +63,6 @@ export class CursosService{
 
     return this.repository.findAllActive();
   }
-   async findAllActiveLite() {
-    return this.repository.findAllActiveLite();
-  }
 
   async obtenerUnCurso(id: string): Promise<Curso> {
     const existe = await this.repository.findById(id);

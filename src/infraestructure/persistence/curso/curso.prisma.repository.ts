@@ -68,7 +68,7 @@ export class CursoPrismaRepository implements CursoRepository {
   }
 
   async findAllActive(): Promise<Curso[]> {
-    const categorias = await this.prisma.curso.findMany({
+    const rows = await this.prisma.curso.findMany({
       include: {
         profesor: {
           select: {
@@ -92,25 +92,10 @@ export class CursoPrismaRepository implements CursoRepository {
         },
       },
     });
-    const res = Curso.fromPrismaList(categorias);
-    return res;
+
+    return Curso.fromPrismaList(rows);
   }
-  async findAllActiveLite(): Promise<any[]> {
-    return this.prisma.curso.findMany({
-      where: { estado: true },
-      select: {
-        id: true,
-        nombre: true,
-        descripcion: true,
-        imagen: true,
-        precio: true,
-         beneficios: {                       
-        select: { titulo: true, descripcion: true },
-      },
-        categoria: { select: {  nombre: true } },
-      },
-    });
-  }
+ 
 
   async save(curso: Curso): Promise<Curso> {
     const data = await this.prisma.curso.create({
