@@ -102,7 +102,7 @@ export class CursoPrismaRepository implements CursoRepository {
       data: {
         nombre: curso.nombre,
         descripcion: curso.descripcion,
-        beneficios: curso.beneficios?.map(b => ({ titulo: b.titulo, descripcion: b.descripcion })) ?? [],
+        beneficios: curso.beneficios,
         fechaInicio: curso.fechaInicio,
         fechaFinal: curso.fechaFinal,
         precio: curso.precio,
@@ -153,8 +153,7 @@ export class CursoPrismaRepository implements CursoRepository {
       nombre: curso.nombre,
       
       descripcion: curso.descripcion,
-      beneficios: curso.beneficios?.map(b => ({ titulo: b.titulo, descripcion: b.descripcion })) ?? [],
-
+      beneficios: curso.beneficios, 
       fechaInicio: curso.fechaInicio,
       fechaFinal: curso.fechaFinal,
       precio: curso.precio,
@@ -162,17 +161,13 @@ export class CursoPrismaRepository implements CursoRepository {
       imagen: curso.imagen,
       duracionSemanas: curso.duracionSemanas,
     };
-      if (curso.beneficios) {
-      dataUpdate.beneficios = curso.beneficios;
-    }
-
     if (curso.profesorId) {
       dataUpdate.profesor = {
         connect: {
           id: curso.profesorId,
         },
       };
-    }
+    } 
 
     if (curso.categoriaId) {
       dataUpdate.categoria = {
@@ -180,7 +175,7 @@ export class CursoPrismaRepository implements CursoRepository {
           id: curso.categoriaId,
         },
       };
-    }
+    } 
 
     const data = await this.prisma.curso.update({
       where: { id },

@@ -62,7 +62,7 @@ export class CursosController {
   @Get()
   @ApiOperation({ summary: 'Recibe todos los cursos que se encuentren activos(estado = true).' })
   async findAll() {
-    const result = await this.getAllCursoUseCase.execute(RequestListarCurso.LISTAR_TODOS);
+    const result = await this.getAllCursoUseCase.execute(RequestListarCurso.LISTAR_CURSOS_ADMIN);
     if (result.isFailure) {
       throw new HttpException(result.error.message, HttpStatus.BAD_REQUEST);
     }
@@ -72,14 +72,17 @@ export class CursosController {
     };
   }
 
-  @Get('lite')
-  @ApiOperation({ summary: 'Lista de cursos en formato ligero para el frontend.' })
+  @Get('angular')
+  @ApiOperation({ summary: 'Lista de cursos para angular' })
   async findAllLite() {
-    const result = await this.getAllCursoUseCase.execute(RequestListarCurso.LISTAR_LITE);
+    const result = await this.getAllCursoUseCase.execute(RequestListarCurso.LISTAR_CURSOS_ANGULAR);
     if (result.isFailure) {
       throw new HttpException(result.error.message, HttpStatus.BAD_REQUEST);
     }
-    return result.getValue();
+    return {
+      data: result,
+      message: 'Cursos angular obtenidos.',
+    };
   }
 
   @Get(':id')

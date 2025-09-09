@@ -15,20 +15,20 @@ export class GetAllCursoUseCase {
   ) {}
 
   async execute(
-    request: RequestListarCurso = RequestListarCurso.LISTAR_TODOS,
+    request: RequestListarCurso = RequestListarCurso.LISTAR_CURSOS_ADMIN,
   ): Promise<Result<Curso[] | CursoLiteDto[]>> {
     try {
       const cursos = await this.cursoService.listarCursos(); 
 
       switch (request) {
-        case RequestListarCurso.LISTAR_LITE: {
+        case RequestListarCurso.LISTAR_CURSOS_ANGULAR: {
           const lite = plainToInstance(CursoLiteDto, cursos, {
             excludeExtraneousValues: true,
           });
           return Result.okList(lite);
         }
 
-        case RequestListarCurso.LISTAR_TODOS:
+        case RequestListarCurso.LISTAR_CURSOS_ADMIN:
         default: {
           return Result.okList(cursos);
         }

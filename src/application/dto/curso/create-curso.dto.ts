@@ -44,8 +44,6 @@ export class CreateCursoDto {
         example: "2025-05-31T05:11:55.496Z",
         description: "Fecha de creación del curso."
     })
-  //@MinLength(0, {message: 'La fecha de creación debe tener mas de 0 caracteres.'}) // Innecesario con IsDate - Si se necesita limites con MinDate o MaxDate
-  //@MaxLength(20, {message: 'La fecha de creación debe tener menos de 20 caracteres.'}) // Innecesario con IsDate - Si se necesita limites con MinDate o MaxDate
   @IsDate({message: 'La fecha de creación debe cumplir con el formato de la fecha.'})
   @IsOptional()
   @Type(() => Date)
@@ -55,8 +53,6 @@ export class CreateCursoDto {
         example: "2025-05-31T05:11:55.496Z",
         description: "Fecha de inicio del curso."
     })
-  //@MinLength(0, {message: 'La fecha de inicio debe tener mas de 0 caracteres.'}) // Innecesario con IsDate - Si se necesita limites con MinDate o MaxDate
-  //@MaxLength(20, {message: 'La fecha de inicio debe tener menos de 20 caracteres.'}) // Innecesario con IsDate - Si se necesita limites con MinDate o MaxDate
   @IsDate({message: 'La fecha de inicio debe cumplir con el formato de la fecha.'})
   @IsOptional()
   @Type(() => Date)
@@ -66,8 +62,6 @@ export class CreateCursoDto {
         example: "2025-05-31T05:11:55.496Z",
         description: "Fecha de finalización del curso."
     })
-  //@MinLength(0, {message: 'La fecha final debe tener mas de 0 caracteres.'}) // Innecesario con IsDate - Si se necesita limites con MinDate o MaxDate
-  //@MaxLength(20, {message: 'La fecha final debe tener menos de 20 caracteres.'}) // Innecesario con IsDate - Si se necesita limites con MinDate o MaxDate
   @IsDate({message: 'La fecha final debe cumplir con el formato de la fecha.'})
   @IsOptional()
   @Type(() => Date)
@@ -88,8 +82,6 @@ export class CreateCursoDto {
         example: "true",
         description: "Estado del curso."
     })
-  //@MinLength(0, {message: 'El estado debe tener 1 o mas caracteres.'}) // Innecesario con IsBoolean
-  //@MaxLength(15, {message: 'El estado debe tener menos de 15 caracteres.'}) // Innecesario con IsBoolean
   @IsOptional()
   @IsBoolean({message: 'El estado debe ser un valor de tipo boolean.'})
   estado: boolean;
@@ -147,16 +139,5 @@ export class CreateCursoDto {
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => BeneficioDto)
-  @Transform(
-    ({ value }) =>
-      Array.isArray(value)
-        ? value.map((item) =>
-            typeof item === 'string'
-              ? { titulo: item, descripcion: item }
-              : item
-          )
-        : [],
-    { toClassOnly: true }
-  )
   beneficios: BeneficioDto[];
 }
