@@ -1,3 +1,4 @@
+import { plainToInstance } from 'class-transformer';
 import { Injectable } from '@nestjs/common';
 import { Curso } from 'src/core/entities/curso/curso.entity';
 import { CursoRepository } from 'src/core/repositories/curso/curso.respository';
@@ -160,6 +161,7 @@ export class CursoPrismaRepository implements CursoRepository {
       estado: curso.estado,
       imagen: curso.imagen,
       duracionSemanas: curso.duracionSemanas,
+      
     };
     if (curso.profesorId) {
       dataUpdate.profesor = {

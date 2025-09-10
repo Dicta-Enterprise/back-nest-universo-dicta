@@ -46,7 +46,7 @@ export class Curso {
       data.categoriaId,
       data.profesor,
       data.categoria,
-      (data.beneficios ?? []).map((b: any) => Beneficio.fromPrisma(b)),
+      data.beneficios,
       /*
       data.idioma,
       data.planetas,*/

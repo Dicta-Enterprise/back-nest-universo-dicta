@@ -1,6 +1,6 @@
   
 import { ApiProperty } from '@nestjs/swagger';
-import { Expose, Transform, Type } from 'class-transformer';
+import { Expose, Transform } from 'class-transformer';
 
 export class BeneficioLiteDto {
   @ApiProperty()
@@ -12,7 +12,7 @@ export class BeneficioLiteDto {
   descripcion: string;
 }
 
-export class CursoLiteDto {
+export class CursoResponseDto {
   @ApiProperty() @Expose() id: string | number;
   @ApiProperty() @Expose() nombre: string;
   @ApiProperty() @Expose() descripcion: string;
@@ -32,7 +32,6 @@ export class CursoLiteDto {
 
   @ApiProperty({ type: [BeneficioLiteDto] })
   @Expose()
-  @Type(() => BeneficioLiteDto)
   beneficios: BeneficioLiteDto[];
 
   @ApiProperty() @Expose() imagen: string;

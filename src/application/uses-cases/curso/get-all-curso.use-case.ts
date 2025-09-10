@@ -5,7 +5,7 @@ import { Curso } from 'src/core/entities/curso/curso.entity';
 import { CursosService } from 'src/core/services/curso/cursos.service';
 import { Result } from 'src/shared/domain/result/result';
 import { plainToInstance } from 'class-transformer';
-import { CursoLiteDto } from 'src/application/dto/curso/curso-lite.dto';
+import { CursoResponseDto } from 'src/application/dto/curso/curso-response.dto';
 
 @Injectable()
 export class GetAllCursoUseCase {
@@ -16,13 +16,13 @@ export class GetAllCursoUseCase {
 
   async execute(
     request: RequestListarCurso = RequestListarCurso.LISTAR_CURSOS_ADMIN,
-  ): Promise<Result<Curso[] | CursoLiteDto[]>> {
+  ): Promise<Result<Curso[] | CursoResponseDto[]>> {
     try {
       const cursos = await this.cursoService.listarCursos(); 
 
       switch (request) {
         case RequestListarCurso.LISTAR_CURSOS_ANGULAR: {
-          const lite = plainToInstance(CursoLiteDto, cursos, {
+          const lite = plainToInstance(CursoResponseDto, cursos, {
             excludeExtraneousValues: true,
           });
           return Result.okList(lite);
