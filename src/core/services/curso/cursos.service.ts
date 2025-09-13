@@ -1,5 +1,4 @@
 import { HttpStatus, Inject, Injectable, Logger, OnModuleInit } from '@nestjs/common';
-
 import { CreateCursoDto } from 'src/application/dto/curso/create-curso.dto';
 import { UpdateCursoDto } from 'src/application/dto/curso/update-curso.dto';
 import { CURSO_REPOSITORY } from 'src/core/constants/constants';
@@ -36,7 +35,7 @@ export class CursosService{
       );
     }
 
-    const curso = new Curso(
+      const curso = new Curso(
       null,
       dtoCurso.nombre,
       dtoCurso.descripcion || '',
@@ -49,12 +48,18 @@ export class CursosService{
       dtoCurso.duracionSemanas,
       dtoCurso.profesorId,
       dtoCurso.categoriaId,
-    )
+      undefined,
+      undefined,
+      dtoCurso.beneficios,
+       
+    );
+
 
     return this.repository.save(curso);
   }
 
   async listarCursos(): Promise<Curso[]> {
+
 
     return this.repository.findAllActive();
   }
@@ -92,6 +97,9 @@ export class CursosService{
       dtoCurso.duracionSemanas,
       dtoCurso.profesorId,
       dtoCurso.categoriaId,
+      undefined,
+      undefined,
+      dtoCurso.beneficios
     )
 
     return this.repository.update(id, curso);

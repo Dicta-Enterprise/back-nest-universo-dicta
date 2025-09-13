@@ -66,6 +66,7 @@ export class PlanetaPrismaRepository implements PlanetaRepository {
         })),
       },
     });
+
     return Planeta.fromPrisma(data);
   }
 
