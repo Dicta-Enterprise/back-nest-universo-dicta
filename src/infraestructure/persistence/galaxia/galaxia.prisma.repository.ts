@@ -101,7 +101,9 @@ export class GalaxiaPrismaRepository implements GalaxiaRepository {
       skip: (page - 1) * limit,
       take: limit,
       where: { estado: true, ...(categoriaId && { categoriaId: categoriaId }) },
-
+       include:{
+        categoria:true
+      },
       orderBy: { fechaCreacion: 'desc' },
     });
     // Validar si no hay resultados
