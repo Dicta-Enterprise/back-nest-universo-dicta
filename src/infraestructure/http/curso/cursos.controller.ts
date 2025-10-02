@@ -1,23 +1,23 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
+  Get,
   HttpException,
   HttpStatus,
+  Param,
+  Patch,
+  Post,
 } from '@nestjs/common';
 
-import { CursosService } from '../../../core/services/curso/cursos.service';
+// import { CursosService } from '../../../core/services/curso/cursos.service';
 import * as useCase from 'src/application/uses-cases/curso';
 import { ParseObjectIdPipe } from 'src/shared/pipes/parse-object-id.pipe';
 import * as dto from 'src/application/dto/curso';
 import * as azureCase from 'src/application/uses-cases/azure';
-import { RequiredFile } from 'src/shared/decorator/required-file.decorator';
+// import { RequiredFile } from 'src/shared/decorator/required-file.decorator';
 import { ApiBody, ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
-import { plainToInstance } from 'class-transformer';
+// import { plainToInstance } from 'class-transformer';
 import { RequestListarCurso } from 'src/shared/enums/request-list-curso-enum';
 @Controller('cursos')
 export class CursosController {
@@ -106,7 +106,7 @@ export class CursosController {
   @Patch(':id')
   @ApiOperation({ summary: 'Actualiza los datos de un curso y cambia o mantiene su estado en true(activo).' })
   @ApiParam({ name: 'id', example: '5f43e9b5e3f1c530d8b6f8a9', description: 'ID del curso.' })
-  @ApiBody({ type: dto.CreateCursoDto })
+  @ApiBody({ type: dto.UpdateCursoDto })
   @ApiResponse({ status: 200, description: 'Curso actualizado correctamente.' })
   @ApiResponse({ status: 404, description: 'No se encontró el curso con el ID proporcionado.' })
   async update(
