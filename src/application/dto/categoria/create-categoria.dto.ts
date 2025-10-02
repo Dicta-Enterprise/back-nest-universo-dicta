@@ -1,7 +1,6 @@
 import { Transform, Type } from 'class-transformer';
 import {
   IsBoolean,
-  IsDate,
   IsNotEmpty,
   IsNumber,
   IsOptional,
@@ -18,28 +17,22 @@ export class CreateCategoriaDto {
   descripcion: string;
 
   @IsOptional()
+  @Transform(({ value }) => value === 'true' || value === true) // 👈 convierte string a boolean
   @IsBoolean()
   estado: boolean;
 
-  @IsDate()
   @IsOptional()
-  @Type(() => Date)
-  fechaCreacion: Date;
-
-  @IsDate()
-  @IsOptional()
-  @Type(() => Date)
-  fechaActualizacion: Date;
-
-  @IsOptional()
+  @Type(() => Number) // 👈 convierte a número
   @IsNumber()
   x?: number;
 
   @IsOptional()
+  @Type(() => Number)
   @IsNumber()
   y?: number;
 
   @IsOptional()
+  @Type(() => Number)
   @IsNumber()
   z?: number;
 

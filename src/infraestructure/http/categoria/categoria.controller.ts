@@ -8,7 +8,10 @@ import {
   Param,
   Patch,
   Post,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import {
   ApiBody,
   ApiOperation,
@@ -35,6 +38,7 @@ export class CategoriaController {
   ) {}
 
   @Post()
+  @UseInterceptors(FileInterceptor('modelo'))
   @ApiOperation({ summary: 'Crear una nueva categoría' })
   @ApiBody({
     type: dto.CreateCategoriaDto,
@@ -42,8 +46,8 @@ export class CategoriaController {
   })
   @ApiResponse({ status: 201, description: 'Categoría creada exitosamente' })
   @ApiResponse({ status: 400, description: 'Error en los datos enviados' })
-  async create(@Body() body: dto.CreateCategoriaDto) {
-    const result = await this.createUseCase.execute(body);
+  async create(@Body() body: dto.CreateCategoriaDto, @UploadedFile() file: Express.Multer.File) {
+    const result = await this.createUseCase.execute(body,file);
 
     if (result.isFailure) {
       throw new HttpException(result.error.message, HttpStatus.BAD_REQUEST);
@@ -94,6 +98,7 @@ export class CategoriaController {
   }
 
   @Patch(':id')
+  @UseInterceptors(FileInterceptor('modelo')) // 'modelo' es el nombre del campo en form-data
   @ApiOperation({ summary: 'Actualizar una categoría' })
   @ApiParam({ name: 'id', description: 'ID de la categoría', type: String })
   @ApiBody({
@@ -105,14 +110,17 @@ export class CategoriaController {
     description: 'Categoría actualizada correctamente',
   })
   @ApiResponse({ status: 400, description: 'Error al actualizar la categoría' })
-  async update(
+ async update(
     @Param('id', ParseObjectIdPipe) id: string,
     @Body() updateCategoriaDto: dto.UpdateCategoriaDto,
-  ) {
-    const result = await this.updateCategoriaUseCase.execute(
+    @UploadedFile() file?: Express.Multer.File,
+  )  {
+   const result = await this.updateCategoriaUseCase.execute(
       id,
       updateCategoriaDto,
+      file, 
     );
+
 
     if (result.isFailure) {
       throw new HttpException(result.error.message, HttpStatus.BAD_REQUEST);

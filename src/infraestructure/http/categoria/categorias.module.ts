@@ -13,6 +13,7 @@ import { DeleteCategoriaUseCase } from 'src/application/uses-cases/categoria/del
 import { SaveImageStorageUseCase } from 'src/application/uses-cases/azure/save-image-storage.use.case';
 import { AzureStorageService } from 'src/core/services/azure/azure-storage.service';
 import { DeleteImageStorageUseCase } from 'src/application/uses-cases/azure/delete-image-storage.use.case';
+import { ArchivoService } from 'src/core/services/Archivo/archivo.service';
 
 @Module({
   imports: [SharedModule, PrismaModule],
@@ -30,7 +31,8 @@ import { DeleteImageStorageUseCase } from 'src/application/uses-cases/azure/dele
     DeleteCategoriaUseCase,
     SaveImageStorageUseCase,
     DeleteImageStorageUseCase,
-    AzureStorageService
+    AzureStorageService,
+    ArchivoService
   ],
   exports: [CategoriaService],
 })
