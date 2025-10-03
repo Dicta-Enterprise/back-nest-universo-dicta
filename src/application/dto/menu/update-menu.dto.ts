@@ -1,4 +1,4 @@
-import { PartialType } from '@nestjs/mapped-types';
+import { PartialType } from '@nestjs/swagger';
 import { CreateMenuDto } from './create-menu.dto';
 import { EstadoGenerico } from '@prisma/client';
 import { IsEnum } from 'class-validator';

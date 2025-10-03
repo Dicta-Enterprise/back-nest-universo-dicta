@@ -16,12 +16,14 @@ import {
   ApiParam,
   ApiQuery,
   ApiResponse,
+  ApiTags,
 } from '@nestjs/swagger';
 import * as dto from 'src/application/dto/planeta/';
 import { PlanetaPaginationDto } from 'src/application/dto/planeta/PlanetaPagination.dto';
 import * as useCase from 'src/application/uses-cases/planeta';
 import { ParseObjectIdPipe } from 'src/shared/pipes/parse-object-id.pipe';
 
+@ApiTags('Planetas')
 @Controller('planetas')
 export class planetasController {
   constructor(
