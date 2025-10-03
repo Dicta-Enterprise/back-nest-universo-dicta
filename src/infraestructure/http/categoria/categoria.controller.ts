@@ -98,7 +98,7 @@ export class CategoriaController {
   }
 
   @Patch(':id')
-  @UseInterceptors(FileInterceptor('modelo')) // 'modelo' es el nombre del campo en form-data
+  @UseInterceptors(FileInterceptor('modelo')) 
   @ApiOperation({ summary: 'Actualizar una categoría' })
   @ApiParam({ name: 'id', description: 'ID de la categoría', type: String })
   @ApiBody({

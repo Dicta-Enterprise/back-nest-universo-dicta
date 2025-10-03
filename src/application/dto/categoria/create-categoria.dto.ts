@@ -2,6 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
 import {
   IsBoolean,
+  IsDate,
   IsNotEmpty,
   IsNumber,
   IsOptional,
@@ -33,7 +34,7 @@ export class CreateCategoriaDto {
     default: true,
   })
   @IsOptional()
-  @Transform(({ value }) => value === 'true' || value === true) // 👈 convierte string a boolean
+  @Transform(({ value }) => value === 'true' || value === true) 
   @IsBoolean()
   estado: boolean;
 
@@ -65,6 +66,7 @@ export class CreateCategoriaDto {
     required: false,
   })
   @IsOptional()
+  @Type(() => Number) 
   @IsNumber()
   x?: number;
 
