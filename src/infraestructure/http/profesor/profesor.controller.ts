@@ -91,7 +91,7 @@ export class ProfesorController {
       @Patch(':id')
       @ApiOperation({ summary: 'Actualiza los datos de un Profesor y cambia o mantiene su estado en true(activo).' })
       @ApiParam({ name: 'id', example: '67d233e71bb71f59d56de0b8', description: 'ID del profesor.' })
-      @ApiBody({ type: createProfesorDto })
+      @ApiBody({ type: updateProfesorDto })
       @ApiResponse({ status: 200, description: 'Profesor actualizado correctamente.' })
       @ApiResponse({ status: 404, description: 'No se encontró el profesor con el ID proporcionado.' })
       async update(@Param('id', ParseObjectIdPipe) id:string, @Body() updateProfesorDto: updateProfesorDto){
