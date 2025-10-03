@@ -33,6 +33,18 @@ export class CategoriaService {
       );
     }
 
+    const totalCategorias = await this.repository.countActive();
+    if (totalCategorias >= 3) {
+      throw new BussinesRuleException(
+        'No se pueden crear más de 3 categorías',
+        HttpStatus.BAD_REQUEST,
+        {
+          totalActual: totalCategorias, // total actual de categorías
+          codigoError: 'LIMITE_CATEGORIAS_ALCANZADO',
+        },
+      );
+    }
+    
     const categoria = new Categoria(
       null,
       dto.nombre,

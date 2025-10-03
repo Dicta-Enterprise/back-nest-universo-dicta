@@ -41,7 +41,7 @@ export class CategoriaController {
     description: 'Datos para crear la categoría',
   })
   @ApiResponse({ status: 201, description: 'Categoría creada exitosamente' })
-  @ApiResponse({ status: 400, description: 'Error en los datos enviados' })
+  @ApiResponse({ status: 400, description: 'Datos inválidos, categoría duplicada o límite de 3 categorías alcanzado' })
   async create(@Body() body: dto.CreateCategoriaDto) {
     const result = await this.createUseCase.execute(body);
 

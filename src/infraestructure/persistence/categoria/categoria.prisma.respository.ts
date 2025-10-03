@@ -47,6 +47,13 @@ export class CategoriaPrismaRepository implements CategoriaRepository {
     return Categoria.fromPrismaList(categorias);
   }
 
+  async countActive(): Promise<number> {
+    const count = await this.prisma.categoria.count({
+      where: { estado: true },
+    });
+    return count;
+  }
+
   async update(id: string, categoria: Partial<Categoria>): Promise<Categoria> {
     const data = await this.prisma.categoria.update({
       where: { id },
