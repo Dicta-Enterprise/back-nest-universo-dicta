@@ -34,6 +34,7 @@ export class CreateCategoriaDto {
     default: true,
   })
   @IsOptional()
+  @Transform(({ value }) => value === 'true' || value === true) 
   @IsBoolean()
   estado: boolean;
 
@@ -65,6 +66,7 @@ export class CreateCategoriaDto {
     required: false,
   })
   @IsOptional()
+  @Type(() => Number) 
   @IsNumber()
   x?: number;
 
@@ -74,6 +76,7 @@ export class CreateCategoriaDto {
     required: false,
   })
   @IsOptional()
+  @Type(() => Number)
   @IsNumber()
   y?: number;
 
@@ -83,6 +86,7 @@ export class CreateCategoriaDto {
     required: false,
   })
   @IsOptional()
+  @Type(() => Number)
   @IsNumber()
   z?: number;
 

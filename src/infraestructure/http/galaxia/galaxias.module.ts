@@ -10,16 +10,17 @@ import { GetAllGalaxiaUseCase } from 'src/application/uses-cases/galaxias/get-al
 import { SharedModule } from 'src/shared/shared.module';
 import { PrismaModule } from 'src/core/services/prisma/prisma.module';
 import {
+  ActualizarGalaxiaCasoDeUso,
   CreateGalaxiaUseCase,
   CreateMultipleGalaxiasUseCase,
   DeleteGalaxiaUseCase,
   GetOneGalaxiaUseCase,
-  ActualizarGalaxiaCasoDeUso,
 } from 'src/application/uses-cases/galaxias';
 import { CategoriaService } from 'src/core/services/categoria/categoria.service';
 import { CategoriaPrismaRepository } from 'src/infraestructure/persistence/categoria/categoria.prisma.respository';
 import { SaveImageStorageUseCase } from 'src/application/uses-cases/azure';
 import { AzureStorageService } from 'src/core/services/azure/azure-storage.service';
+import { ArchivoService } from 'src/core/services/Archivo/archivo.service';
 
 @Module({
   imports: [SharedModule, PrismaModule],
@@ -43,6 +44,7 @@ import { AzureStorageService } from 'src/core/services/azure/azure-storage.servi
     DeleteGalaxiaUseCase,
     SaveImageStorageUseCase,
     AzureStorageService,
+    ArchivoService
   ],
   exports: [GalaxiasService],
 })

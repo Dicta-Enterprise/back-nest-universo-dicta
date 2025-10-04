@@ -15,13 +15,13 @@ export class CreateCategoriaUseCase {
 
   async execute(
     dto: CreateCategoriaDto,
-    // imagenResult: string,
+   imagen?: Express.Multer.File
   ): Promise<Result<Categoria>> {
     // const createDto = {...dto, imagenUrl: imagenResult }; <-- comentado
     const createDto = { ...dto };
 
     try {
-      const categoria = await this.categoriaService.crearCategoria(createDto);
+      const categoria = await this.categoriaService.crearCategoria(createDto,imagen);
       this.eventEmitter.emit('categoria.creada', new CategoriaEvent(categoria));
       return Result.ok(categoria);
     } catch (error) {
