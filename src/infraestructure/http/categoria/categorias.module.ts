@@ -34,6 +34,6 @@ import { ArchivoService } from 'src/core/services/Archivo/archivo.service';
     AzureStorageService,
     ArchivoService
   ],
-  exports: [CategoriaService],
+  exports: [CategoriaService, GetAllCategoriaUseCase],
 })
 export class CategoriaModule {}

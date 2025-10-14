@@ -28,6 +28,6 @@ import { planetasController } from './planetas.controller';
     UpdatePlanetaUseCase,
     DeletePlanetaUseCase,
   ],
-  exports: [PlanetasService],
+  exports: [PlanetasService, GetAllPlanetaUseCase],
 })
 export class PlanetasModule {}
