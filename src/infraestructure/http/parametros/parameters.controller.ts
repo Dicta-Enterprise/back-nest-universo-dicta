@@ -3,10 +3,10 @@ import { GetAllParametersUseCase } from '../../../application/uses-cases/paramet
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Parámetros')
-@Controller('parameters') // Define la ruta base para este controlador: /parameters.
+@Controller('parameters') // Definimos la ruta base o endpoint para este controlador: /parameters.
 export class ParametersController {
   constructor(
-    // Inyección de dependencia del UseCase para la lógica de obtención de parámetros.
+    // Inyección de dependencia del UseCase para la lógica de obtención de parámetros a traves de USE CASE
     private readonly getAllParametersUseCase: GetAllParametersUseCase) {}
 
   @Get()
@@ -19,6 +19,10 @@ export class ParametersController {
       //Lanza un error si el caso de uso falla
       throw new HttpException(result.error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
-    return result;
+    return {
+      data: result.getValue(),
+      status: 200,
+      message: 'Parámetros obtenidos exitosamente',
+    };
   }
 }

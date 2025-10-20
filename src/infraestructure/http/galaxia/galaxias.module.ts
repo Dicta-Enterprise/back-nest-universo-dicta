@@ -46,6 +46,6 @@ import { ArchivoService } from 'src/core/services/Archivo/archivo.service';
     AzureStorageService,
     ArchivoService
   ],
-  exports: [GalaxiasService, GetAllGalaxiaUseCase],
+  exports: [GalaxiasService],
 })
 export class GalaxiasModule {}
