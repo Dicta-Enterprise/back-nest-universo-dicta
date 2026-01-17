@@ -5,11 +5,11 @@ import { Logger, ValidationPipe } from '@nestjs/common';
 import { envs } from './config/envs';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as path from 'path';
+import { apiReference } from '@scalar/nestjs-api-reference';
 
 async function bootstrap() {
   const logger = new Logger('API');
 
-  // 👈 Usamos NestExpressApplication
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   app.setGlobalPrefix('api');
@@ -26,9 +26,8 @@ async function bootstrap() {
     }),
   );
 
-  // --- SERVIR ARCHIVOS ESTÁTICOS ---
   app.useStaticAssets(path.join(process.cwd(), 'uploads'), {
-    prefix: '/uploads/', // URL pública
+    prefix: '/uploads/',
   });
 
   // --- SWAGGER ---
@@ -39,11 +38,22 @@ async function bootstrap() {
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
+
+  // Swagger
+  SwaggerModule.setup('api/swagger', app, document);
+
+  // Scalar (ANTES del listen)
+  app.use(
+    '/api/scalar',
+    apiReference({
+      content: document,
+    }),
+  );
 
   await app.listen(envs.port);
 
-  logger.log(`API corriendo en el puerto ${envs.port}`);
-  logger.log(`API corriendo en la BD ${envs.databaseUrl}`);
+  logger.log(`API corriendo en http://localhost:${envs.port}/api`);
+  logger.log(`Swagger: http://localhost:${envs.port}/api/swagger`);
+  logger.log(`Scalar:  http://localhost:${envs.port}/api/scalar`);
 }
 bootstrap();
