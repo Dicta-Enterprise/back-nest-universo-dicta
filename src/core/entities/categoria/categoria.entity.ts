@@ -7,7 +7,7 @@ export class Categoria {
     public estado: boolean,
     public fechaCreacion: Date,
     public fechaActualizacion: Date,
-  
+
     public x?: number,
     public y?: number,
     public z?: number,
@@ -19,19 +19,18 @@ export class Categoria {
     this.estado = false;
   }
 
-  static fromPrismaList(data: any[]): Categoria[] {
+  static fromPrismaList(data: Categoria[]): Categoria[] {
     return data.map((item) => Categoria.fromPrisma(item));
   }
 
-  static fromPrisma(data: any): Categoria {
+  static fromPrisma(data: Categoria): Categoria {
     return new Categoria(
       data.id,
       data.nombre,
       data.descripcion,
-
       data.estado,
-      data.fechaCreacion ?? data.createdAt,
-      data.fechaActualizacion ?? data.updatedAt,
+      data.fechaCreacion,
+      data.fechaActualizacion,
       data.x,
       data.y,
       data.z,

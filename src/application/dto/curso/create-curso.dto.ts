@@ -15,8 +15,8 @@ class BeneficioDto {
 export class CreateCursoDto {
 
   @ApiProperty({ 
-          example: "Matemática básica.",
-          description: "Nombre del curso."
+          example: 'Matemática básica.',
+          description: 'Nombre del curso.'
       })
   @MinLength(2, {message: 'El nombre debe tener mas de 1 carácter.'})
   @MaxLength(100, {message: 'El nombre debe tener menos de 100 caracteres.'})
@@ -28,8 +28,8 @@ export class CreateCursoDto {
   nombre: string;
 
   @ApiProperty({ 
-        example: "Curso para aprender a realizar operaciones con los operadores matemáticos.",
-        description: "Descripción del curso."
+        example: 'Curso para aprender a realizar operaciones con los operadores matemáticos.',
+        description: 'Descripción del curso.'
     })
   @MinLength(2, {message: 'La descripción debe tener mas de 2 caracteres.'})
   @MaxLength(1000, {message: 'La descripción debe tener menos de 1000 caracteres.'})
@@ -41,8 +41,8 @@ export class CreateCursoDto {
   descripcion: string;
 
   @ApiProperty({ 
-        example: "2025-05-31T05:11:55.496Z",
-        description: "Fecha de creación del curso."
+        example: '2025-05-31T05:11:55.496Z',
+        description: 'Fecha de creación del curso.'
     })
   @IsDate({message: 'La fecha de creación debe cumplir con el formato de la fecha.'})
   @IsOptional()
@@ -50,8 +50,8 @@ export class CreateCursoDto {
   fechaCreacion: Date;
 
   @ApiProperty({ 
-        example: "2025-05-31T05:11:55.496Z",
-        description: "Fecha de inicio del curso."
+        example: '2025-05-31T05:11:55.496Z',
+        description: 'Fecha de inicio del curso.'
     })
   @IsDate({message: 'La fecha de inicio debe cumplir con el formato de la fecha.'})
   @IsOptional()
@@ -59,8 +59,8 @@ export class CreateCursoDto {
   fechaInicio: Date;
 
   @ApiProperty({ 
-        example: "2025-05-31T05:11:55.496Z",
-        description: "Fecha de finalización del curso."
+        example: '2025-05-31T05:11:55.496Z',
+        description: 'Fecha de finalización del curso.'
     })
   @IsDate({message: 'La fecha final debe cumplir con el formato de la fecha.'})
   @IsOptional()
@@ -68,8 +68,8 @@ export class CreateCursoDto {
   fechaFinal: Date;
   
   @ApiProperty({ 
-        example: "250.90",
-        description: "Precio del curso."
+        example: '250.90',
+        description: 'Precio del curso.'
     })
   @Min(0.0, {message: 'El precio debe ser mayor a 0.'})
   @Max(12000000, {message: 'El precio debe ser menor a 12 millones.'})
@@ -79,16 +79,16 @@ export class CreateCursoDto {
   precio: number;
 
   @ApiProperty({ 
-        example: "true",
-        description: "Estado del curso."
+        example: 'true',
+        description: 'Estado del curso.'
     })
   @IsOptional()
   @IsBoolean({message: 'El estado debe ser un valor de tipo boolean.'})
   estado: boolean;
 
   @ApiProperty({ 
-        example: "www.example.com/matematica_icono.png",
-        description: "Imagen del curso."
+        example: 'www.example.com/matematica_icono.png',
+        description: 'Imagen del curso.'
     })
   @MinLength(2, {message: 'La imagen debe tener mas de 1 carácter.'})
   @MaxLength(250, {message: 'La imagen debe tener menos de 250 caracteres.'})
@@ -99,8 +99,8 @@ export class CreateCursoDto {
   imagen: string;
 
   @ApiProperty({ 
-        example: "5.5",
-        description: "Duración del curso medido por semanas."
+        example: '5.5',
+        description: 'Duración del curso medido por semanas.'
     })
   @Min(0.0, {message: 'La duración debe ser mayor a 0.'})
   @Max(101.0, {message: 'La duración debe ser menor a 101.'})
@@ -110,8 +110,8 @@ export class CreateCursoDto {
   duracionSemanas: number;
   
   @ApiProperty({ 
-        example: "64fd1c2f9a25d8e3f41b9c7a",
-        description: "Id del profesor asignado al curso."
+        example: '64fd1c2f9a25d8e3f41b9c7a',
+        description: 'Id del profesor asignado al curso.'
     })
   @IsMongoId({message: 'profesorId debe ser MongoID.'})
   @IsString({message: 'profesorId debe ser un dato de tipo String.'})
@@ -120,8 +120,8 @@ export class CreateCursoDto {
   profesorId: string;
 
   @ApiProperty({ 
-        example: "5f43e9b5e3f1c530d8b6f8a9",
-        description: "Id de la categoría asignada al curso."
+        example: '5f43e9b5e3f1c530d8b6f8a9',
+        description: 'Id de la categoría asignada al curso.'
     })
   @IsMongoId({message: 'categoriaId debe ser MongoID.'})
   @IsString({message: 'categoriaId debe ser un dato de tipo String.'})

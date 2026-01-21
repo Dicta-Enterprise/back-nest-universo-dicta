@@ -1,5 +1,3 @@
-
-
 export class ItemImagenLanding {
   constructor(
     public id: string,
@@ -7,11 +5,7 @@ export class ItemImagenLanding {
     public descripcion?: string,
   ) {}
 
-  static fromPrisma(data: any): ItemImagenLanding {
-    return new ItemImagenLanding(
-      data.id,
-      data.url,
-      data.descripcion,
-    );
+  static fromPrisma(data: ItemImagenLanding): ItemImagenLanding {
+    return new ItemImagenLanding(data.id, data.url, data.descripcion);
   }
 }

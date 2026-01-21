@@ -4,11 +4,11 @@ export class Estandar {
     public descripcion: string,
   ) {}
 
-  static fromPrismaList(data: any[]): Estandar[] {
+  static fromPrismaList(data: Estandar[]): Estandar[] {
     return data.map((item) => Estandar.fromPrisma(item));
   }
 
-  static fromPrisma(data: any): Estandar {
+  static fromPrisma(data: Estandar): Estandar {
     return new Estandar(data.id, data.descripcion);
   }
 }

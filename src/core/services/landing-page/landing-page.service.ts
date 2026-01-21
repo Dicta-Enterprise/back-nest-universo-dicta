@@ -1,29 +1,27 @@
-import { HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { CreateLandingPageDto } from 'src/application/dto/lading-page/create-landing-page.dto';
 import { UpdateLandingPageDto } from 'src/application/dto/lading-page/update-landing-page.dto';
 import { LANDING_PAGE_REPOSITORY } from 'src/core/constants/constants';
-import { LandingPage} from 'src/core/entities/landing-page/landing-page.entity';
+import { LandingPage } from 'src/core/entities/landing-page/landing-page.entity';
 import { LandingPageRepository } from 'src/core/repositories/landing-page/landing-page.repository';
 import { BussinesRuleException } from 'src/shared/domain/exceptions/business-rule.exception';
 import { ValidatorService } from 'src/shared/application/validation/validator.service';
 
-
 @Injectable()
 export class LandingPageService {
   constructor(
-  @InjectModel(LANDING_PAGE_REPOSITORY)
-  private repository: LandingPageRepository,
-  private readonly validator: ValidatorService,
+    @InjectModel(LANDING_PAGE_REPOSITORY)
+    private repository: LandingPageRepository,
+    private readonly validator: ValidatorService,
   ) {}
 
-  
   async create(dto: CreateLandingPageDto): Promise<LandingPage> {
     await this.validator.validate(dto, CreateLandingPageDto);
 
     const existe = await this.repository.findByTitulo(dto.titulo);
     if (existe) {
-      throw new BussinesRuleException (
+      throw new BussinesRuleException(
         'Landing page ya existe con ese título',
         HttpStatus.BAD_REQUEST,
         {
@@ -44,8 +42,8 @@ export class LandingPageService {
       dto.landingUrl,
       new Date(),
       new Date(),
+      dto.itemImagenesLanding || [],
       dto.itemColores || [],
-      dto.itemImagenesLanding || []
     );
     return this.repository.save(landingPage);
   }
@@ -65,7 +63,6 @@ export class LandingPageService {
           id: id,
           codigoError: 'LANDING_PAGE_NO_ENCONTRADA',
         },
-      
       );
     }
     return existe;
@@ -77,7 +74,7 @@ export class LandingPageService {
     const landingPage = new LandingPage(
       null,
       dto.titulo,
-      dto.descripcion,  
+      dto.descripcion,
       dto.imagenPrincipal,
       dto.contenido,
       dto.estado || true,
@@ -86,8 +83,8 @@ export class LandingPageService {
       dto.landingUrl,
       new Date(),
       new Date(),
+      dto.itemImagenesLanding || [],
       dto.itemColores || [],
-      dto.itemImagenesLanding || []
     );
     return this.repository.update(id, landingPage);
   }
@@ -95,6 +92,6 @@ export class LandingPageService {
   async remove(id: string) {
     const landingPage = await this.findOne(id);
     const estado: boolean = landingPage.estado === true ? false : true;
-    return this.repository.delete(id,estado);
+    return this.repository.delete(id, estado);
   }
 }

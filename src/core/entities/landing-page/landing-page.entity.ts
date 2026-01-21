@@ -1,8 +1,8 @@
 // src/core/entities/landing-page.entity.ts
 
-import { ItemImagenLanding } from "./item-imagen-landing.entity";
-import { ItemColores } from "./item-colores.entity";
-
+import { LandingPage as LandingPagePrisma } from '@prisma/client';
+import { ItemImagenLanding } from './item-imagen-landing.entity';
+import { ItemColores } from './item-colores.entity';
 export class LandingPage {
   constructor(
     public id: string,
@@ -20,15 +20,11 @@ export class LandingPage {
     public itemColores: ItemColores[],
   ) {}
 
-   public desactivar(): void {
-    this.estado = false;
+  static fromPrismaList(data: LandingPagePrisma[]): LandingPage[] {
+    return data.map((item) => LandingPage.fromPrisma(item));
   }
 
-    static fromPrismaList(data: any[]): LandingPage[] {
-    return data.map(item => LandingPage.fromPrisma(item));
-  }
-
-  static fromPrisma(data: any): LandingPage {
+  static fromPrisma(data: LandingPagePrisma): LandingPage {
     return new LandingPage(
       data.id,
       data.titulo,
@@ -41,10 +37,8 @@ export class LandingPage {
       data.landingUrl,
       data.fechaCreacion,
       data.fechaActualizacion,
-      data.itemImagenesLanding,
-      data.itemColores, 
+      [],
+      [],
     );
   }
-
- 
 }

@@ -1,7 +1,7 @@
-import { Injectable } from "@nestjs/common";
-import { Profesor } from "src/core/entities/profesor/profesor.entity";
-import { ProfesorRepository } from "src/core/repositories/profesor/profesor.repository";
-import { PrismaService } from "src/core/services/prisma/prisma.service";
+import { Injectable } from '@nestjs/common';
+import { Profesor } from 'src/core/entities/profesor/profesor.entity';
+import { ProfesorRepository } from 'src/core/repositories/profesor/profesor.repository';
+import { PrismaService } from 'src/core/services/prisma/prisma.service';
 
 @Injectable()
 export class ProfesorPrismaRepository implements ProfesorRepository{

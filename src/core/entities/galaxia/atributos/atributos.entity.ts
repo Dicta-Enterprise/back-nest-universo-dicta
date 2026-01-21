@@ -9,7 +9,7 @@ export class Atributos {
     public colores: Color[],
   ) {}
 
-  static fromPrisma(data: any): Atributos {
+  static fromPrisma(data: Atributos): Atributos {
     return new Atributos(
       data.id,
       data.galaxiaId,
@@ -18,6 +18,7 @@ export class Atributos {
     );
   }
 
-  static fromPrismaList(data: any[]): Atributos[] {
-  return data.map((item) => Atributos.fromPrisma(item));  }
+  static fromPrismaList(data: Atributos[]): Atributos[] {
+    return data.map((item) => Atributos.fromPrisma(item));
+  }
 }

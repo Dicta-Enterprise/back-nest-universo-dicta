@@ -6,7 +6,7 @@ export class ItemColores {
     public descripcion?: string,
   ) {}
 
-  static fromPrisma(data: any): ItemColores {
+  static fromPrisma(data: ItemColores): ItemColores {
     return new ItemColores(
       data.id,
       data.color,
