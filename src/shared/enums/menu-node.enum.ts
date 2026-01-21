@@ -1,0 +1,4 @@
+export enum MenuNode {
+  MENU_PARAMS = 'MENU_PARAMS',
+  MENU_CHILD_PARAMS = 'MENU_CHILD_PARAMS',
+}

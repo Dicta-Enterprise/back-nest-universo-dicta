@@ -246,3 +246,16 @@ model ItemColores {
   landingPage   LandingPage @relation(fields: [landingPageId], references: [id])
   landingPageId String      @db.ObjectId
 }
+
+model MenuSidebar {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  icon      String?
+  route     String?
+  code      String   @unique
+  node      String
+  typeMenu  String   
+  parentId  String?  @db.ObjectId
+  order     Int      @default(0)
+  active    Boolean  @default(true)
+}
