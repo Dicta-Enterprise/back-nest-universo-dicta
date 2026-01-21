@@ -9,7 +9,6 @@ export class Planeta {
     public id: string,
     public nombre: string,
     public grupo: string,
-    public planetaNombre: string,
     public tema: string,
     public textura: string,
     public url: string,
@@ -26,16 +25,15 @@ export class Planeta {
     public galaxia?: Galaxia | null,
   ) {}
 
-  static fromPrismaList(data: any[]): Planeta[] {
+  static fromPrismaList(data: Planeta[]): Planeta[] {
     return data.map((item) => Planeta.fromPrisma(item));
   }
 
-  static fromPrisma(data: any): Planeta {
+  static fromPrisma(data: Planeta): Planeta {
     return new Planeta(
       data.id,
       data.nombre,
       data.grupo,
-      data.planetaNombre,
       data.tema,
       data.textura,
       data.url,
@@ -44,8 +42,8 @@ export class Planeta {
       data.resumenCurso,
       data.estado,
       data.info ? InfoPlaneta.fromPrisma(data.info) : null,
-      data.peligros ? data.peligros.map((p: any) => Peligro.fromPrisma(p)) : [],       
-      data.beneficios ? data.beneficios.map((b: any) => Beneficio.fromPrisma(b)) : [], 
+      data.peligros ? data.peligros.map((p: Peligro) => Peligro.fromPrisma(p)) : [],       
+      data.beneficios ? data.beneficios.map((b: Beneficio) => Beneficio.fromPrisma(b)) : [], 
       data.fechaCreacion,
       data.fechaActualizacion,
       data.galaxiaId,
