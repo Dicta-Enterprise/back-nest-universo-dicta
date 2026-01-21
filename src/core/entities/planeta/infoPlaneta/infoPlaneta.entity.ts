@@ -10,7 +10,7 @@ export class InfoPlaneta {
     public villano: string,
   ) {}
 
-  static fromPrisma(data: any): InfoPlaneta {
+  static fromPrisma(data: InfoPlaneta): InfoPlaneta {
     return new InfoPlaneta(
       data.tipoRiesgo,
       data.tamano,

@@ -146,16 +146,16 @@ type Beneficio {
 }
 
 model Curso {
-  id              String    @id @default(auto()) @map("_id") @db.ObjectId
-  nombre          String    @unique
+  id              String      @id @default(auto()) @map("_id") @db.ObjectId
+  nombre          String      @unique
   descripcion     String
   beneficios      Beneficio[]
-  fechaCreacion   DateTime  @default(now())
+  fechaCreacion   DateTime    @default(now())
   fechaInicio     DateTime?
   fechaFinal      DateTime?
   precio          Float
-  estado          Boolean   @default(true)
-  imagen          String    @unique
+  estado          Boolean     @default(true)
+  imagen          String      @unique
   duracionSemanas Float?
 
   profesor    Profesor?  @relation(fields: [profesorId], references: [id])

@@ -6,10 +6,10 @@ export class Result<T> {
   
     private constructor(isSuccess: boolean, error?: Error, value?: T) {
       if (isSuccess && error) {
-        throw new Error("Resultado exitoso no puede contener un error");
+        throw new Error('Resultado exitoso no puede contener un error');
       }
       if (!isSuccess && !error) {
-        throw new Error("Resultado fallido debe contener un error");
+        throw new Error('Resultado fallido debe contener un error');
       }
   
       this.isSuccess = isSuccess;
@@ -20,7 +20,7 @@ export class Result<T> {
   
     public getValue(): T {
       if (this.isFailure) {
-        throw new Error("No se puede obtener valor de un resultado fallido");
+        throw new Error('No se puede obtener valor de un resultado fallido');
       }
       return this._value as T;
     }

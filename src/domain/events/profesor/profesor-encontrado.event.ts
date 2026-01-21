@@ -1,5 +1,5 @@
-import { Profesor } from "src/core/entities/profesor/profesor.entity";
-import { IDomainEvent } from "src/shared/domain/events/domain-event.interface";
+import { Profesor } from 'src/core/entities/profesor/profesor.entity';
+import { IDomainEvent } from 'src/shared/domain/events/domain-event.interface';
 
 
 export class profesorEncontradoEvent implements IDomainEvent{

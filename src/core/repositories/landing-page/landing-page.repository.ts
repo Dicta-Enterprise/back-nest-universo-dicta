@@ -1,6 +1,6 @@
 // src/core/repositories/landing-page.repository.ts
 
-import { LandingPage } from "src/core/entities/landing-page/landing-page.entity";
+import { LandingPage } from 'src/core/entities/landing-page/landing-page.entity';
 
 
 
