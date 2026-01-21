@@ -50,7 +50,6 @@ export class PlanetasService {
       null, // id
       dtoPlaneta.nombre,
       dtoPlaneta.grupo,
-      dtoPlaneta.planetaNombre,
       dtoPlaneta.tema,
       dtoPlaneta.textura,
       dtoPlaneta.url,
@@ -141,7 +140,6 @@ export class PlanetasService {
       null, // id (lo maneja Prisma)
       dtoPlaneta.nombre,
       dtoPlaneta.grupo,
-      dtoPlaneta.planetaNombre,
       dtoPlaneta.tema,
       dtoPlaneta.textura,
       dtoPlaneta.url,

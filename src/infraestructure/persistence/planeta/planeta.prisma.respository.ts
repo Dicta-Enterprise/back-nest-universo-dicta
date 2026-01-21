@@ -28,9 +28,8 @@ export class PlanetaPrismaRepository implements PlanetaRepository {
       data: {
         grupo: planeta.grupo,
         nombre: planeta.nombre,
-        planetaNombre: planeta.planetaNombre,
         tema: planeta.tema,
-        galaxiaId: planeta.galaxiaId,
+        galaxia: { connect: { id: planeta.galaxiaId } },
         textura: planeta.textura,
         url: planeta.url,
         imagenResumen: planeta.imagenResumen,
@@ -99,7 +98,6 @@ export class PlanetaPrismaRepository implements PlanetaRepository {
       data: {
         grupo: planeta.grupo,
         nombre: planeta.nombre,
-        planetaNombre: planeta.planetaNombre,
         tema: planeta.tema,
         galaxiaId: planeta.galaxiaId,
         textura: planeta.textura,

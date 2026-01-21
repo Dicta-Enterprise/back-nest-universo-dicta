@@ -41,7 +41,7 @@ export class CreatePlanetaDto {
   @IsString()
   @IsNotEmpty()
   @Transform(({ value }) => value?.trim())
-  planetaNombre: string;
+
 
   @ApiProperty({
     example: 'SALUD_MENTAL',
