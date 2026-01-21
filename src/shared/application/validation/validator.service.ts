@@ -21,6 +21,7 @@ export class ValidatorService {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private formatErrors(errors: any[]): string {
     return errors
       .map((error) => {

@@ -1,4 +1,3 @@
-import { plainToInstance } from 'class-transformer';
 import { Injectable } from '@nestjs/common';
 import { Curso } from 'src/core/entities/curso/curso.entity';
 import { CursoRepository } from 'src/core/repositories/curso/curso.respository';
@@ -96,7 +95,6 @@ export class CursoPrismaRepository implements CursoRepository {
 
     return Curso.fromPrismaList(rows);
   }
- 
 
   async save(curso: Curso): Promise<Curso> {
     const data = await this.prisma.curso.create({
@@ -110,7 +108,7 @@ export class CursoPrismaRepository implements CursoRepository {
         estado: curso.estado,
         imagen: curso.imagen,
         duracionSemanas: curso.duracionSemanas,
-        
+
         profesor: {
           connect: {
             id: curso.profesorId,
@@ -150,18 +148,18 @@ export class CursoPrismaRepository implements CursoRepository {
   }
 
   async update(id: string, curso: Partial<Curso>): Promise<Curso> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const dataUpdate: any = {
       nombre: curso.nombre,
-      
+
       descripcion: curso.descripcion,
-      beneficios: curso.beneficios, 
+      beneficios: curso.beneficios,
       fechaInicio: curso.fechaInicio,
       fechaFinal: curso.fechaFinal,
       precio: curso.precio,
       estado: curso.estado,
       imagen: curso.imagen,
       duracionSemanas: curso.duracionSemanas,
-      
     };
     if (curso.profesorId) {
       dataUpdate.profesor = {
@@ -169,7 +167,7 @@ export class CursoPrismaRepository implements CursoRepository {
           id: curso.profesorId,
         },
       };
-    } 
+    }
 
     if (curso.categoriaId) {
       dataUpdate.categoria = {
@@ -177,7 +175,7 @@ export class CursoPrismaRepository implements CursoRepository {
           id: curso.categoriaId,
         },
       };
-    } 
+    }
 
     const data = await this.prisma.curso.update({
       where: { id },
@@ -218,6 +216,4 @@ export class CursoPrismaRepository implements CursoRepository {
 
     return Curso.fromPrisma(data);
   }
-
-
 }

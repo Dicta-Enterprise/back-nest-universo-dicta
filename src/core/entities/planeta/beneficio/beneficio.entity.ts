@@ -4,10 +4,7 @@ export class Beneficio {
     public descripcion: string,
   ) {}
 
-  static fromPrisma(data: any): Beneficio {
-    return new Beneficio(
-      data.titulo,
-      data.descripcion,
-    );
+  static fromPrisma(data: Beneficio): Beneficio {
+    return new Beneficio(data.titulo, data.descripcion);
   }
 }

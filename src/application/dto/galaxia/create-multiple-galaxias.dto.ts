@@ -1,11 +1,11 @@
 import { Type } from 'class-transformer';
 import {
-  IsString,
   IsArray,
-  ValidateNested,
-  IsOptional,
-  IsUrl,
   IsObject,
+  IsOptional,
+  IsString,
+  IsUrl,
+  ValidateNested,
 } from 'class-validator';
 import { Vector3Dto } from './vector/vector-galaxia.dto';
 

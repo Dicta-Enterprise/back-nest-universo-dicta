@@ -1,4 +1,4 @@
-import { Profesor } from "src/core/entities/profesor/profesor.entity";
+import { Profesor } from 'src/core/entities/profesor/profesor.entity';
 
 
 export interface ProfesorRepository{

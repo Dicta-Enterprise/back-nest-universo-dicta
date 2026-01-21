@@ -17,8 +17,8 @@ export class Planeta {
     public resumenCurso: string,
     public estado: EstadoGenerico,
     public info: InfoPlaneta,
-   public peligros: Peligro[],         
-    public beneficios: Beneficio[], 
+    public peligros: Peligro[],
+    public beneficios: Beneficio[],
     public fechaCreacion: Date,
     public fechaActualizacion: Date,
     public galaxiaId: string,
@@ -42,8 +42,12 @@ export class Planeta {
       data.resumenCurso,
       data.estado,
       data.info ? InfoPlaneta.fromPrisma(data.info) : null,
-      data.peligros ? data.peligros.map((p: Peligro) => Peligro.fromPrisma(p)) : [],       
-      data.beneficios ? data.beneficios.map((b: Beneficio) => Beneficio.fromPrisma(b)) : [], 
+      data.peligros
+        ? data.peligros.map((p: Peligro) => Peligro.fromPrisma(p))
+        : [],
+      data.beneficios
+        ? data.beneficios.map((b: Beneficio) => Beneficio.fromPrisma(b))
+        : [],
       data.fechaCreacion,
       data.fechaActualizacion,
       data.galaxiaId,

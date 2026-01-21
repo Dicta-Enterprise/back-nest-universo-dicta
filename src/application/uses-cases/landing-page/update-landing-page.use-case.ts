@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { UpdateLandingPageDto } from 'src/application/dto/lading-page/update-landing-page.dto';
-import { LandingPageService } from "src/core/services/landing-page/landing-page.service";
+import { LandingPageService } from 'src/core/services/landing-page/landing-page.service';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { LandingPage } from 'src/core/entities/landing-page/landing-page.entity';
 import { Result } from 'src/shared/domain/result/result';

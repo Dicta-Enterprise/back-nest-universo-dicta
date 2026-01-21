@@ -1,9 +1,9 @@
-import { Injectable } from "@nestjs/common";
-import { EventEmitter2 } from "@nestjs/event-emitter";
-import { Galaxia } from "src/core/entities/galaxia/galaxia.entity";
-import { GalaxiasService } from "src/core/services/galaxia/galaxias.service";
-import { GalaxiaEvent } from "src/domain/events/galaxia/galaxia-creado.event";
-import { Result } from "src/shared/domain/result/result";
+import { Injectable } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { Galaxia } from 'src/core/entities/galaxia/galaxia.entity';
+import { GalaxiasService } from 'src/core/services/galaxia/galaxias.service';
+import { GalaxiaEvent } from 'src/domain/events/galaxia/galaxia-creado.event';
+import { Result } from 'src/shared/domain/result/result';
 
 
 

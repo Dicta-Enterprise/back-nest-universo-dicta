@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { LandingPage } from 'src/core/entities/landing-page/landing-page.entity';
-import { LandingPageService } from "src/core/services/landing-page/landing-page.service";
+import { LandingPageService } from 'src/core/services/landing-page/landing-page.service';
 import { Result } from 'src/shared/domain/result/result';
 
 @Injectable()

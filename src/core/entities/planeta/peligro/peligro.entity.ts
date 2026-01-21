@@ -8,7 +8,7 @@ export class Peligro {
     public cta?: string,
   ) {}
 
-  static fromPrisma(data: any): Peligro {
+  static fromPrisma(data: Peligro): Peligro {
     return new Peligro(
       data.nombre,
       data.descripcion,

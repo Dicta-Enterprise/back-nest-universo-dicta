@@ -1,4 +1,4 @@
-import { GenericBase } from "./Generic.Class";
+import { GenericBase } from './Generic.Class';
 
 export class CustomError<T> extends GenericBase<T> {
     data: T | null; // Puedes hacer esto para manejar el caso de no tener datos

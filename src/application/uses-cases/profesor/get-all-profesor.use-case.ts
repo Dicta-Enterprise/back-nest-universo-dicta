@@ -1,7 +1,7 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable } from '@nestjs/common';
 import { ProfesorService } from '../../../core/services/profesor/profesor.service';
-import { Result } from "src/shared/domain/result/result";
-import { Profesor } from "src/core/entities/profesor/profesor.entity";
+import { Result } from 'src/shared/domain/result/result';
+import { Profesor } from 'src/core/entities/profesor/profesor.entity';
 
 @Injectable()
 export class GetAllProfesorUseCase{

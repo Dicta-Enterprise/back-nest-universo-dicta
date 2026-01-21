@@ -1,41 +1,37 @@
-import { HttpStatus, Inject, Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { CreateCursoDto } from 'src/application/dto/curso/create-curso.dto';
 import { UpdateCursoDto } from 'src/application/dto/curso/update-curso.dto';
 import { CURSO_REPOSITORY } from 'src/core/constants/constants';
-import { CustomError } from 'src/shared/class/Error.Class';
 import { CursoRepository } from '../../repositories/curso/curso.respository';
 import { ValidatorService } from 'src/shared/application/validation/validator.service';
 import { Curso } from 'src/core/entities/curso/curso.entity';
 import { BussinesRuleException } from 'src/shared/domain/exceptions/business-rule.exception';
-import * as dto from 'src/application/dto/curso';
 
 @Injectable()
-export class CursosService{
-
+export class CursosService {
   constructor(
     @Inject(CURSO_REPOSITORY)
     private repository: CursoRepository,
     private readonly validator: ValidatorService,
-    ) {}
+  ) {}
 
-  async crearCurso(dtoCurso: CreateCursoDto): Promise<Curso>{
-
+  async crearCurso(dtoCurso: CreateCursoDto): Promise<Curso> {
     await this.validator.validate(dtoCurso, CreateCursoDto);
 
     const existe = await this.repository.findByName(dtoCurso.nombre);
 
-    if(existe){
+    if (existe) {
       throw new BussinesRuleException(
         'El curso ya existe',
         HttpStatus.BAD_REQUEST,
         {
           nombre: dtoCurso.nombre,
           codigoError: 'CURSO_DUPLICADO',
-        }
+        },
       );
     }
 
-      const curso = new Curso(
+    const curso = new Curso(
       null,
       dtoCurso.nombre,
       dtoCurso.descripcion || '',
@@ -51,16 +47,12 @@ export class CursosService{
       undefined,
       undefined,
       dtoCurso.beneficios,
-       
     );
-
 
     return this.repository.save(curso);
   }
 
   async listarCursos(): Promise<Curso[]> {
-
-
     return this.repository.findAllActive();
   }
 
@@ -99,17 +91,16 @@ export class CursosService{
       dtoCurso.categoriaId,
       undefined,
       undefined,
-      dtoCurso.beneficios
-    )
+      dtoCurso.beneficios,
+    );
 
     return this.repository.update(id, curso);
-
   }
 
   async eliminarCurso(id: string): Promise<Curso> {
     const curso = await this.obtenerUnCurso(id);
 
-    const estado: boolean = curso.estado === true ? false : true; 
+    const estado: boolean = curso.estado === true ? false : true;
 
     return this.repository.delete(id, estado);
   }

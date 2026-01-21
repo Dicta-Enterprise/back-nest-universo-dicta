@@ -15,21 +15,18 @@ export class MenuService extends PrismaClient implements OnModuleInit {
 
   async create(createMenuDto: CreateMenuDto) {
     return `This action removes a #${createMenuDto} menu`;
-
   }
 
   async findAll() {
-    return `This action removes a  menu`;
-
+    return 'This action removes a  menu';
   }
 
   async findOne(id: string) {
-    console.log(id);
+    return `This action removes a #${id} menu`;
   }
 
   async update(id: string, updateMenuDto: UpdateMenuDto) {
-    console.log(id);
-    console.log(updateMenuDto);
+    return `This action removes a #${updateMenuDto + id} menu`;
   }
 
   remove(id: string) {

@@ -14,11 +14,9 @@ export class IdiomaService {
     private readonly validator: ValidatorService,
   ) {}
 
-  async crearIdioma(dto: any): Promise<Idioma> {
-
-    
+  async crearIdioma(dto: CreateIdiomaDto): Promise<Idioma> {
     await this.validator.validate(dto, CreateIdiomaDto);
-     
+
     const existe = await this.repository.findByName(dto.nombre);
 
     if (existe) {
@@ -31,57 +29,45 @@ export class IdiomaService {
         },
       );
     }
-  
+
     const idioma = new Idioma(null, dto.nombre, true);
 
     return this.repository.save(idioma);
   }
-  
+
   async listarIdiomas(): Promise<Idioma[]> {
-      return this.repository.findAllActive();
+    return this.repository.findAllActive();
   }
 
-   async obtenerUnIdioma(id: string): Promise<Idioma> {
-    
-      const existe = await this.repository.findById(id);
-  
-      if (!existe) {
-        throw new BussinesRuleException(
-          'El idioma no existe',
-          HttpStatus.NOT_FOUND,
-          {
-            id: id,
-            codigoError: 'IDIOMA_NO_ENCONTRADA',
-          },
-        );
-      }
-  
-      return existe;
-    }
-  
+  async obtenerUnIdioma(id: string): Promise<Idioma> {
+    const existe = await this.repository.findById(id);
 
-    async actualizarIdioma(
-      id: string,
-      dto: UpdateIdiomaDto,
-    ): Promise<Idioma> {
-      await this.validator.validate(dto, UpdateIdiomaDto);
-    
-      const idioma = new Idioma(
-        id,
-        dto.nombre,
-        true, 
+    if (!existe) {
+      throw new BussinesRuleException(
+        'El idioma no existe',
+        HttpStatus.NOT_FOUND,
+        {
+          id: id,
+          codigoError: 'IDIOMA_NO_ENCONTRADA',
+        },
       );
-    
-      return this.repository.update(id, idioma);
     }
-    
-  async eliminarIdioma(id: string): Promise<Idioma> {
-    console.log("servicio",id)
-      const idioma = await this.obtenerUnIdioma(id);
-      console.log("idioma",idioma)
-      const estado: boolean = idioma.estado === true ? false : true; // Cambia el estado a false si ya está en false
-  
-      return this.repository.delete(id, estado);
-    }
-}
 
+    return existe;
+  }
+
+  async actualizarIdioma(id: string, dto: UpdateIdiomaDto): Promise<Idioma> {
+    await this.validator.validate(dto, UpdateIdiomaDto);
+
+    const idioma = new Idioma(id, dto.nombre, true);
+
+    return this.repository.update(id, idioma);
+  }
+
+  async eliminarIdioma(id: string): Promise<Idioma> {
+    const idioma = await this.obtenerUnIdioma(id);
+    const estado: boolean = idioma.estado === true ? false : true; // Cambia el estado a false si ya está en false
+
+    return this.repository.delete(id, estado);
+  }
+}

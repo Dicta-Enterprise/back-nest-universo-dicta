@@ -1,5 +1,5 @@
-import { Curso } from "src/core/entities/curso/curso.entity";
-import { IDomainEvent } from "src/shared/domain/events/domain-event.interface";
+import { Curso } from 'src/core/entities/curso/curso.entity';
+import { IDomainEvent } from 'src/shared/domain/events/domain-event.interface';
 
 export class CursoCreadoEvent implements IDomainEvent{
     public readonly dateTimeOccurred: Date;
