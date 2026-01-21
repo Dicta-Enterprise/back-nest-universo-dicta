@@ -101,7 +101,6 @@ model Planeta {
   id                 String         @id @default(auto()) @map("_id") @db.ObjectId
   grupo              String
   nombre             String         @unique
-  planetaNombre      String
   estado             EstadoGenerico @default(ACTIVO)
   tema               String
   textura            String
