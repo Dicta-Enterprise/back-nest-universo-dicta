@@ -14,7 +14,7 @@ export class GetOneGalaxiaUseCase {
 
   async execute(id: string): Promise<Result<Galaxia>> {
     try {
-      const galaxia = await this.galaxiaService.ObtenerGalaxia(id);
+      const galaxia = await this.galaxiaService.obtenerGalaxia(id);
 
       this.eventEmitter.emit('galaxia.obtenida', new GalaxiaEvent(galaxia));
       return Result.ok(galaxia);

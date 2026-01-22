@@ -1,18 +1,24 @@
-import { Injectable } from '@nestjs/common';
+import { CATEGORIA_FACTORY } from '@constants/factories';
+import { Inject, Injectable } from '@nestjs/common';
 import { Categoria } from 'src/core/entities/categoria/categoria.entity';
+import { CategoriaFactory } from 'src/core/fabricas/categoria/categoria.factory';
 import { CategoriaRepository } from 'src/core/repositories/categoria/categoria.respository';
 import { PrismaService } from 'src/core/services/prisma/prisma.service';
 
 @Injectable()
 export class CategoriaPrismaRepository implements CategoriaRepository {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    @Inject(CATEGORIA_FACTORY)
+    private readonly categoriaFactory: CategoriaFactory,
+  ) {}
 
   async findById(id: string): Promise<Categoria | null> {
     const data = await this.prisma.categoria.findUnique({
       where: { id },
     });
 
-    return data ? Categoria.fromPrisma(data) : null;
+    return data ? this.categoriaFactory.crearDesdePrisma(data) : null;
   }
 
   async findByName(nombre: string): Promise<Categoria | null> {
@@ -20,7 +26,7 @@ export class CategoriaPrismaRepository implements CategoriaRepository {
       where: { nombre },
     });
 
-    return data ? Categoria.fromPrisma(data) : null;
+    return data ? this.categoriaFactory.crearDesdePrisma(data) : null;
   }
 
   async save(categoria: Categoria): Promise<Categoria> {
@@ -37,14 +43,14 @@ export class CategoriaPrismaRepository implements CategoriaRepository {
       },
     });
 
-    return Categoria.fromPrisma(data);
+    return this.categoriaFactory.crearDesdePrisma(data);
   }
 
   async findAllActive(): Promise<Categoria[]> {
     const categorias = await this.prisma.categoria.findMany({
       where: { estado: true },
     });
-    return Categoria.fromPrismaList(categorias);
+    return categorias.map((p) => this.categoriaFactory.crearDesdePrisma(p));
   }
 
   async countActive(): Promise<number> {
@@ -68,7 +74,7 @@ export class CategoriaPrismaRepository implements CategoriaRepository {
         modelo: categoria.modelo,
       },
     });
-    return Categoria.fromPrisma(data);
+    return this.categoriaFactory.crearDesdePrisma(data);
   }
 
   async delete(id: string, estado: boolean): Promise<Categoria> {
@@ -77,6 +83,6 @@ export class CategoriaPrismaRepository implements CategoriaRepository {
       data: { estado },
     });
 
-    return Categoria.fromPrisma(data);
+    return this.categoriaFactory.crearDesdePrisma(data);
   }
 }

@@ -12,6 +12,8 @@ import { GetAllLandingPageUseCase } from 'src/application/uses-cases/landing-pag
 import { GetOneLandingPageUseCase } from 'src/application/uses-cases/landing-page/get-one-landing-page.use-case';
 import { UpdateLandingPageUseCase } from 'src/application/uses-cases/landing-page/update-landing-page.use-case';
 import { DeleteLandingPageUseCase } from 'src/application/uses-cases/landing-page/delete-landing-page.use-case';
+import { LANDING_PAGE_FACTORY } from '@constants/factories';
+import { DefaultLandingPageFactory } from 'src/core/fabricas/landing-page/landing-page.factory';
 
 @Module({
   imports: [SharedModule, PrismaModule],
@@ -20,6 +22,10 @@ import { DeleteLandingPageUseCase } from 'src/application/uses-cases/landing-pag
     {
       provide: LANDING_PAGE_REPOSITORY,
       useClass: LandingPagePrismaRepository,
+    },
+    {
+      provide: LANDING_PAGE_FACTORY,
+      useClass: DefaultLandingPageFactory,
     },
     LandingPageService,
     CreateLandingPageUseCase,

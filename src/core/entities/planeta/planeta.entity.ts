@@ -24,34 +24,4 @@ export class Planeta {
     public galaxiaId: string,
     public galaxia?: Galaxia | null,
   ) {}
-
-  static fromPrismaList(data: Planeta[]): Planeta[] {
-    return data.map((item) => Planeta.fromPrisma(item));
-  }
-
-  static fromPrisma(data: Planeta): Planeta {
-    return new Planeta(
-      data.id,
-      data.nombre,
-      data.grupo,
-      data.tema,
-      data.textura,
-      data.url,
-      data.imagenResumen,
-      data.imagenBeneficios,
-      data.resumenCurso,
-      data.estado,
-      data.info ? InfoPlaneta.fromPrisma(data.info) : null,
-      data.peligros
-        ? data.peligros.map((p: Peligro) => Peligro.fromPrisma(p))
-        : [],
-      data.beneficios
-        ? data.beneficios.map((b: Beneficio) => Beneficio.fromPrisma(b))
-        : [],
-      data.fechaCreacion,
-      data.fechaActualizacion,
-      data.galaxiaId,
-      data.galaxia ? Galaxia.fromPrisma(data.galaxia) : null,
-    );
-  }
 }

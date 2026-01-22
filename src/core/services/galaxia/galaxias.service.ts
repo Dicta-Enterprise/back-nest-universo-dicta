@@ -74,7 +74,7 @@ export class GalaxiasService {
     return this.repository.save(galaxia);
   }
 
-  async ListarGalaxia(galaxiaPaginationDto: GalaxiaPaginationDto) {
+  async listarGalaxia(galaxiaPaginationDto: GalaxiaPaginationDto) {
     return this.repository.findAllActive(galaxiaPaginationDto);
   }
 
@@ -143,7 +143,7 @@ export class GalaxiasService {
   return this.repository.saveMultiple(galaxias);
 }
 
-  async ObtenerGalaxia(id: string): Promise<Galaxia> {
+  async obtenerGalaxia(id: string): Promise<Galaxia> {
     const existe = await this.repository.findById(id);
 
     if (!existe) {
@@ -159,7 +159,7 @@ export class GalaxiasService {
     return existe;
   }
 
-  async ActualizarGalaxia(id: string, dto: UpdateGalaxiaDto): Promise<Galaxia> {
+  async actualizarGalaxia(id: string, dto: UpdateGalaxiaDto): Promise<Galaxia> {
     await this.validator.validate(dto, UpdateGalaxiaDto);
 
     const galaxiaExistente = await this.repository.findById(id);
@@ -196,7 +196,7 @@ export class GalaxiasService {
   }
 
   async eliminarGalaxia(id: string): Promise<Galaxia> {
-    await this.ObtenerGalaxia(id); // lanza excepción si no existe
+    await this.obtenerGalaxia(id); // lanza excepción si no existe
 
     try {
       return await this.repository.delete(id, false);

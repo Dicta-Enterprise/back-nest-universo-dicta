@@ -9,17 +9,4 @@ export class InfoPlaneta {
     public temperatura: string,
     public villano: string,
   ) {}
-
-  static fromPrisma(data: InfoPlaneta): InfoPlaneta {
-    return new InfoPlaneta(
-      data.tipoRiesgo,
-      data.tamano,
-      data.composicion,
-      data.riesgo,
-      data.nivel,
-      data.ambiente,
-      data.temperatura,
-      data.villano,
-    );
-  }
 }
