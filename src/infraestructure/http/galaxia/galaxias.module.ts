@@ -1,10 +1,7 @@
 import { Module } from '@nestjs/common';
 import { GalaxiasService } from '../../../core/services/galaxia/galaxias.service';
 import { GalaxiasController } from './galaxias.controller';
-import {
-  CATEGORIA_REPOSITORY,
-  GALAXIA_REPOSITORY,
-} from 'src/core/constants/constants';
+import { GALAXIA_REPOSITORY } from 'src/core/constants/constants';
 import { GalaxiaPrismaRepository } from 'src/infraestructure/persistence/galaxia/galaxia.prisma.repository';
 import { GetAllGalaxiaUseCase } from 'src/application/uses-cases/galaxias/get-all-galaxia.use.case';
 import { SharedModule } from 'src/shared/shared.module';
@@ -17,13 +14,15 @@ import {
   GetOneGalaxiaUseCase,
 } from 'src/application/uses-cases/galaxias';
 import { CategoriaService } from 'src/core/services/categoria/categoria.service';
-import { CategoriaPrismaRepository } from 'src/infraestructure/persistence/categoria/categoria.prisma.respository';
 import { SaveImageStorageUseCase } from 'src/application/uses-cases/azure';
 import { AzureStorageService } from 'src/core/services/azure/azure-storage.service';
 import { ArchivoService } from 'src/core/services/Archivo/archivo.service';
+import { GALAXIA_FACTORY } from '@constants/factories';
+import { DefaultGalaxiaFactory } from 'src/core/fabricas/galaxia/galaxia.factory';
+import { CategoriaModule } from '@controllers/categoria/categorias.module';
 
 @Module({
-  imports: [SharedModule, PrismaModule],
+  imports: [SharedModule, PrismaModule, CategoriaModule],
   controllers: [GalaxiasController],
   providers: [
     {
@@ -31,12 +30,12 @@ import { ArchivoService } from 'src/core/services/Archivo/archivo.service';
       useClass: GalaxiaPrismaRepository,
     },
     {
-      provide: CATEGORIA_REPOSITORY,
-      useClass: CategoriaPrismaRepository,
+      provide: GALAXIA_FACTORY,
+      useClass: DefaultGalaxiaFactory,
     },
     GalaxiasService,
-    CategoriaService,
     GetAllGalaxiaUseCase,
+    CategoriaService,
     CreateGalaxiaUseCase,
     CreateMultipleGalaxiasUseCase,
     GetOneGalaxiaUseCase,
@@ -44,8 +43,8 @@ import { ArchivoService } from 'src/core/services/Archivo/archivo.service';
     DeleteGalaxiaUseCase,
     SaveImageStorageUseCase,
     AzureStorageService,
-    ArchivoService
+    ArchivoService,
   ],
-  exports: [GalaxiasService],
+  exports: [GalaxiasService, CategoriaService],
 })
 export class GalaxiasModule {}

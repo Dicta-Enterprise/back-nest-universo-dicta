@@ -1,14 +1,20 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { GALAXIA_FACTORY } from '@constants/factories';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { GalaxiaPaginationDto } from 'src/application/dto/galaxia';
 
 import { Galaxia } from 'src/core/entities/galaxia/galaxia.entity';
+import { GalaxiaFactory } from 'src/core/fabricas/galaxia/galaxia.factory';
 import { GalaxiaRepository } from 'src/core/repositories/galaxia/galaxia.repository';
 import { PrismaService } from 'src/core/services/prisma/prisma.service';
 
 @Injectable()
 export class GalaxiaPrismaRepository implements GalaxiaRepository {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    @Inject(GALAXIA_FACTORY)
+    private readonly galaxiaFactory: GalaxiaFactory,
+  ) {}
 
   async save(galaxia: Galaxia): Promise<Galaxia> {
     const createData: Prisma.GalaxiaCreateInput = {
@@ -45,7 +51,7 @@ export class GalaxiaPrismaRepository implements GalaxiaRepository {
       include: { categoria: true },
     });
 
-    return Galaxia.fromPrisma(data);
+    return this.galaxiaFactory.crearDesdePrisma(data);
   }
   async saveMultiple(galaxias: Galaxia[]): Promise<Galaxia[]> {
     return await this.prisma.$transaction(async (prisma) => {
@@ -86,7 +92,7 @@ export class GalaxiaPrismaRepository implements GalaxiaRepository {
           include: { categoria: true },
         });
 
-        results.push(Galaxia.fromPrisma(data));
+        results.push(this.galaxiaFactory.crearDesdePrisma(data));
       }
 
       return results;
@@ -101,8 +107,8 @@ export class GalaxiaPrismaRepository implements GalaxiaRepository {
       skip: (page - 1) * limit,
       take: limit,
       where: { estado: true, ...(categoriaId && { categoriaId: categoriaId }) },
-       include:{
-        categoria:true
+      include: {
+        categoria: true,
       },
       orderBy: { fechaCreacion: 'desc' },
     });
@@ -114,7 +120,7 @@ export class GalaxiaPrismaRepository implements GalaxiaRepository {
           : 'No existen galaxias activas',
       );
     }
-    return Galaxia.fromPrismaList(galaxias);
+    return galaxias.map((g) => this.galaxiaFactory.crearDesdePrisma(g));
   }
 
   async findById(id: string): Promise<Galaxia | null> {
@@ -123,7 +129,7 @@ export class GalaxiaPrismaRepository implements GalaxiaRepository {
       include: { categoria: true },
     });
 
-    return data ? Galaxia.fromPrisma(data) : null;
+    return data ? this.galaxiaFactory.crearDesdePrisma(data) : null;
   }
 
   async findByName(nombre: string): Promise<Galaxia | null> {
@@ -132,7 +138,7 @@ export class GalaxiaPrismaRepository implements GalaxiaRepository {
       include: { categoria: true },
     });
 
-    return data ? Galaxia.fromPrisma(data) : null;
+    return data ? this.galaxiaFactory.crearDesdePrisma(data) : null;
   }
 
   async update(id: string, galaxia: Partial<Galaxia>): Promise<Galaxia> {
@@ -171,7 +177,7 @@ export class GalaxiaPrismaRepository implements GalaxiaRepository {
       include: { categoria: true },
     });
 
-    return Galaxia.fromPrisma(data);
+    return this.galaxiaFactory.crearDesdePrisma(data);
   }
 
   async delete(id: string, estado: boolean): Promise<Galaxia> {
@@ -184,7 +190,7 @@ export class GalaxiaPrismaRepository implements GalaxiaRepository {
       include: { categoria: true },
     });
 
-    return Galaxia.fromPrisma(data);
+    return this.galaxiaFactory.crearDesdePrisma(data);
   }
 
   async findByNombreYCategoria(
@@ -196,7 +202,7 @@ export class GalaxiaPrismaRepository implements GalaxiaRepository {
       include: { categoria: true },
     });
 
-    return galaxia ? Galaxia.fromPrisma(galaxia) : null;
+    return galaxia ? this.galaxiaFactory.crearDesdePrisma(galaxia) : null;
   }
 
   async testConnection(): Promise<void> {

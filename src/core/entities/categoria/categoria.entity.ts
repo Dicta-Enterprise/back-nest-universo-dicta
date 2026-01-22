@@ -1,3 +1,4 @@
+
 export class Categoria {
   constructor(
     public id: string,
@@ -14,28 +15,4 @@ export class Categoria {
     public url?: string,
     public modelo?: string,
   ) {}
-
-  public desactivar(): void {
-    this.estado = false;
-  }
-
-  static fromPrismaList(data: Categoria[]): Categoria[] {
-    return data.map((item) => Categoria.fromPrisma(item));
-  }
-
-  static fromPrisma(data: Categoria): Categoria {
-    return new Categoria(
-      data.id,
-      data.nombre,
-      data.descripcion,
-      data.estado,
-      data.fechaCreacion,
-      data.fechaActualizacion,
-      data.x,
-      data.y,
-      data.z,
-      data.url,
-      data.modelo,
-    );
-  }
 }
