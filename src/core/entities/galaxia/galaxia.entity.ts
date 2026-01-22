@@ -18,27 +18,4 @@ export class Galaxia {
     public posicion: VectorGalaxia | null,
     public rotacion: VectorGalaxia | null,
   ) {}
-
-  static fromPrisma(data: Galaxia): Galaxia {
-    return new Galaxia(
-      data.id,
-      data.nombre,
-      data.descripcion,
-      data.imagen ?? null,
-      data.url ?? null,
-      data.textura ?? null,
-      data.estado,
-      data.fechaCreacion,
-      data.fechaActualizacion,
-      data.categoria ? Categoria.fromPrisma(data.categoria) : null,
-      data.categoriaId,
-      data.color,
-      VectorGalaxia.fromPrisma(data.posicion),
-      VectorGalaxia.fromPrisma(data.rotacion),
-    );
-  }
-
-  static fromPrismaList(data: Galaxia[]): Galaxia[] {
-    return data.map((item) => Galaxia.fromPrisma(item));
-  }
 }

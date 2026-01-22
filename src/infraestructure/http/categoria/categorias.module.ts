@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { CategoriaController } from './categoria.controller';
 import { CategoriaService } from 'src/core/services/categoria/categoria.service';
 import { SharedModule } from 'src/shared/shared.module';
@@ -14,14 +14,25 @@ import { SaveImageStorageUseCase } from 'src/application/uses-cases/azure/save-i
 import { AzureStorageService } from 'src/core/services/azure/azure-storage.service';
 import { DeleteImageStorageUseCase } from 'src/application/uses-cases/azure/delete-image-storage.use.case';
 import { ArchivoService } from 'src/core/services/Archivo/archivo.service';
+import { CATEGORIA_FACTORY } from '@constants/factories';
+import { DefaultCategoriaFactory } from 'src/core/fabricas/categoria/categoria.factory';
+import { GalaxiasModule } from '@controllers/galaxia/galaxias.module';
 
 @Module({
-  imports: [SharedModule, PrismaModule],
+  imports: [
+    SharedModule,
+    PrismaModule,
+    forwardRef(() => GalaxiasModule),
+  ],
   controllers: [CategoriaController],
   providers: [
     {
       provide: CATEGORIA_REPOSITORY,
       useClass: CategoriaPrismaRepository,
+    },
+    {
+      provide: CATEGORIA_FACTORY,
+      useClass: DefaultCategoriaFactory,
     },
     CategoriaService,
     CreateCategoriaUseCase,
@@ -32,8 +43,11 @@ import { ArchivoService } from 'src/core/services/Archivo/archivo.service';
     SaveImageStorageUseCase,
     DeleteImageStorageUseCase,
     AzureStorageService,
-    ArchivoService
+    ArchivoService,
   ],
-  exports: [CategoriaService],
+  exports: [
+    CategoriaService,
+    CATEGORIA_REPOSITORY,
+  ],
 })
 export class CategoriaModule {}

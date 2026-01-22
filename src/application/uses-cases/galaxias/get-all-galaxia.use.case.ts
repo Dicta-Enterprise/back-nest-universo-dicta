@@ -13,7 +13,7 @@ export class GetAllGalaxiaUseCase {
 
   async execute(galaxiaPaginationDto: GalaxiaPaginationDto): Promise<Result<Galaxia[]>> {
       try {
-        const galaxia = await this.galaxiaService.ListarGalaxia(galaxiaPaginationDto);
+        const galaxia = await this.galaxiaService.listarGalaxia(galaxiaPaginationDto);
   
         return Result.okList(galaxia);
       } catch (error) {

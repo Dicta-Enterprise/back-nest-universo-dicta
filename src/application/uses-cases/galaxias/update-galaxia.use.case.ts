@@ -18,7 +18,7 @@ export class ActualizarGalaxiaCasoDeUso {
     dto: UpdateGalaxiaDto,
   ): Promise<Result<Galaxia>> {
     try {
-      const galaxia = await this.galaxiaService.ActualizarGalaxia(id, dto);
+      const galaxia = await this.galaxiaService.actualizarGalaxia(id, dto);
       this.eventEmitter.emit('galaxia.actualizada', new GalaxiaEvent(galaxia));
       return Result.ok(galaxia);
     } catch (error) {
