@@ -1,32 +1,16 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { ParametersResponseDto } from '../../../application/dto/parameters/parameter-response.dto';
+import { Injectable } from '@nestjs/common';
+import { ParameterItemDto } from 'src/application/dto/parameters/parameter-item.dto';
+import { ParametersResponseDto } from 'src/application/dto/parameters/parameters-response.dto';
+import { BussinesRuleException } from 'src/shared/domain/exceptions/business-rule.exception';
+
 import { CategoriaService } from '../categoria/categoria.service';
 import { GalaxiasService } from '../galaxia/galaxias.service';
 import { PlanetasService } from '../planeta/planetas.service';
 import { IdiomaService } from '../idioma/idioma.service';
 import { ProfesorService } from '../profesor/profesor.service';
 
-interface BaseParametro {
-  id: number | string;
-  nombre: string;
-}
-
-interface Profesor {
-  id: number | string;
-  nombre: string;
-  apellido_paterno?: string;
-  apellido_materno?: string;
-}
-
-interface IdValueResponse {
-  id: number | string;
-  value: string;
-  code: string;
-}
-
 @Injectable()
 export class ParametersService {
-  private readonly logger = new Logger(ParametersService.name);
   private readonly emptyPagination = { page: 1, limit: 1000 };
 
   constructor(
@@ -37,200 +21,93 @@ export class ParametersService {
     private readonly profesorService: ProfesorService,
   ) {}
 
-  async getParameters(type?: string): Promise<{
-    status: string;
-    message: string;
-    data: ParametersResponseDto | IdValueResponse[];
-  }> {
+  async getCategorias(): Promise<ParameterItemDto[]> {
+    const categorias = await this.categoriaService.listarCategorias();
+    return this.mapToParameterItem(categorias, 'nombre', 'CATEGORIA');
+  }
+
+  async getGalaxias(): Promise<ParameterItemDto[]> {
+    const galaxias = await this.galaxiaService.ListarGalaxia(
+      this.emptyPagination,
+    );
+    return this.mapToParameterItem(galaxias, 'nombre', 'GALAXIA');
+  }
+
+  async getPlanetas(): Promise<ParameterItemDto[]> {
+    const planetas = await this.planetaService.listarPlanetas(
+      this.emptyPagination,
+    );
+    return this.mapToParameterItem(planetas, 'nombre', 'PLANETA');
+  }
+
+  async getIdiomas(): Promise<ParameterItemDto[]> {
+    const idiomas = await this.idiomaService.listarIdiomas();
+    return this.mapToParameterItem(idiomas, 'nombre', 'IDIOMA');
+  }
+
+  async getProfesores(): Promise<ParameterItemDto[]> {
+    const profesores = await this.profesorService.listarProfesores();
+    return this.mapProfesores(profesores);
+  }
+
+  async getAll(): Promise<ParametersResponseDto> {
     try {
-      if (!type) {
-        // Sin tipo específico: retornar todos los parámetros
-        return await this.getAllParameters();
-      } else {
-        // Con tipo específico: retornar solo ese tipo
-        return await this.getParametersByType(type);
-      }
+      const response = new ParametersResponseDto();
+
+      response.DP_CATEGORIAS = await this.getCategorias();
+      response.DP_GALAXIAS = await this.getGalaxias();
+      response.DP_PLANETAS = await this.getPlanetas();
+      response.DP_IDIOMAS = await this.getIdiomas();
+      response.DP_PROFESORES = await this.getProfesores();
+
+      return response;
     } catch (error) {
-      this.logger.error('Error al obtener parámetros', (error as Error).stack);
-      
-      if (!type) {
-        return {
-          status: 'error',
-          message: 'Error al obtener los parámetros',
-          data: new ParametersResponseDto(),
-        };
-      } else {
-        return {
-          status: 'error',
-          message: `Error al obtener ${type}`,
-          data: [],
-        };
-      }
+      throw new BussinesRuleException(
+        'Error al obtener los parámetros del sistema',
+        5001,
+        error,
+      );
     }
   }
 
-  private async getAllParameters(): Promise<{
-    status: string;
-    message: string;
-    data: ParametersResponseDto;
-  }> {
-    const response = new ParametersResponseDto();
-
-    try {
-      const categorias = await this.categoriaService.listarCategorias();
-      const galaxias = await this.galaxiaService.ListarGalaxia(this.emptyPagination);
-      const planetas = await this.planetaService.listarPlanetas(this.emptyPagination);
-      const idiomas = await this.idiomaService.listarIdiomas();
-      const profesores = await this.profesorService.listarProfesores();
-
-      response.DP_CATEGORIAS = this.mapToIdValue(
-        categorias as BaseParametro[],
-        'nombre',
-        'CATEGORIA',
-      );
-
-      response.DP_GALAXIAS = this.mapToIdValue(
-        galaxias as BaseParametro[],
-        'nombre',
-        'GALAXIA',
-      );
-
-      response.DP_PLANETAS = this.mapToIdValue(
-        planetas as BaseParametro[],
-        'nombre',
-        'PLANETA',
-      );
-
-      response.DP_IDIOMAS = this.mapToIdValue(
-        idiomas as BaseParametro[],
-        'nombre',
-        'IDIOMA',
-      );
-
-      response.DP_PROFESORES = this.mapProfesores(
-        profesores as Profesor[],
-      );
-
-      return {
-        status: 'success',
-        message: 'Parámetros obtenidos exitosamente',
-        data: response,
-      };
-    } catch (error) {
-      this.logger.error('Error al obtener parámetros', (error as Error).stack);
-      return {
-        status: 'error',
-        message: 'Error al obtener los parámetros',
-        data: response,
-      };
-    }
-  }
-
-  private async getParametersByType(
-    type: string,
-  ): Promise<{
-    status: string;
-    message: string;
-    data: IdValueResponse[];
-  }> {
-    try {
-      let data: IdValueResponse[] = [];
-
-      // Convertir a mayúsculas para comparación (acepta DP_CATEGORIAS o dp_categorias)
-      const normalizedType = type.toUpperCase();
-
-      switch (normalizedType) {
-        case 'DP_CATEGORIAS':
-          data = this.mapToIdValue(
-            (await this.categoriaService.listarCategorias()) as BaseParametro[],
-            'nombre',
-            'CATEGORIA',
-          );
-          break;
-
-        case 'DP_GALAXIAS':
-          data = this.mapToIdValue(
-            (await this.galaxiaService.ListarGalaxia(
-              this.emptyPagination,
-            )) as BaseParametro[],
-            'nombre',
-            'GALAXIA',
-          );
-          break;
-
-        case 'DP_PLANETAS':
-          data = this.mapToIdValue(
-            (await this.planetaService.listarPlanetas(
-              this.emptyPagination,
-            )) as BaseParametro[],
-            'nombre',
-            'PLANETA',
-          );
-          break;
-
-        case 'DP_IDIOMAS':
-          data = this.mapToIdValue(
-            (await this.idiomaService.listarIdiomas()) as BaseParametro[],
-            'nombre',
-            'IDIOMA',
-          );
-          break;
-
-        case 'DP_PROFESORES':
-          data = this.mapProfesores(
-            (await this.profesorService.listarProfesores()) as Profesor[],
-          );
-          break;
-
-        default:
-          return {
-            status: 'error',
-            message: `Tipo '${type}' no válido. Tipos válidos: DP_CATEGORIAS, DP_GALAXIAS, DP_PLANETAS, DP_IDIOMAS, DP_PROFESORES`,
-            data: [],
-          };
-      }
-
-      return {
-        status: 'success',
-        message: `Parámetros de ${type} obtenidos exitosamente`,
-        data,
-      };
-    } catch (error) {
-      this.logger.error(
-        `Error al obtener parámetros de tipo ${type}`,
-        (error as Error).stack,
-      );
-      return {
-        status: 'error',
-        message: `Error al obtener ${type}`,
-        data: [],
-      };
-    }
-  }
-
-  private mapToIdValue<T extends BaseParametro>(
+  private mapToParameterItem<T extends { id: string }>(
     items: T[],
     nameField: keyof T,
-    tipo?: string,
-  ): IdValueResponse[] {
-    if (!Array.isArray(items)) return [];
+    tipo: string,
+  ): ParameterItemDto[] {
+    if (!Array.isArray(items)) {
+      throw new BussinesRuleException(
+        'Formato inválido de datos de parámetros',
+        5002,
+      );
+    }
 
     return items
       .filter(item => item?.id && item[nameField])
       .map(item => ({
         id: item.id,
         value: String(item[nameField]),
-        code: tipo
-          ? this.generarCodigo(tipo, String(item[nameField]))
-          : '',
+        code: this.generarCodigo(tipo, String(item[nameField])),
       }));
   }
 
-  private mapProfesores(profesores: Profesor[]): IdValueResponse[] {
-    if (!Array.isArray(profesores)) return [];
+  private mapProfesores(
+    profesores: {
+      id: string;
+      nombre?: string;
+      apellido_paterno?: string;
+      apellido_materno?: string;
+    }[],
+  ): ParameterItemDto[] {
+    if (!Array.isArray(profesores)) {
+      throw new BussinesRuleException(
+        'Formato inválido de datos de profesores',
+        5003,
+      );
+    }
 
     return profesores
-      .filter(p => p?.id && p?.nombre)
+      .filter(p => p?.id)
       .map(p => {
         const nombreCompleto = [
           p.nombre,
@@ -251,14 +128,12 @@ export class ParametersService {
   private generarCodigo(tipo: string, nombre: string): string {
     const tipoCodigo = tipo.toUpperCase().substring(0, 4);
 
-    let nombreCodigo = nombre
+    const nombreCodigo = nombre
       .toUpperCase()
       .normalize('NFD')
       .replace(/[\u0300-\u036f]/g, '')
       .replace(/[^A-Z\s-]/g, '')
-      .trim();
-
-    nombreCodigo = nombreCodigo
+      .trim()
       .replace(/\s+/g, '_')
       .replace(/-+/g, '_')
       .replace(/_+/g, '_');
@@ -267,14 +142,12 @@ export class ParametersService {
   }
 
   private generarCodigoProfesor(nombreCompleto: string): string {
-    let nombreCodigo = nombreCompleto
+    const nombreCodigo = nombreCompleto
       .toUpperCase()
       .normalize('NFD')
       .replace(/[\u0300-\u036f]/g, '')
       .replace(/[^A-Z\s-]/g, '')
-      .trim();
-
-    nombreCodigo = nombreCodigo
+      .trim()
       .replace(/\s+/g, '_')
       .replace(/-+/g, '_')
       .replace(/_+/g, '_');
