@@ -5,7 +5,7 @@ import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger'
 
 @ApiTags('menus') 
 @Controller('menus')
-export class MenuController {
+export class MenuSidebarController {
   constructor(private readonly menuService: MenuService) {}
 
   @Get(':node')
