@@ -10,6 +10,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 import { MenuModule } from './infraestructure/http/menu/menu.module';
 import { AzureModule } from './infraestructure/http/azure/azure.module';
 import { ProfesorModule } from './infraestructure/http/profesor/profesor.module';
+import { ParametersModule } from './infraestructure/http/parameters/parameters.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { ProfesorModule } from './infraestructure/http/profesor/profesor.module'
     IdiomaModule,
     ProfesorModule,
     AzureModule,
+    ParametersModule
   ],
   controllers: [AppController],
   providers: [AppService],
