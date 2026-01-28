@@ -1,7 +1,7 @@
-import { MenuRepository } from 'src/core/repositories/MenuSidebar/menu.repository'
+import { MenuSidebarRepository } from 'src/core/repositories/menu-sidebar/menuSidebar.repository'
 import { MenuNode } from 'src/shared/enums/menu-node.enum'
 import { MenuType } from 'src/shared/enums/menu-type.enum'
-import { MenuResponse } from 'src/core/entities/MenuSidebar/Menu.entity' 
+import { MenuResponse } from 'src/core/entities/menu-sidebar/menuSidebar.entity' 
 
 
 class BadRequestError extends Error {
@@ -19,7 +19,7 @@ class NotFoundError extends Error {
 }
 
 export class GetMenusByNodeUseCase {
-  constructor(private readonly menuRepo: MenuRepository) {}
+  constructor(private readonly menuRepo: MenuSidebarRepository) {}
 
   async execute(node: string): Promise<MenuResponse[]> {
     if (!this.isValidMenuNodeString(node)) {

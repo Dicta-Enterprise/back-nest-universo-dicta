@@ -246,10 +246,6 @@ model ItemColores {
   landingPageId String      @db.ObjectId
 }
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 57b54fa (mejora del sidebar corregida)
 model MenuSidebar {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   name      String

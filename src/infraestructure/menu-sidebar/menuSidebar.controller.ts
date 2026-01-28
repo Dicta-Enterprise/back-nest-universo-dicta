@@ -1,12 +1,12 @@
 import { Controller, Get, HttpCode, HttpStatus, Param, UsePipes, ValidationPipe } from '@nestjs/common'
-import { MenuService } from 'src/core/services/menu-sidebar/menu.service'
+import { MenuSidebarService } from '@services/menu-sidebar/menusidebar.service'
 import { GetMenuParamsDto } from 'src/application/dto/menu-sidebar/get-menu-sidebar-params.dto'
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger'
 
 @ApiTags('menus') 
 @Controller('menus')
 export class MenuSidebarController {
-  constructor(private readonly menuService: MenuService) {}
+  constructor(private readonly menuService: MenuSidebarService) {}
 
   @Get(':node')
   @HttpCode(HttpStatus.OK)

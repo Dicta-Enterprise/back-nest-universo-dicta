@@ -1,10 +1,10 @@
-import { MenuEntity } from 'src/core/entities/menu-sidebar/Menu.entity'
+import { MenuEntity } from 'src/core/entities/menu-sidebar/menuSidebar.entity'
 
-export interface MenuRepository {
+export interface MenuSidebarRepository {
   findByNode(node: string): Promise<MenuEntity[]>
 }
 
-export class PrismaMenuRepository implements MenuRepository {
+export class PrismaMenuSidebarRepository implements MenuSidebarRepository {
   constructor(private prisma: unknown) {}
   
   async findByNode(node: string): Promise<MenuEntity[]> {

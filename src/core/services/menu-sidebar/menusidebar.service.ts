@@ -6,7 +6,7 @@ import { ChildMenuResponseDto, MenuResponseDto } from 'src/application/dto/menu-
 import { MenuSidebar } from '@prisma/client' 
 
 @Injectable()
-export class MenuService {
+export class MenuSidebarService {
   constructor(
     @Inject('MENU_REPOSITORY')
     private readonly menuRepository: MenuRepository,
