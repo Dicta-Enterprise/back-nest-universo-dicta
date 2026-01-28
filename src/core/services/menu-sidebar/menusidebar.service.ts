@@ -5,6 +5,7 @@ import { MenuType } from 'src/shared/enums/menu-type.enum'
 import { ChildMenuResponseDto, MenuResponseDto } from 'src/application/dto/menu-sidebar/menu-response.dto'
 import { MenuSidebar } from '@prisma/client' 
 
+
 @Injectable()
 export class MenuSidebarService {
   constructor(
