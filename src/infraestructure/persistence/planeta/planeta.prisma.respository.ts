@@ -1,26 +1,32 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { PLANETA_FACTORY } from '@constants/factories';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { EstadoGenerico } from '@prisma/client';
 import { PlanetaPaginationDto } from 'src/application/dto/planeta/PlanetaPagination.dto';
 import { Planeta } from 'src/core/entities/planeta/planeta.entity';
+import { PlanetaFactory } from 'src/core/fabricas/planeta/planeta.factory';
 import { PlanetaRepository } from 'src/core/repositories/planeta/planeta.respository';
 import { PrismaService } from 'src/core/services/prisma/prisma.service';
 
 @Injectable()
 export class PlanetaPrismaRepository implements PlanetaRepository {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    @Inject(PLANETA_FACTORY)
+    private readonly planetaFactory: PlanetaFactory,
+  ) {}
 
   async findById(id: string): Promise<Planeta | null> {
     const data = await this.prisma.planeta.findUnique({
       where: { id },
     });
-    return data ? Planeta.fromPrisma(data) : null;
+    return data ? this.planetaFactory.crearDesdePrisma(data) : null;
   }
 
   async findByName(nombre: string): Promise<Planeta | null> {
     const data = await this.prisma.planeta.findUnique({
       where: { nombre },
     });
-    return data ? Planeta.fromPrisma(data) : null;
+    return data ? this.planetaFactory.crearDesdePrisma(data) : null;
   }
 
   async save(planeta: Planeta): Promise<Planeta> {
@@ -28,9 +34,8 @@ export class PlanetaPrismaRepository implements PlanetaRepository {
       data: {
         grupo: planeta.grupo,
         nombre: planeta.nombre,
-        planetaNombre: planeta.planetaNombre,
         tema: planeta.tema,
-        galaxiaId: planeta.galaxiaId,
+        galaxia: { connect: { id: planeta.galaxiaId } },
         textura: planeta.textura,
         url: planeta.url,
         imagenResumen: planeta.imagenResumen,
@@ -67,7 +72,7 @@ export class PlanetaPrismaRepository implements PlanetaRepository {
       },
     });
 
-    return Planeta.fromPrisma(data);
+    return this.planetaFactory.crearDesdePrisma(data);
   }
 
   async findAllActive(
@@ -83,14 +88,14 @@ export class PlanetaPrismaRepository implements PlanetaRepository {
         ...(galaxiaId && { galaxiaId: galaxiaId }),
       },
     });
-    if(!planetas || planetas.length === 0){
+    if (!planetas || planetas.length === 0) {
       throw new NotFoundException(
         galaxiaId
           ? `No existen planetas activos en la galaxia ${galaxiaId}`
           : 'No existen planetas activos',
       );
     }
-    return Planeta.fromPrismaList(planetas);
+    return planetas.map((p) => this.planetaFactory.crearDesdePrisma(p));
   }
 
   async update(id: string, planeta: Partial<Planeta>): Promise<Planeta> {
@@ -99,7 +104,6 @@ export class PlanetaPrismaRepository implements PlanetaRepository {
       data: {
         grupo: planeta.grupo,
         nombre: planeta.nombre,
-        planetaNombre: planeta.planetaNombre,
         tema: planeta.tema,
         galaxiaId: planeta.galaxiaId,
         textura: planeta.textura,
@@ -151,7 +155,7 @@ export class PlanetaPrismaRepository implements PlanetaRepository {
       },
     });
 
-    return Planeta.fromPrisma(data);
+    return this.planetaFactory.crearDesdePrisma(data);
   }
 
   async delete(id: string, estado: EstadoGenerico): Promise<Planeta> {
@@ -159,6 +163,6 @@ export class PlanetaPrismaRepository implements PlanetaRepository {
       where: { id },
       data: { estado },
     });
-    return Planeta.fromPrisma(data);
+    return this.planetaFactory.crearDesdePrisma(data);
   }
 }

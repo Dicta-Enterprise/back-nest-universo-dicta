@@ -1,5 +1,5 @@
-import { LandingPage } from "src/core/entities/landing-page/landing-page.entity";
-import { IDomainEvent } from "src/shared/domain/events/domain-event.interface";
+import { LandingPage } from 'src/core/entities/landing-page/landing-page.entity';
+import { IDomainEvent } from 'src/shared/domain/events/domain-event.interface';
 
 
 

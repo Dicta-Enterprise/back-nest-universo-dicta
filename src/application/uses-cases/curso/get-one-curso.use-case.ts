@@ -1,9 +1,9 @@
-import { Injectable } from "@nestjs/common";
-import { EventEmitter2 } from "@nestjs/event-emitter";
-import { Curso } from "src/core/entities/curso/curso.entity";
-import { CursosService } from "src/core/services/curso/cursos.service";
-import { CursoCreadoEvent } from "src/domain/events/curso/curso-creado.event";
-import { Result } from "src/shared/domain/result/result";
+import { Injectable } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { Curso } from 'src/core/entities/curso/curso.entity';
+import { CursosService } from 'src/core/services/curso/cursos.service';
+import { CursoCreadoEvent } from 'src/domain/events/curso/curso-creado.event';
+import { Result } from 'src/shared/domain/result/result';
 
 @Injectable()
 export class GetOneCursoUseCase{

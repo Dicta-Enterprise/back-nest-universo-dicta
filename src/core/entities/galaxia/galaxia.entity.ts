@@ -1,17 +1,5 @@
 import { Categoria } from '../categoria/categoria.entity';
-
-export class Vector3 {
-  constructor(
-    public x: number,
-    public y: number,
-    public z: number,
-  ) {}
-
-  static fromPrisma(data: any): Vector3 | null {
-    if (!data) return null;
-    return new Vector3(data.x, data.y, data.z);
-  }
-}
+import { VectorGalaxia } from './vector.entity';
 
 export class Galaxia {
   constructor(
@@ -27,30 +15,7 @@ export class Galaxia {
     public categoria: Categoria | null,
     public categoriaId: string,
     public color: string,
-    public posicion: Vector3 | null,
-    public rotacion: Vector3 | null,
+    public posicion: VectorGalaxia | null,
+    public rotacion: VectorGalaxia | null,
   ) {}
-
-  static fromPrisma(data: any): Galaxia {
-    return new Galaxia(
-      data.id,
-      data.nombre,
-      data.descripcion,
-      data.imagen ?? null,
-      data.url ?? null,
-      data.textura ?? null,
-      data.estado,
-      data.fechaCreacion,
-      data.fechaActualizacion,
-      data.categoria ? Categoria.fromPrisma(data.categoria) : null,
-      data.categoriaId,
-      data.color,
-      Vector3.fromPrisma(data.posicion),
-      Vector3.fromPrisma(data.rotacion),
-    );
-  }
-
-  static fromPrismaList(data: any[]): Galaxia[] {
-    return data.map((item) => Galaxia.fromPrisma(item));
-  }
 }

@@ -8,24 +8,30 @@ import * as azureCase from 'src/application/uses-cases/azure';
 import { AzureStorageService } from 'src/core/services/azure/azure-storage.service';
 import { SharedModule } from 'src/shared/shared.module';
 import { PrismaModule } from 'src/core/services/prisma/prisma.module';
+import { CURSO_FACTORY } from '@constants/factories';
+import { DefaultCursoFactory } from 'src/core/fabricas/curso/curso.factory';
 
 @Module({
-  imports:[SharedModule, PrismaModule],
+  imports: [SharedModule, PrismaModule],
   controllers: [CursosController],
   providers: [
     {
       provide: CURSO_REPOSITORY,
       useClass: CursoPrismaRepository,
-  },
-  CursosService,
-  useCase.CreateCursoUseCase,
-  useCase.DeleteCursoUseCase,
-  useCase.GetAllCursoUseCase,
-  useCase.GetOneCursoUseCase,
-  useCase.UpdateCursoUseCase,
-  azureCase.SaveImageStorageUseCase,
-  azureCase.DeleteImageStorageUseCase,
-  AzureStorageService
-],
+    },
+    {
+      provide: CURSO_FACTORY,
+      useClass: DefaultCursoFactory,
+    },
+    CursosService,
+    useCase.CreateCursoUseCase,
+    useCase.DeleteCursoUseCase,
+    useCase.GetAllCursoUseCase,
+    useCase.GetOneCursoUseCase,
+    useCase.UpdateCursoUseCase,
+    azureCase.SaveImageStorageUseCase,
+    azureCase.DeleteImageStorageUseCase,
+    AzureStorageService,
+  ],
 })
 export class CursosModule {}

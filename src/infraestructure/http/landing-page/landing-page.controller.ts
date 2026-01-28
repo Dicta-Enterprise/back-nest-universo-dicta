@@ -9,9 +9,8 @@ import {
   Patch,
   Post,
 } from '@nestjs/common';
-import { ParseObjectIdPipe } from "src/shared/pipes/parse-object-id.pipe";
-import * as useCase from "src/application/uses-cases/landing-page";
-import { Result } from 'src/shared/domain/result/result'
+import { ParseObjectIdPipe } from 'src/shared/pipes/parse-object-id.pipe';
+import * as useCase from 'src/application/uses-cases/landing-page';
 
 // Importar los DTOs correspondientes:
 import { UpdateLandingPageDto } from 'src/application/dto/lading-page/update-landing-page.dto';

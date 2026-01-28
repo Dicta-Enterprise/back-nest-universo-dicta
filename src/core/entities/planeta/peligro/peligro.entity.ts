@@ -7,15 +7,4 @@ export class Peligro {
     public villano?: string,
     public cta?: string,
   ) {}
-
-  static fromPrisma(data: any): Peligro {
-    return new Peligro(
-      data.nombre,
-      data.descripcion,
-      data.nivelRiesgo,
-      data.temperatura,
-      data.villano,
-      data.cta,
-    );
-  }
 }

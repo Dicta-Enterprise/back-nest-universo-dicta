@@ -6,14 +6,26 @@ import { PROFESOR_REPOSITORY } from 'src/core/constants/constants';
 import { ProfesorPrismaRepository } from 'src/infraestructure/persistence/profesor/profesor.prisma.repository';
 import { ProfesorService } from 'src/core/services/profesor/profesor.service';
 import { CreateProfesorUseCase } from 'src/application/uses-cases/profesor/create-profesor.use-case';
-import { DeleteProfesorUseCase, GetAllProfesorUseCase, GetOneProfesorUseCase, UpdateProfesorUseCase } from 'src/application/uses-cases/profesor';
+import {
+  DeleteProfesorUseCase,
+  GetAllProfesorUseCase,
+  GetOneProfesorUseCase,
+  UpdateProfesorUseCase,
+} from 'src/application/uses-cases/profesor';
+import { PROFESOR_FACTORY } from '@constants/factories';
+import { DefaultProfesorFactory } from 'src/core/fabricas/profesor/profesor.factory';
 
 @Module({
-    imports:[SharedModule, PrismaModule],
-    controllers: [ProfesorController],
-    providers:[{
-        provide: PROFESOR_REPOSITORY,
-        useClass: ProfesorPrismaRepository,
+  imports: [SharedModule, PrismaModule],
+  controllers: [ProfesorController],
+  providers: [
+    {
+      provide: PROFESOR_REPOSITORY,
+      useClass: ProfesorPrismaRepository,
+    },
+    {
+      provide: PROFESOR_FACTORY,
+      useClass: DefaultProfesorFactory,
     },
     ProfesorService,
     CreateProfesorUseCase,
@@ -21,8 +33,7 @@ import { DeleteProfesorUseCase, GetAllProfesorUseCase, GetOneProfesorUseCase, Up
     GetOneProfesorUseCase,
     DeleteProfesorUseCase,
     UpdateProfesorUseCase,
-    ],
-    exports:[ProfesorService, PROFESOR_REPOSITORY],
-
+  ],
+  exports: [ProfesorService, PROFESOR_REPOSITORY],
 })
 export class ProfesorModule {}

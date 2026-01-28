@@ -1,4 +1,6 @@
-import { IsString, IsArray, IsOptional, IsBoolean } from 'class-validator';
+import { ItemColores } from '@prisma/client';
+import { IsArray, IsBoolean, IsOptional, IsString } from 'class-validator';
+import { ItemImagenLanding } from 'src/core/entities/landing-page/item-imagen-landing.entity';
 
 export class CreateLandingPageDto {
   @IsString()
@@ -26,6 +28,10 @@ export class CreateLandingPageDto {
 
   @IsString()
   landingUrl: string;
-  itemImagenesLanding: any[];
-  itemColores: any[];
+
+  @IsArray()
+  itemImagenesLanding: ItemImagenLanding[];
+
+  @IsArray()
+  itemColores: ItemColores[];
 }

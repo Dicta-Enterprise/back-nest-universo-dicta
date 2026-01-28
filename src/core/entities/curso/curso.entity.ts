@@ -1,8 +1,6 @@
 import { Beneficio } from './../planeta/beneficio/beneficio.entity';
 import { Categoria } from '../categoria/categoria.entity';
 import { Profesor } from '../profesor/profesor.entity';
-import { Estandar } from '../estandar/estandar.entity';
-import { Planeta } from '../planeta/planeta.entity';
 
 export class Curso {
   constructor(
@@ -21,35 +19,5 @@ export class Curso {
     public profesor?: Profesor,
     public categoria?: Categoria,
     public beneficios?: Beneficio[],
-    /*
-    public idioma: Estandar,
-    public planetas: Planeta,*/
   ) {}
-
-  static fromPrismaList(data: any[]): Curso[] {
-    return data.map((item) => Curso.fromPrisma(item));
-  }
-
-  static fromPrisma(data: any): Curso {
-    return new Curso(
-      data.id,
-      data.nombre,
-      data.descripcion,
-      data.fechaCreacion,
-      data.fechaInicio,
-      data.fechaFinal,
-      data.precio,
-      data.estado,
-      data.imagen,
-      data.duracionSemanas,
-      data.profesorId,
-      data.categoriaId,
-      data.profesor,
-      data.categoria,
-      data.beneficios,
-      /*
-      data.idioma,
-      data.planetas,*/
-    );
-  }
 }

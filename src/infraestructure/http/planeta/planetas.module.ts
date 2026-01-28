@@ -12,6 +12,8 @@ import { PrismaModule } from 'src/core/services/prisma/prisma.module';
 import { PlanetaPrismaRepository } from 'src/infraestructure/persistence/planeta/planeta.prisma.respository';
 import { SharedModule } from 'src/shared/shared.module';
 import { planetasController } from './planetas.controller';
+import { PLANETA_FACTORY } from '@constants/factories';
+import { DefaultPlanetaFactory } from 'src/core/fabricas/planeta/planeta.factory';
 
 @Module({
   imports: [SharedModule, PrismaModule],
@@ -20,6 +22,10 @@ import { planetasController } from './planetas.controller';
     {
       provide: PLANETA_REPOSITORY,
       useClass: PlanetaPrismaRepository,
+    },
+    {
+      provide: PLANETA_FACTORY,
+      useClass: DefaultPlanetaFactory,
     },
     PlanetasService,
     CreatePlanetaUseCase,
