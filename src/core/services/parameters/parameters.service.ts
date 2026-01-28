@@ -15,7 +15,7 @@ export class ParametersService {
 
   constructor(
     private readonly categoriaService: CategoriaService,
-    private readonly galaxiaService: GalaxiasService,
+    private readonly galaxiasService: GalaxiasService,
     private readonly planetaService: PlanetasService,
     private readonly idiomaService: IdiomaService,
     private readonly profesorService: ProfesorService,
@@ -27,16 +27,14 @@ export class ParametersService {
   }
 
   async getGalaxias(): Promise<ParameterItemDto[]> {
-    const galaxias = await this.galaxiaService.ListarGalaxia(
+    const galaxias = await this.galaxiasService.listarGalaxia(
       this.emptyPagination,
     );
-    return this.mapToParameterItem(galaxias, 'nombre', 'GALAXIA');
+    return this.mapToParameterItem(galaxias, 'nombre', 'GALAXIA'); // 'nombre' según tu entidad Galaxia
   }
 
   async getPlanetas(): Promise<ParameterItemDto[]> {
-    const planetas = await this.planetaService.listarPlanetas(
-      this.emptyPagination,
-    );
+    const planetas = await this.planetaService.listarPlanetas(this.emptyPagination);
     return this.mapToParameterItem(planetas, 'nombre', 'PLANETA');
   }
 

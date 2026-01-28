@@ -1,7 +1,7 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Query } from '@nestjs/common';
 import {
   ApiOperation,
-  ApiParam,
+  ApiQuery,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
@@ -13,27 +13,18 @@ import { ParameterItemDto } from 'src/application/dto/parameters/parameter-item.
 @ApiTags('Parámetros')
 @Controller('parameters')
 export class ParametersController {
-  constructor(
-    private readonly parametersService: ParametersService,
-  ) {}
+  constructor(private readonly parametersService: ParametersService) {}
 
   @Get()
-  @ApiOperation({ summary: 'Obtener TODOS los parámetros del sistema' })
-  @ApiResponse({ status: 200 })
-  getAll() {
-    return this.handleGet();
-  }
-
-  @Get(':type')
-  @ApiOperation({ summary: 'Obtener parámetros por tipo' })
-  @ApiParam({
+  @ApiOperation({ summary: 'Obtener parámetros por tipo o todos si no se envía' })
+  @ApiQuery({
     name: 'type',
+    required: false,
     description:
       'DP_CATEGORIAS | DP_GALAXIAS | DP_PLANETAS | DP_IDIOMAS | DP_PROFESORES',
-    example: 'DP_CATEGORIAS',
   })
   @ApiResponse({ status: 200 })
-  getByType(@Param('type') type: string) {
+  async getParameters(@Query('type') type?: string) {
     return this.handleGet(type);
   }
 
