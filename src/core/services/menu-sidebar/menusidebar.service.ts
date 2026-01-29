@@ -1,28 +1,38 @@
-import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common'
-import { MenuRepository } from 'src/core/repositories/menu-sidebar/menu-repository.interface'
+import { BadRequestException, Injectable } from '@nestjs/common' 
+import { PrismaMenuSidebarRepository } from 'src/core/repositories/menu-sidebar/menuSidebar.repository'
 import { MenuNode } from 'src/shared/enums/menu-node.enum'
 import { MenuType } from 'src/shared/enums/menu-type.enum'
 import { ChildMenuResponseDto, MenuResponseDto } from 'src/application/dto/menu-sidebar/menu-response.dto'
-import { MenuSidebar } from '@prisma/client' 
-
+import { MenuSidebar } from '@prisma/client'
 
 @Injectable()
 export class MenuSidebarService {
   constructor(
-    @Inject('MENU_REPOSITORY')
-    private readonly menuRepository: MenuRepository,
+    private readonly menuRepository: PrismaMenuSidebarRepository,
   ) {}
 
   async getMenusByNode(node: string): Promise<MenuResponseDto[]> {
     this.validateMenuNode(node)
+
+    const allActiveMenus = await this.getAllActiveMenus()
+
+    const fathersInNode = allActiveMenus.filter(menu => 
+      menu.typeMenu === 'FATHER' && menu.node === node
+    )
     
-    const menus = await this.menuRepository.findByNode(node)
-    
-    if (!menus.length) {
-      throw new NotFoundException('MENUS_NOT_FOUND')
+    if (fathersInNode.length === 0) {
+      return []
     }
 
-    return this.buildMenuHierarchy(menus)
+    return this.buildMenuHierarchy(fathersInNode, allActiveMenus)
+  }
+
+  private async getAllActiveMenus(): Promise<MenuSidebar[]> {
+
+    const menuParams = await this.menuRepository.findByNode('MENU_PARAMS')
+    const childParams = await this.menuRepository.findByNode('MENU_CHILD_PARAMS')
+    
+    return [...menuParams, ...childParams] as MenuSidebar[]
   }
 
   private validateMenuNode(node: string): void {
@@ -31,9 +41,10 @@ export class MenuSidebarService {
     }
   }
 
-  private buildMenuHierarchy(menus: MenuSidebar[]): MenuResponseDto[] { 
-    const fathers = menus.filter(menu => menu.typeMenu === 'FATHER')
-
+  private buildMenuHierarchy(
+    fathers: MenuSidebar[], 
+    allMenus: MenuSidebar[]
+  ): MenuResponseDto[] {
     return fathers.map((father): MenuResponseDto => ({
       id: father.id,
       icon: father.icon ?? '',
@@ -42,13 +53,20 @@ export class MenuSidebarService {
       typeMenu: father.typeMenu as MenuType,
       code: father.code,
       route: father.route ?? '',
-      children: this.getChildrenForFather(father.id, menus), 
+      children: this.getChildrenForFather(father.id, allMenus), 
     }))
   }
 
-  private getChildrenForFather(fatherId: string, allMenus: MenuSidebar[]): ChildMenuResponseDto[] { 
+  private getChildrenForFather(
+    fatherId: string, 
+    allMenus: MenuSidebar[]
+  ): ChildMenuResponseDto[] {
     return allMenus
-      .filter(menu => menu.parentId === fatherId)
+      .filter(menu => {
+        if (!menu.parentId) return false
+ 
+        return String(menu.parentId) === String(fatherId)
+      })
       .map((child): ChildMenuResponseDto => ({
         id: child.id,
         icon: child.icon ?? '',
@@ -57,7 +75,7 @@ export class MenuSidebarService {
         typeMenu: child.typeMenu as MenuType,
         code: child.code,
         route: child.route ?? '',
-        children: [], 
+        children: [],
       }))
   }
 }

@@ -1,27 +1,43 @@
+
+import { Injectable } from '@nestjs/common'
 import { MenuEntity } from 'src/core/entities/menu-sidebar/menuSidebar.entity'
+import { PrismaService } from 'src/core/services/prisma/prisma.service'
+import { MenuSidebar } from '@prisma/client'
 
 export interface MenuSidebarRepository {
   findByNode(node: string): Promise<MenuEntity[]>
+  findAllActive(): Promise<MenuSidebar[]> 
 }
 
+@Injectable()
 export class PrismaMenuSidebarRepository implements MenuSidebarRepository {
-  constructor(private prisma: unknown) {}
+  constructor(
+    private readonly prisma: PrismaService,
+  ) {}
   
   async findByNode(node: string): Promise<MenuEntity[]> {
-    const prismaClient = this.prisma as {
-      menuSidebar: {
-        findMany: (args: {
-          where: { node: string; active: boolean }
-          orderBy: { order: 'asc' }
-        }) => Promise<unknown[]>
-      }
-    }
-    
-    const data = await prismaClient.menuSidebar.findMany({
-      where: { node, active: true },
-      orderBy: { order: 'asc' },
+    const data = await this.prisma.menuSidebar.findMany({
+      where: { 
+        node, 
+        active: true 
+      },
+      orderBy: { 
+        order: 'asc' 
+      },
     })
     
     return MenuEntity.fromPrismaList(data)
+  }
+  
+
+  async findAllActive(): Promise<MenuSidebar[]> {
+    return this.prisma.menuSidebar.findMany({
+      where: { 
+        active: true 
+      },
+      orderBy: { 
+        order: 'asc' 
+      },
+    })
   }
 }

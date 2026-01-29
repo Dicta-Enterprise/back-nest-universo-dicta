@@ -8,16 +8,10 @@ import { PrismaService } from 'src/core/services/prisma/prisma.service'
   controllers: [MenuSidebarController],
   providers: [
     MenuSidebarService,
-    PrismaService,
-    {
-      provide: 'MENU_REPOSITORY', 
-      useClass: PrismaMenuSidebarRepository, 
-    },
-  
-    {
-      provide: PrismaMenuSidebarRepository, 
-      useClass: PrismaMenuSidebarRepository,
-    },
+    PrismaService, 
+    PrismaMenuSidebarRepository, 
+    
+
   ],
   exports: [MenuSidebarService],
 })
