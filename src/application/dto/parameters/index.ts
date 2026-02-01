@@ -1,2 +1,1 @@
-export * from './parameter-item.dto';
-export * from './parameters-response.dto';
+export * from './parameters.dto';

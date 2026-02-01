@@ -1,89 +1,89 @@
 import { Controller, Get, Query } from '@nestjs/common';
-import {
-  ApiOperation,
-  ApiQuery,
-  ApiResponse,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { GetParametersUseCase, GetParametersWithPaginationUseCase } from 'src/application/uses-cases/parameters/get-all-parameters.use-case';
+import { GetParametersPaginationDto } from 'src/application/dto/parameters/parameters.dto';
 
-import { ParametersService } from '../../../core/services/parameters/parameters.service';
-import { ParametersResponseDto } from 'src/application/dto/parameters/parameters-response.dto';
-import { ParameterItemDto } from 'src/application/dto/parameters/parameter-item.dto';
-
-@ApiTags('Parámetros')
 @Controller('parameters')
+@ApiTags('Parámetros')
 export class ParametersController {
-  constructor(private readonly parametersService: ParametersService) {}
+  constructor(
+    private readonly getParametersUseCase: GetParametersUseCase,
+    private readonly getParametersWithPaginationUseCase: GetParametersWithPaginationUseCase,
+  ) {}
 
   @Get()
-  @ApiOperation({ summary: 'Obtener parámetros por tipo o todos si no se envía' })
+  @ApiOperation({ summary: 'Obtener parámetros del sistema' })
+  @ApiResponse({ status: 200, description: 'Parámetros obtenidos correctamente' })
+  @ApiResponse({ status: 400, description: 'Tipo de parámetro no válido' })
+  @ApiResponse({ status: 500, description: 'Error interno del servidor' })
   @ApiQuery({
     name: 'type',
     required: false,
-    description:
-      'DP_CATEGORIAS | DP_GALAXIAS | DP_PLANETAS | DP_IDIOMAS | DP_PROFESORES',
+    type: String,
+    description: 'Tipo de parámetro a obtener',
+    example: 'DP_CATEGORIAS'
   })
-  @ApiResponse({ status: 200 })
-  async getParameters(@Query('type') type?: string) {
-    return this.handleGet(type);
+  async get(@Query() query: GetParametersPaginationDto) { 
+    const result = await this.getParametersUseCase.execute(query);
+
+    if (result.isFailure) {
+      throw result.error;
+    }
+
+    const data = result.getValue();
+    const message = query.type 
+      ? `Parámetro ${query.type} obtenido correctamente`
+      : 'Todos los parámetros obtenidos correctamente';
+
+    return {
+      status: 'success',
+      message,
+      data,
+    };
   }
 
-  private async handleGet(type?: string): Promise<{
-    status: string;
-    message: string;
-    data: ParametersResponseDto | ParameterItemDto[];
-  }> {
-    if (!type) {
-      const data = await this.parametersService.getAll();
-      return {
-        status: 'success',
-        message: 'Parámetros obtenidos correctamente',
-        data,
-      };
+  @Get('pagination')
+  @ApiOperation({ summary: 'Obtener parámetros del sistema con paginación completa' })
+  @ApiResponse({ status: 200, description: 'Parámetros obtenidos correctamente' })
+  @ApiResponse({ status: 400, description: 'Tipo de parámetro no válido' })
+  @ApiResponse({ status: 500, description: 'Error interno del servidor' })
+  @ApiQuery({
+    name: 'type',
+    required: false,
+    type: String,
+    description: 'Tipo de parámetro a obtener. Si no se especifica, devuelve todos',
+    example: 'DP_CATEGORIAS'
+  })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    type: Number,
+    description: 'Número de página (por defecto: 1)',
+    example: 1
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    description: 'Cantidad de resultados por página (por defecto: 10)',
+    example: 10
+  })
+  async getWithPagination(@Query() query: GetParametersPaginationDto) { 
+    const result = await this.getParametersWithPaginationUseCase.execute(query);
+
+    if (result.isFailure) {
+      throw result.error;
     }
 
-    switch (type.toUpperCase()) {
-      case 'DP_CATEGORIAS':
-        return {
-          status: 'success',
-          message: 'Categorías obtenidas correctamente',
-          data: await this.parametersService.getCategorias(),
-        };
+    const data = result.getValue();
+    const message = query.type 
+      ? `Parámetro ${query.type} obtenido correctamente con paginación`
+      : 'Todos los parámetros obtenidos correctamente con paginación';
 
-      case 'DP_GALAXIAS':
-        return {
-          status: 'success',
-          message: 'Galaxias obtenidas correctamente',
-          data: await this.parametersService.getGalaxias(),
-        };
-
-      case 'DP_PLANETAS':
-        return {
-          status: 'success',
-          message: 'Planetas obtenidos correctamente',
-          data: await this.parametersService.getPlanetas(),
-        };
-
-      case 'DP_IDIOMAS':
-        return {
-          status: 'success',
-          message: 'Idiomas obtenidos correctamente',
-          data: await this.parametersService.getIdiomas(),
-        };
-
-      case 'DP_PROFESORES':
-        return {
-          status: 'success',
-          message: 'Profesores obtenidos correctamente',
-          data: await this.parametersService.getProfesores(),
-        };
-
-      default:
-        return {
-          status: 'error',
-          message: `Tipo '${type}' no válido`,
-          data: [],
-        };
-    }
+    return {
+      status: 'success',
+      message,
+      data,
+    };
   }
 }

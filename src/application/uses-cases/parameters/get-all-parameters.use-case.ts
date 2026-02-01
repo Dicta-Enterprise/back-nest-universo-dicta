@@ -1,29 +1,36 @@
 import { Injectable } from '@nestjs/common';
 import { Result } from 'src/shared/domain/result/result';
-import { ParametersResponseDto } from 'src/application/dto/parameters/parameters-response.dto';
 import { ParametersService } from 'src/core/services/parameters/parameters.service';
+import { Parameters } from 'src/core/entities/parameters/parameters.entity';
+import { GetParametersPaginationDto } from 'src/application/dto/parameters/parameters.dto';
+import { Paginacion } from 'src/core/entities/paginacion/paginacion.entity';
 
 @Injectable()
-export class GetAllParametersUseCase {
+export class GetParametersUseCase {
   constructor(
     private readonly parametersService: ParametersService,
   ) {}
 
-  async execute(): Promise<Result<ParametersResponseDto>> {
+  async execute(query: GetParametersPaginationDto): Promise<Result<Parameters[] | Record<string, Parameters[]>>> {
     try {
-      const response = new ParametersResponseDto();
+      const data = await this.parametersService.getParameters(query?.type);
+      return Result.ok(data);
+    } catch (error) {
+      return Result.fail(error);
+    }
+  }
+}
 
-      response.DP_CATEGORIAS = await this.parametersService.getCategorias();
+@Injectable()
+export class GetParametersWithPaginationUseCase {
+  constructor(
+    private readonly parametersService: ParametersService,
+  ) {}
 
-      response.DP_GALAXIAS = await this.parametersService.getGalaxias();
-
-      response.DP_PLANETAS = await this.parametersService.getPlanetas();
-
-      response.DP_IDIOMAS = await this.parametersService.getIdiomas();
-
-      response.DP_PROFESORES = await this.parametersService.getProfesores();
-
-      return Result.ok(response);
+  async execute(query: GetParametersPaginationDto): Promise<Result<Record<string, Paginacion<Parameters>>>> {
+    try {
+      const data = await this.parametersService.getParametersWithPagination(query);
+      return Result.ok(data);
     } catch (error) {
       return Result.fail(error);
     }
