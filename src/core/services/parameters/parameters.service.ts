@@ -60,12 +60,10 @@ export class ParametersService {
     try {
       const { type, page = 1, limit = 10 } = query;
 
-      // Si no hay tipo, obtener todos los parámetros paginados
       if (!type) {
         return await this.getAllWithPagination(page, limit);
       }
 
-      // Validar el tipo
       const handler = this.paginationHandlers[type.toUpperCase()];
 
       if (!handler) {
@@ -90,12 +88,62 @@ export class ParametersService {
     }
   }
 
+  // Métodos específicos manteniendo la lógica original
+  private async getCategorias(): Promise<Parameters[]> {
+    const categorias: Categoria[] = await this.categoriaService.listarCategorias();
+    return this.transformToParameter(categorias, 'nombre', 'CATE');
+  }
+
+  private async getGalaxias(): Promise<Parameters[]> {
+    const resultado = await this.galaxiasService.listarGalaxia(this.defaultPagination);
+    const galaxias: Galaxia[] = this.extraerDatosDeResultado<Galaxia>(resultado);
+    return this.transformToParameter(galaxias, 'nombre', 'GALA');
+  }
+
+  private async getPlanetas(): Promise<Parameters[]> {
+    const resultado = await this.planetaService.listarPlanetas(this.defaultPagination);
+    const planetas: Planeta[] = this.extraerDatosDeResultado<Planeta>(resultado);
+    return this.transformToParameter(planetas, 'nombre', 'PLAN');
+  }
+
+  private async getIdiomas(): Promise<Parameters[]> {
+    const idiomas: Idioma[] = await this.idiomaService.listarIdiomas();
+    return this.transformToParameter(idiomas, 'nombre', 'IDIO');
+  }
+
+  // Métodos de paginación específicos
+  private async getCategoriasPagination(page: number, limit: number): Promise<Paginacion<Parameters>> {
+    const allCategorias: Categoria[] = await this.categoriaService.listarCategorias();
+    const transformedItems = this.transformToParameter(allCategorias, 'nombre', 'CATE');
+    return this.createPagination(transformedItems, page, limit);
+  }
+
+  private async getGalaxiasPagination(page: number, limit: number): Promise<Paginacion<Parameters>> {
+    const resultado = await this.galaxiasService.listarGalaxia({ page, limit });
+    const galaxias: Galaxia[] = this.extraerDatosDeResultado<Galaxia>(resultado);
+    const transformedItems = this.transformToParameter(galaxias, 'nombre', 'GALA');
+    return this.createPagination(transformedItems, page, limit);
+  }
+
+  private async getPlanetasPagination(page: number, limit: number): Promise<Paginacion<Parameters>> {
+    const resultado = await this.planetaService.listarPlanetas({ page, limit });
+    const planetas: Planeta[] = this.extraerDatosDeResultado<Planeta>(resultado);
+    const transformedItems = this.transformToParameter(planetas, 'nombre', 'PLAN');
+    return this.createPagination(transformedItems, page, limit);
+  }
+
+  private async getIdiomasPagination(page: number, limit: number): Promise<Paginacion<Parameters>> {
+    const allIdiomas: Idioma[] = await this.idiomaService.listarIdiomas();
+    const transformedItems = this.transformToParameter(allIdiomas, 'nombre', 'IDIO');
+    return this.createPagination(transformedItems, page, limit);
+  }
+
   private readonly handlers: Record<string, () => Promise<Parameters[]>> = {
     DP_CATEGORIAS: () => this.getCategorias(),
     DP_GALAXIAS: () => this.getGalaxias(),
     DP_PLANETAS: () => this.getPlanetas(),
     DP_IDIOMAS: () => this.getIdiomas(),
-    DP_PROFESORES: () => this.getProfesores(),
+    DP_PROFESORES: () => this.transformProfesores(),
   };
 
   private readonly paginationHandlers: Record<string, (page: number, limit: number) => Promise<Paginacion<Parameters>>> = {
@@ -107,181 +155,77 @@ export class ParametersService {
   };
 
   private async getAllWithPagination(page: number, limit: number): Promise<Record<string, Paginacion<Parameters>>> {
-    const [
-      categoriasResult,
-      galaxiasResult,
-      planetasResult,
-      idiomasResult,
-      profesoresResult
-    ] = await Promise.all([
+    const results = await Promise.all([
       this.getCategoriasPagination(page, limit),
       this.getGalaxiasPagination(page, limit),
       this.getPlanetasPagination(page, limit),
       this.getIdiomasPagination(page, limit),
-      this.getProfesoresPagination(page, limit)
+      this.getProfesoresPagination(page, limit),
     ]);
 
     return {
-      DP_CATEGORIAS: categoriasResult,
-      DP_GALAXIAS: galaxiasResult,
-      DP_PLANETAS: planetasResult,
-      DP_IDIOMAS: idiomasResult,
-      DP_PROFESORES: profesoresResult,
+      DP_CATEGORIAS: results[0],
+      DP_GALAXIAS: results[1],
+      DP_PLANETAS: results[2],
+      DP_IDIOMAS: results[3],
+      DP_PROFESORES: results[4],
     };
   }
 
   private async getAll(): Promise<Record<string, Parameters[]>> {
-    const [
-      categorias,
-      galaxias,
-      planetas,
-      idiomas,
-      profesores
-    ] = await Promise.all([
+    const results = await Promise.all([
       this.getCategorias(),
       this.getGalaxias(),
       this.getPlanetas(),
       this.getIdiomas(),
-      this.getProfesores()
+      this.transformProfesores(),
     ]);
 
     return {
-      DP_CATEGORIAS: categorias,
-      DP_GALAXIAS: galaxias,
-      DP_PLANETAS: planetas,
-      DP_IDIOMAS: idiomas,
-      DP_PROFESORES: profesores,
+      DP_CATEGORIAS: results[0],
+      DP_GALAXIAS: results[1],
+      DP_PLANETAS: results[2],
+      DP_IDIOMAS: results[3],
+      DP_PROFESORES: results[4],
     };
   }
 
-  private async getCategorias(): Promise<Parameters[]> {
-    const categorias: Categoria[] = await this.categoriaService.listarCategorias();
-    return this.transformToParameter(categorias, 'nombre', 'CATE');
-  }
-
-  private async getCategoriasPagination(page: number, limit: number): Promise<Paginacion<Parameters>> {
-    const allCategorias: Categoria[] = await this.categoriaService.listarCategorias();
-    const transformedItems = this.transformToParameter(allCategorias, 'nombre', 'CATE');
+  private async transformProfesores(): Promise<Parameters[]> {
+    const rawData = await this.profesorService.listarProfesores();
+    const profesores: Profesor[] = this.extraerDatosDeResultado<Profesor>(rawData);
     
-    const total = transformedItems.length;
-    const totalPages = Math.ceil(total / limit);
-    const startIndex = (page - 1) * limit;
-    const endIndex = Math.min(startIndex + limit, total);
-    const paginatedItems = transformedItems.slice(startIndex, endIndex);
-    
-    return new Paginacion<Parameters>(
-      paginatedItems,
-      page,
-      limit,
-      total,
-      totalPages,
-      page < totalPages,
-      page > 1
-    );
-  }
+    return profesores
+      .filter(p => p?.id)
+      .map(p => {
+        const nombreCompleto = [
+          p.nombre,
+          p.apellido_paterno,
+          p.apellido_materno,
+        ]
+          .filter(Boolean)
+          .join(' ');
 
-  private async getGalaxias(): Promise<Parameters[]> {
-    const resultado = await this.galaxiasService.listarGalaxia(this.defaultPagination);
-    const galaxias: Galaxia[] = this.extraerDatosDeResultado<Galaxia>(resultado);
-    return this.transformToParameter(galaxias, 'nombre', 'GALA');
-  }
-
-  private async getGalaxiasPagination(page: number, limit: number): Promise<Paginacion<Parameters>> {
-    const pagination = { page, limit };
-    const resultado = await this.galaxiasService.listarGalaxia(pagination);
-    const galaxias: Galaxia[] = this.extraerDatosDeResultado<Galaxia>(resultado);
-    const transformedItems = this.transformToParameter(galaxias, 'nombre', 'GALA');
-    
-    const total = transformedItems.length;
-    const totalPages = Math.ceil(total / limit);
-    const startIndex = (page - 1) * limit;
-    const endIndex = Math.min(startIndex + limit, total);
-    const paginatedItems = transformedItems.slice(startIndex, endIndex);
-    
-    return new Paginacion<Parameters>(
-      paginatedItems,
-      page,
-      limit,
-      total,
-      totalPages,
-      page < totalPages,
-      page > 1
-    );
-  }
-
-  private async getPlanetas(): Promise<Parameters[]> {
-    const resultado = await this.planetaService.listarPlanetas(this.defaultPagination);
-    const planetas: Planeta[] = this.extraerDatosDeResultado<Planeta>(resultado);
-    return this.transformToParameter(planetas, 'nombre', 'PLAN');
-  }
-
-  private async getPlanetasPagination(page: number, limit: number): Promise<Paginacion<Parameters>> {
-    const pagination = { page, limit };
-    const resultado = await this.planetaService.listarPlanetas(pagination);
-    const planetas: Planeta[] = this.extraerDatosDeResultado<Planeta>(resultado);
-    const transformedItems = this.transformToParameter(planetas, 'nombre', 'PLAN');
-    
-    const total = transformedItems.length;
-    const totalPages = Math.ceil(total / limit);
-    const startIndex = (page - 1) * limit;
-    const endIndex = Math.min(startIndex + limit, total);
-    const paginatedItems = transformedItems.slice(startIndex, endIndex);
-    
-    return new Paginacion<Parameters>(
-      paginatedItems,
-      page,
-      limit,
-      total,
-      totalPages,
-      page < totalPages,
-      page > 1
-    );
-  }
-
-  private async getIdiomas(): Promise<Parameters[]> {
-    const idiomas: Idioma[] = await this.idiomaService.listarIdiomas();
-    return this.transformToParameter(idiomas, 'nombre', 'IDIO');
-  }
-
-  private async getIdiomasPagination(page: number, limit: number): Promise<Paginacion<Parameters>> {
-    const allIdiomas: Idioma[] = await this.idiomaService.listarIdiomas();
-    const transformedItems = this.transformToParameter(allIdiomas, 'nombre', 'IDIO');
-    
-    const total = transformedItems.length;
-    const totalPages = Math.ceil(total / limit);
-    const startIndex = (page - 1) * limit;
-    const endIndex = Math.min(startIndex + limit, total);
-    const paginatedItems = transformedItems.slice(startIndex, endIndex);
-    
-    return new Paginacion<Parameters>(
-      paginatedItems,
-      page,
-      limit,
-      total,
-      totalPages,
-      page < totalPages,
-      page > 1
-    );
-  }
-
-  private async getProfesores(): Promise<Parameters[]> {
-    const resultado = await this.profesorService.listarProfesores();
-    const profesores: Profesor[] = this.extraerDatosDeResultado<Profesor>(resultado);
-    return this.transformProfesores(profesores);
+        return new Parameters(
+          p.id,
+          nombreCompleto,
+          this.generarCodigo('PROF', nombreCompleto),
+        );
+      });
   }
 
   private async getProfesoresPagination(page: number, limit: number): Promise<Paginacion<Parameters>> {
-    const allProfesores = await this.profesorService.listarProfesores();
-    const profesores: Profesor[] = this.extraerDatosDeResultado<Profesor>(allProfesores);
-    const transformedItems = this.transformProfesores(profesores);
-    
-    const total = transformedItems.length;
+    const items = await this.transformProfesores();
+    return this.createPagination(items, page, limit);
+  }
+
+  private createPagination<T>(items: T[], page: number, limit: number): Paginacion<T> {
+    const total = items.length;
     const totalPages = Math.ceil(total / limit);
     const startIndex = (page - 1) * limit;
     const endIndex = Math.min(startIndex + limit, total);
-    const paginatedItems = transformedItems.slice(startIndex, endIndex);
+    const paginatedItems = items.slice(startIndex, endIndex);
     
-    return new Paginacion<Parameters>(
+    return new Paginacion<T>(
       paginatedItems,
       page,
       limit,
@@ -306,26 +250,6 @@ export class ParametersService {
       return [];
     }
     return [];
-  }
-
-  private transformProfesores(profesores: Profesor[]): Parameters[] {
-    return profesores
-      .filter(p => p?.id)
-      .map(p => {
-        const nombreCompleto = [
-          p.nombre,
-          p.apellido_paterno,
-          p.apellido_materno,
-        ]
-          .filter(Boolean)
-          .join(' ');
-
-        return new Parameters(
-          p.id,
-          nombreCompleto,
-          this.generarCodigo('PROF', nombreCompleto),
-        );
-      });
   }
 
   private transformToParameter<T extends { id: string }>(

@@ -1,6 +1,7 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { GetParametersUseCase, GetParametersWithPaginationUseCase } from 'src/application/uses-cases/parameters/get-all-parameters.use-case';
+import { GetParametersUseCase } from 'src/application/uses-cases/parameters/get-all-parameters.use-case';
+import { GetParametersWithPaginationUseCase } from 'src/application/uses-cases/parameters/get-all-parameters-paginacion.use-case';
 import { GetParametersPaginationDto } from 'src/application/dto/parameters/parameters.dto';
 
 @Controller('parameters')
