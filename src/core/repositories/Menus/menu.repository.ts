@@ -1,14 +1,8 @@
-
 import { Injectable } from '@nestjs/common'
 import { MenuEntity } from 'src/core/entities/menu-sidebar/menuSidebar.entity'
 import { PrismaService } from 'src/core/services/prisma/prisma.service'
 import { MenuSidebar } from '@prisma/client'
-
-export interface MenuSidebarRepository {
-  findByNode(node: string): Promise<MenuEntity[]>
-  findAllActive(): Promise<MenuSidebar[]> 
-}
-
+import { MenuSidebarRepository } from 'src/core/repositories/Menus/menu-repository.interface'
 @Injectable()
 export class PrismaMenuSidebarRepository implements MenuSidebarRepository {
   constructor(
@@ -28,8 +22,6 @@ export class PrismaMenuSidebarRepository implements MenuSidebarRepository {
     
     return MenuEntity.fromPrismaList(data)
   }
-  
-
   async findAllActive(): Promise<MenuSidebar[]> {
     return this.prisma.menuSidebar.findMany({
       where: { 

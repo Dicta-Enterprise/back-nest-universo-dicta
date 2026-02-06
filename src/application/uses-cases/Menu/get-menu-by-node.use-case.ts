@@ -1,38 +1,28 @@
-import { BadRequestException, Injectable } from '@nestjs/common' 
-import { PrismaMenuSidebarRepository } from 'src/core/repositories/menu-sidebar/menuSidebar.repository'
+import { BadRequestException, Inject, Injectable} from '@nestjs/common'
+import { MenuSidebarRepository } from 'src/core/repositories/Menus/menu-repository.interface'
 import { MenuNode } from 'src/shared/enums/menu-node.enum'
 import { MenuType } from 'src/shared/enums/menu-type.enum'
-import { ChildMenuResponseDto, MenuResponseDto } from 'src/application/dto/menu-sidebar/menu-response.dto'
+import { ChildMenuResponseDto, MenuResponseDto } from '@dto/Menus/menu-response.dto'
 import { MenuSidebar } from '@prisma/client'
 
 @Injectable()
-export class MenuSidebarService {
+export class GetMenuByNodeUseCase {
   constructor(
-    private readonly menuRepository: PrismaMenuSidebarRepository,
+    @Inject('MENU_SIDEBAR_REPOSITORY')
+    private readonly menuRepository: MenuSidebarRepository,
   ) {}
 
-  async getMenusByNode(node: string): Promise<MenuResponseDto[]> {
+  async execute(node: string): Promise<MenuResponseDto[]> {
     this.validateMenuNode(node)
-
-    const allActiveMenus = await this.getAllActiveMenus()
-
+    const allActiveMenus = await this.menuRepository.findAllActive()
     const fathersInNode = allActiveMenus.filter(menu => 
       menu.typeMenu === 'FATHER' && menu.node === node
     )
-    
     if (fathersInNode.length === 0) {
       return []
     }
 
     return this.buildMenuHierarchy(fathersInNode, allActiveMenus)
-  }
-
-  private async getAllActiveMenus(): Promise<MenuSidebar[]> {
-
-    const menuParams = await this.menuRepository.findByNode('MENU_PARAMS')
-    const childParams = await this.menuRepository.findByNode('MENU_CHILD_PARAMS')
-    
-    return [...menuParams, ...childParams] as MenuSidebar[]
   }
 
   private validateMenuNode(node: string): void {
@@ -64,7 +54,6 @@ export class MenuSidebarService {
     return allMenus
       .filter(menu => {
         if (!menu.parentId) return false
- 
         return String(menu.parentId) === String(fatherId)
       })
       .map((child): ChildMenuResponseDto => ({
