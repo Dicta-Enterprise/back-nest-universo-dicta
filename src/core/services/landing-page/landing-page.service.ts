@@ -1,5 +1,5 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
+import { Inject } from '@nestjs/common';
 import { CreateLandingPageDto } from 'src/application/dto/lading-page/create-landing-page.dto';
 import { UpdateLandingPageDto } from 'src/application/dto/lading-page/update-landing-page.dto';
 import { LANDING_PAGE_REPOSITORY } from 'src/core/constants/constants';
@@ -11,7 +11,7 @@ import { ValidatorService } from 'src/shared/application/validation/validator.se
 @Injectable()
 export class LandingPageService {
   constructor(
-    @InjectModel(LANDING_PAGE_REPOSITORY)
+    @Inject(LANDING_PAGE_REPOSITORY)
     private repository: LandingPageRepository,
     private readonly validator: ValidatorService,
   ) {}
