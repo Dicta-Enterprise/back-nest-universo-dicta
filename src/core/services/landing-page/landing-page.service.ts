@@ -7,6 +7,8 @@ import { LandingPage } from 'src/core/entities/landing-page/landing-page.entity'
 import { LandingPageRepository } from 'src/core/repositories/landing-page/landing-page.repository';
 import { BussinesRuleException } from 'src/shared/domain/exceptions/business-rule.exception';
 import { ValidatorService } from 'src/shared/application/validation/validator.service';
+import { ItemImagenLanding } from 'src/core/entities/landing-page/item-imagen-landing.entity';
+import { ItemColores } from 'src/core/entities/landing-page/item-colores.entity';
 
 @Injectable()
 export class LandingPageService {
@@ -42,8 +44,12 @@ export class LandingPageService {
       dto.landingUrl,
       new Date(),
       new Date(),
-      dto.itemImagenesLanding || [],
-      dto.itemColores || [],
+      (dto.itemImagenesLanding || []).map((img) =>
+        new ItemImagenLanding(null, img.url),
+      ),
+      (dto.itemColores || []).map((color) =>
+        new ItemColores(null, color.color),
+      ),
     );
     return this.repository.save(landingPage);
   }
@@ -83,8 +89,12 @@ export class LandingPageService {
       dto.landingUrl,
       new Date(),
       new Date(),
-      dto.itemImagenesLanding || [],
-      dto.itemColores || [],
+      (dto.itemImagenesLanding || []).map((img) =>
+        new ItemImagenLanding(null, img.url),
+      ),
+      (dto.itemColores || []).map((color) =>
+        new ItemColores(null, color.color),
+      ),
     );
     return this.repository.update(id, landingPage);
   }
