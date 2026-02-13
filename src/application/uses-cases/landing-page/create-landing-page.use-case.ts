@@ -16,16 +16,19 @@ export class CreateLandingPageUseCase {
 
   async execute(
     dto: CreateLandingPageDto,
-    imagenResult: string, 
   ): Promise<Result<LandingPage>> {
-  
-    const createDto = {...dto, imagenUrl: imagenResult,};
-    
+
     try {
-      const landingPage = await this.landingPageService.create(createDto);
-      this.eventEmitter.emit('landingPage.created', new LandingPageEvent(landingPage));
+      const landingPage = await this.landingPageService.create(dto);
+
+      this.eventEmitter.emit(
+        'landingPage.created',
+        new LandingPageEvent(landingPage),
+      );
+
       return Result.ok(landingPage);
-    }catch (error) {
+
+    } catch (error) {
       return Result.fail(error);
     }
   }

@@ -23,9 +23,13 @@ export class LandingPagePrismaRepository implements LandingPageRepository {
   async findById(id: string): Promise<LandingPage | null> {
     const data = await this.prisma.landingPage.findUnique({
       where: { id },
+      include: {
+        itemImagenesLanding: true,
+        itemColores: true,
+      },
     });
 
-    return data ? this.landingPageFactory.crearDesdePrisma(data) : null;
+    return data? this.landingPageFactory.crearDesdePrismaConRelaciones(data): null;
   }
 
   async findBySlug(slug: string): Promise<LandingPage | null> {
@@ -47,10 +51,26 @@ export class LandingPagePrismaRepository implements LandingPageRepository {
         slug: landingPage.slug,
         metaKeywords: landingPage.metaKeywords,
         landingUrl: landingPage.landingUrl,
+
+        itemImagenesLanding: {
+          create: landingPage.itemImagenesLanding.map((img) => ({
+            imagenUrl: img.imagenUrl,
+          })),
+        },
+
+        itemColores: {
+          create: landingPage.itemColores.map((color) => ({
+            color: color.color,
+          })),
+        },
+      },
+      include: {
+        itemImagenesLanding: true,
+        itemColores: true,
       },
     });
 
-    return this.landingPageFactory.crearDesdePrisma(data);
+    return this.landingPageFactory.crearDesdePrismaConRelaciones(data);
   }
 
   async findAllActive(): Promise<LandingPage[]> {
@@ -58,10 +78,14 @@ export class LandingPagePrismaRepository implements LandingPageRepository {
       where: {
         estado: true,
       },
+      include: {
+        itemImagenesLanding: true,
+        itemColores: true,
+      },
     });
 
     return landingPages.map((lp) =>
-      this.landingPageFactory.crearDesdePrisma(lp),
+      this.landingPageFactory.crearDesdePrismaConRelaciones(lp),
     );
   }
 
