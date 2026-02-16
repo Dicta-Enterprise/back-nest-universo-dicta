@@ -5,6 +5,7 @@ export class Galaxia {
   constructor(
     public id: string,
     public nombre: string,
+    public tema: string,
     public descripcion: string,
     public imagen: string | null,
     public url: string | null,

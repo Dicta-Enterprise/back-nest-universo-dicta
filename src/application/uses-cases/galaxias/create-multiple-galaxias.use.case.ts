@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { CreateMultipleGalaxiasDto } from 'src/application/dto/galaxia/create-multiple-galaxias.dto';
+import { CreateMultipleGalaxiasDto } from 'src/application/dto/galaxia/create-multiple-galaxia.dto';
 import { Galaxia } from 'src/core/entities/galaxia/galaxia.entity';
 import { GalaxiasService } from 'src/core/services/galaxia/galaxias.service';
 import { Result } from 'src/shared/domain/result/result';
