@@ -33,7 +33,7 @@ export class GetGalaxiasByCategoriaFor3DUseCase {
           ...galaxia,
           posicion: this.formatPositionFor3D(galaxia.posicion),
           rotacion: this.formatRotationFor3D(galaxia.rotacion),
-          active: galaxia.active ?? true,
+          estado: galaxia.estado?? true,
           categoriaId: galaxia.categoriaId,
           nombre: galaxia.nombre,
           descripcion: galaxia.descripcion,

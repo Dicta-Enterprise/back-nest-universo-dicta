@@ -171,6 +171,7 @@ model Curso {
 model Galaxia {
   id                 String    @id @default(auto()) @map("_id") @db.ObjectId
   nombre             String
+  tema               String
   descripcion        String
   estado             Boolean   @default(true)
   imagen             String?

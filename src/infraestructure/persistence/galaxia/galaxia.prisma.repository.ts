@@ -20,6 +20,7 @@ export class GalaxiaPrismaRepository implements GalaxiaRepository {
     const createData: Prisma.GalaxiaCreateInput = {
       nombre: galaxia.nombre,
       descripcion: galaxia.descripcion,
+      tema: galaxia.tema,
       imagen: galaxia.imagen,
       url: galaxia.url,
       textura: galaxia.textura,
@@ -61,6 +62,7 @@ export class GalaxiaPrismaRepository implements GalaxiaRepository {
         const createData: Prisma.GalaxiaCreateInput = {
           nombre: galaxia.nombre,
           descripcion: galaxia.descripcion,
+          tema: galaxia.tema,
           imagen: galaxia.imagen,
           url: galaxia.url,
           textura: galaxia.textura,
@@ -208,4 +210,14 @@ export class GalaxiaPrismaRepository implements GalaxiaRepository {
   async testConnection(): Promise<void> {
     await this.prisma.galaxia.count();
   }
+
+  async findByCategoriaId(categoriaId: string): Promise<Galaxia[]> {
+    const galaxiasPrisma = await this.prisma.galaxia.findMany({
+      where: { categoriaId },
+      include: { categoria: true },
+    });
+
+    return galaxiasPrisma.map((g) => this.galaxiaFactory.crearDesdePrisma(g));
+  }
+
 }
