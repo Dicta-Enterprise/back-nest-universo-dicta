@@ -114,7 +114,7 @@ export class GalaxiaPrismaRepository implements GalaxiaRepository {
       },
       orderBy: { fechaCreacion: 'desc' },
     });
-    // Validar si no hay resultados
+
     if (!galaxias || galaxias.length === 0) {
       throw new NotFoundException(
         categoriaId

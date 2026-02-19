@@ -12,6 +12,6 @@ export interface GalaxiaRepository {
   findByNombreYCategoria(
     nombre: string,
     categoriaId: string,
-  ): Promise<Galaxia | null>;
+  ): Promise<Galaxia>;
   findByCategoriaId(categoriaId: string): Promise<Galaxia[]>;
 }
