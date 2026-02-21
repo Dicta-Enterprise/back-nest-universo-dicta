@@ -1,5 +1,4 @@
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-
 import { CreateGalaxiaDto } from '../../../application/dto/galaxia/create-galaxia.dto';
 import { UpdateGalaxiaDto } from 'src/application/dto/galaxia/update-galaxia.dto';
 import { GALAXIA_REPOSITORY } from 'src/core/constants/constants';
@@ -11,9 +10,10 @@ import { BussinesRuleException } from 'src/shared/domain/exceptions/business-rul
 import { CategoriaService } from '../categoria/categoria.service';
 import { CreateMultipleGalaxiasDto } from 'src/application/dto/galaxia/create-multiple-galaxia.dto';
 import { GalaxiaPaginationDto } from 'src/application/dto/galaxia';
-import { Galaxia3DResponseDto  } from 'src/application/dto/galaxia/response-galaxia.dto';
+import { Galaxia3DResponseDto } from 'src/application/dto/galaxia/response-galaxia.dto';
 import { GalaxiasPorCategoriaResponseDto } from 'src/application/dto/galaxia/galaxia-por-categoria-response.dto';
 import { plainToInstance } from 'class-transformer';
+import { generarTemaDesdeNombre } from 'src/shared/helper/galaxias.helper';
 
 @Injectable()
 export class GalaxiasService {
@@ -57,9 +57,7 @@ export class GalaxiasService {
       );
     }
 
-    const posicionFormateada = this.ensureObjectFormat(createGalaxiaDto.posicion);
-    const rotacionFormateada = this.ensureObjectFormat(createGalaxiaDto.rotacion);
-    const temaGalaxia = createGalaxiaDto.tema || this.generarTemaDesdeNombre(createGalaxiaDto.nombre);
+    const temaGalaxia = createGalaxiaDto.tema || generarTemaDesdeNombre(createGalaxiaDto.nombre);
 
     const galaxia = new Galaxia(
       null,
@@ -75,8 +73,8 @@ export class GalaxiasService {
       createGalaxiaDto.categoria,
       createGalaxiaDto.categoriaId,
       createGalaxiaDto.color,
-      posicionFormateada,
-      rotacionFormateada,
+      createGalaxiaDto.posicion,
+      createGalaxiaDto.rotacion, 
     );
 
     return this.repository.save(galaxia);
@@ -99,10 +97,7 @@ export class GalaxiasService {
         throw new BussinesRuleException(
           `La categoría con ID ${categoriaId} no existe`,
           HttpStatus.BAD_REQUEST,
-          {
-            categoriaId,
-            codigoError: 'CATEGORIA_NO_ENCONTRADA',
-          },
+          { categoriaId, codigoError: 'CATEGORIA_NO_ENCONTRADA' },
         );
       }
     }
@@ -128,10 +123,8 @@ export class GalaxiasService {
     }
 
     const galaxias: Galaxia[] = galaxiasData.map(galaxiaData => {
-      const posicionFormateada = this.ensureObjectFormat(galaxiaData.posicion);
-      const rotacionFormateada = this.ensureObjectFormat(galaxiaData.rotacion);
       const nombreGalaxia = galaxiaData.nombre || nombreGrupo;
-      const temaGalaxia = galaxiaData.tema || this.generarTemaDesdeNombre(nombreGalaxia);
+      const temaGalaxia = galaxiaData.tema || generarTemaDesdeNombre(nombreGalaxia);
 
       return new Galaxia(
         null,
@@ -147,8 +140,8 @@ export class GalaxiasService {
         galaxiaData.categoria,
         galaxiaData.categoriaId,
         galaxiaData.color,
-        posicionFormateada,
-        rotacionFormateada,
+        galaxiaData.posicion,
+        galaxiaData.rotacion,
       );
     });
 
@@ -160,12 +153,8 @@ export class GalaxiasService {
 
     if (!existe) {
       throw new BussinesRuleException(
-        'No se encontró la galaxia',
+        'Error',
         HttpStatus.NOT_FOUND,
-        {
-          id,
-          codigoError: 'GALAXIA_NO_ENCONTRADA',
-        },
       );
     }
     return existe;
@@ -175,18 +164,11 @@ export class GalaxiasService {
     const galaxia = await this.obtenerGalaxia(id);
     
     return plainToInstance(Galaxia3DResponseDto, {
+      ...galaxia,
       id: galaxia.id,
-      tema: galaxia.tema || this.generarTemaDesdeNombre(galaxia.nombre),
-      color: galaxia.color,
-      posicion: this.formatPositionFor3D(galaxia.posicion),
-      rotacion: this.formatRotationFor3D(galaxia.rotacion),
+      tema: galaxia.tema || generarTemaDesdeNombre(galaxia.nombre),
       active: galaxia.estado,
-      categoriaId: galaxia.categoriaId,
-      nombre: galaxia.nombre,
-      descripcion: galaxia.descripcion,
-      imagen: galaxia.imagen,
-      textura: galaxia.textura,
-      url: galaxia.url,
+      
     }, {
       excludeExtraneousValues: true,
     });
@@ -198,31 +180,18 @@ export class GalaxiasService {
       throw new BussinesRuleException(
         `Categoría con ID ${categoriaId} no encontrada`,
         HttpStatus.NOT_FOUND,
-        {
-          categoriaId,
-          codigoError: 'CATEGORIA_NO_ENCONTRADA',
-        },
       );
     }
 
     const galaxias = await this.repository.findByCategoriaId(categoriaId);
-    
     const galaxiasActivas = galaxias.filter(g => g.estado !== false);
 
     const galaxiasFormateadas = galaxiasActivas.map(galaxia => 
       plainToInstance(Galaxia3DResponseDto, {
+        ...galaxia,
         id: galaxia.id,
-        tema: galaxia.tema || this.generarTemaDesdeNombre(galaxia.nombre),
-        color: galaxia.color,
-        posicion: this.formatPositionFor3D(galaxia.posicion),
-        rotacion: this.formatRotationFor3D(galaxia.rotacion),
+        tema: galaxia.tema || generarTemaDesdeNombre(galaxia.nombre),
         active: galaxia.estado,
-        categoriaId: galaxia.categoriaId,
-        nombre: galaxia.nombre,
-        descripcion: galaxia.descripcion,
-        imagen: galaxia.imagen,
-        textura: galaxia.textura,
-        url: galaxia.url,
       }, {
         excludeExtraneousValues: true,
       })
@@ -242,26 +211,12 @@ export class GalaxiasService {
 
     if (!galaxiaExistente) {
       throw new BussinesRuleException(
-        'No se encontró la galaxia',
+        'Error',
         HttpStatus.NOT_FOUND,
-        {
-          id,
-          codigoError: 'GALAXIA_NO_ENCONTRADA',
-        },
       );
     }
 
-    let posicionFormateada = galaxiaExistente.posicion;
-    if (dto.posicion) {
-      posicionFormateada = this.ensureObjectFormat(dto.posicion);
-    }
-
-    let rotacionFormateada = galaxiaExistente.rotacion;
-    if (dto.rotacion) {
-      rotacionFormateada = this.ensureObjectFormat(dto.rotacion);
-    }
-
-    const temaGalaxia = dto.tema || galaxiaExistente.tema || this.generarTemaDesdeNombre(dto.nombre || galaxiaExistente.nombre);
+    const temaGalaxia = dto.tema || galaxiaExistente.tema || generarTemaDesdeNombre(dto.nombre || galaxiaExistente.nombre);
 
     const galaxiaActualizada = new Galaxia(
       id,
@@ -292,74 +247,11 @@ export class GalaxiasService {
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : 'Error desconocido';
       throw new CustomError(
-        'Error al eliminar la galaxia',
+        'Error',
         message,
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }
 
-  private ensureObjectFormat(value: unknown): { x: number; y: number; z: number } {
-    if (!value) {
-      return { x: 0, y: 0, z: 0 };
-    }
-    
-    if (Array.isArray(value)) {
-      return {
-        x: Number(value[0]) ?? 0,
-        y: Number(value[1]) ?? 0,
-        z: Number(value[2]) ?? 0,
-      };
-    }
-    
-    if (typeof value === 'object' && value !== null) {
-      const v = value as { x?: number; y?: number; z?: number };
-      return {
-        x: v.x ?? 0,
-        y: v.y ?? 0,
-        z: v.z ?? 0,
-      };
-    }
-    
-    return { x: 0, y: 0, z: 0 };
-  }
-
-  private formatPositionFor3D(posicion: unknown): number[] {
-    if (Array.isArray(posicion)) {
-      return posicion as number[];
-    }
-    if (posicion && typeof posicion === 'object') {
-      const p = posicion as { x?: number; y?: number; z?: number };
-      return [
-        p.x ?? 0, 
-        p.y ?? 0, 
-        p.z ?? 0
-      ];
-    }
-    return [0, 0, 0];
-  }
-
-  private formatRotationFor3D(rotacion: unknown): number[] {
-    if (Array.isArray(rotacion)) {
-      return rotacion as number[];
-    }
-    if (rotacion && typeof rotacion === 'object') {
-      const r = rotacion as { x?: number; y?: number; z?: number };
-      return [
-        r.x ?? 0, 
-        r.y ?? 0, 
-        r.z ?? 0
-      ];
-    }
-    return [0, 0, 0];
-  }
-
-  private generarTemaDesdeNombre(nombre: string): string {
-    if (!nombre) return 'galaxia';
-    return nombre.toLowerCase()
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .replace(/\s+/g, '-')
-      .replace(/[^a-z0-9-]/g, '');
-  }
 }

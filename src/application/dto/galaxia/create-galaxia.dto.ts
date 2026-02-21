@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Transform, Type } from 'class-transformer';
+import { plainToInstance, Transform, Type } from 'class-transformer';
 import {
   IsBoolean,
   IsMongoId,
@@ -13,9 +13,10 @@ import { Vector3Dto } from './vector/vector-galaxia.dto';
 import { Categoria } from '@entities/categoria/categoria.entity';
 
 export class CreateGalaxiaDto {
-  @ApiProperty({ example: 'salud-mental', description: 'Tema de la galaxia usado por el motor 3D' })
+@ApiProperty({ example: 'salud-mental', description: 'Tema de la galaxia' })
   @IsString()
-  @Transform(({ value }) => value?.trim())
+  @IsOptional() 
+  @Transform(({ value }) => (value === null ? undefined : value?.trim()))
   tema?: string;
 
   @ApiProperty({ example: 'Salud Emocional', description: 'Nombre visible de la galaxia en ADMIN' })
@@ -54,19 +55,23 @@ export class CreateGalaxiaDto {
     required: true,
   })
   @Transform(({ value }) => {
-    if (!value) return { x: 0, y: 0, z: 0 };
-    if (Array.isArray(value)) {
-      return { 
-        x: value[0] ?? 0, 
-        y: value[1] ?? 0, 
-        z: value[2] ?? 0 
-      };
+    let data = { x: 0, y: 0, z: 0 };
+    if (value) {
+      if (Array.isArray(value)) {
+        data = { 
+          x: Number(value[0]) || 0, 
+          y: Number(value[1]) || 0, 
+          z: Number(value[2]) || 0 
+        };
+      } else if (typeof value === 'object') {
+        data = {
+          x: Number(value.x) || 0,
+          y: Number(value.y) || 0,
+          z: Number(value.z) || 0
+        };
+      }
     }
-    return {
-      x: value.x ?? 0,
-      y: value.y ?? 0,
-      z: value.z ?? 0
-    };
+    return plainToInstance(Vector3Dto, data);
   })
   @ValidateNested()
   @Type(() => Vector3Dto)
@@ -79,19 +84,23 @@ export class CreateGalaxiaDto {
     required: true,
   })
   @Transform(({ value }) => {
-    if (!value) return { x: 0, y: 0, z: 0 };
-    if (Array.isArray(value)) {
-      return { 
-        x: value[0] ?? 0, 
-        y: value[1] ?? 0, 
-        z: value[2] ?? 0 
-      };
+    let data = { x: 0, y: 0, z: 0 };
+    if (value) {
+      if (Array.isArray(value)) {
+        data = { 
+          x: Number(value[0]) || 0, 
+          y: Number(value[1]) || 0, 
+          z: Number(value[2]) || 0 
+        };
+      } else if (typeof value === 'object') {
+        data = {
+          x: Number(value.x) || 0,
+          y: Number(value.y) || 0,
+          z: Number(value.z) || 0
+        };
+      }
     }
-    return {
-      x: value.x ?? 0,
-      y: value.y ?? 0,
-      z: value.z ?? 0
-    };
+    return plainToInstance(Vector3Dto, data);
   })
   @ValidateNested()
   @Type(() => Vector3Dto)
@@ -120,5 +129,4 @@ export class CreateGalaxiaDto {
   @ApiPropertyOptional({ example: new Date(), description: 'Fecha de actualización' })
   @IsOptional()
   fechaActualizacion?: Date;
-
 }

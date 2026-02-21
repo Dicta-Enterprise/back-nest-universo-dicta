@@ -19,6 +19,7 @@ export class DefaultGalaxiaFactory implements GalaxiaFactory {
     return new Galaxia(
       prisma.id,
       prisma.nombre,
+      prisma.tema,
       prisma.descripcion,
       prisma.imagen,
       prisma.url,
@@ -37,6 +38,7 @@ export class DefaultGalaxiaFactory implements GalaxiaFactory {
     return new Galaxia(
       prisma.id,
       prisma.nombre,
+      prisma.tema,
       prisma.descripcion,
       prisma.imagen,
       prisma.url,
