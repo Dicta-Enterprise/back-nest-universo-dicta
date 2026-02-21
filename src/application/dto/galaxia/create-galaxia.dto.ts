@@ -15,7 +15,7 @@ import { Categoria } from '@entities/categoria/categoria.entity';
 export class CreateGalaxiaDto {
 @ApiProperty({ example: 'salud-mental', description: 'Tema de la galaxia' })
   @IsString()
-  @IsOptional() // Permite que sea opcional, pero si viene, lo valida
+  @IsOptional() 
   @Transform(({ value }) => (value === null ? undefined : value?.trim()))
   tema?: string;
 
