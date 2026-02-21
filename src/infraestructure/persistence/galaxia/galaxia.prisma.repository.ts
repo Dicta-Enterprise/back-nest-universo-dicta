@@ -147,6 +147,7 @@ export class GalaxiaPrismaRepository implements GalaxiaRepository {
     const updateData: Prisma.GalaxiaUpdateInput = {
       nombre: galaxia.nombre,
       descripcion: galaxia.descripcion,
+      tema: galaxia.tema,
       imagen: galaxia.imagen,
       url: galaxia.url,
       textura: galaxia.textura,
