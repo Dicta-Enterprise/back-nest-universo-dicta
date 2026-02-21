@@ -30,7 +30,7 @@ export class LandingPageController {
   // Método POST para crear una nueva landing page
   @Post()
   async create(@Body() createDto: CreateLandingPageDto) {
-    const result = await this.createUseCase.execute(createDto, 'landing-page');
+    const result = await this.createUseCase.execute(createDto);
 
     if (result.isFailure) {
       throw new HttpException(

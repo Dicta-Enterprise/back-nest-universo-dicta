@@ -1,5 +1,5 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
+import { Inject } from '@nestjs/common';
 import { CreateLandingPageDto } from 'src/application/dto/lading-page/create-landing-page.dto';
 import { UpdateLandingPageDto } from 'src/application/dto/lading-page/update-landing-page.dto';
 import { LANDING_PAGE_REPOSITORY } from 'src/core/constants/constants';
@@ -7,11 +7,13 @@ import { LandingPage } from 'src/core/entities/landing-page/landing-page.entity'
 import { LandingPageRepository } from 'src/core/repositories/landing-page/landing-page.repository';
 import { BussinesRuleException } from 'src/shared/domain/exceptions/business-rule.exception';
 import { ValidatorService } from 'src/shared/application/validation/validator.service';
+import { ItemImagenLanding } from 'src/core/entities/landing-page/item-imagen-landing.entity';
+import { ItemColores } from 'src/core/entities/landing-page/item-colores.entity';
 
 @Injectable()
 export class LandingPageService {
   constructor(
-    @InjectModel(LANDING_PAGE_REPOSITORY)
+    @Inject(LANDING_PAGE_REPOSITORY)
     private repository: LandingPageRepository,
     private readonly validator: ValidatorService,
   ) {}
@@ -42,8 +44,12 @@ export class LandingPageService {
       dto.landingUrl,
       new Date(),
       new Date(),
-      dto.itemImagenesLanding || [],
-      dto.itemColores || [],
+      (dto.itemImagenesLanding || []).map((img) =>
+        new ItemImagenLanding(null, img.url),
+      ),
+      (dto.itemColores || []).map((color) =>
+        new ItemColores(null, color.color),
+      ),
     );
     return this.repository.save(landingPage);
   }
@@ -83,8 +89,12 @@ export class LandingPageService {
       dto.landingUrl,
       new Date(),
       new Date(),
-      dto.itemImagenesLanding || [],
-      dto.itemColores || [],
+      (dto.itemImagenesLanding || []).map((img) =>
+        new ItemImagenLanding(null, img.url),
+      ),
+      (dto.itemColores || []).map((color) =>
+        new ItemColores(null, color.color),
+      ),
     );
     return this.repository.update(id, landingPage);
   }

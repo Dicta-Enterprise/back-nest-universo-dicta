@@ -232,8 +232,8 @@ export class GalaxiasService {
       galaxiaExistente.categoria,
       dto.categoriaId ?? galaxiaExistente.categoriaId,
       dto.color ?? galaxiaExistente.color,
-      dto.posicion ?? galaxiaExistente.posicion,
-      dto.rotacion ?? galaxiaExistente.rotacion,
+      posicionFormateada,
+      rotacionFormateada,
     );
 
     return this.repository.update(id, galaxiaActualizada);
