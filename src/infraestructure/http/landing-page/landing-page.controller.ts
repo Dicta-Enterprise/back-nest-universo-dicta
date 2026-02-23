@@ -40,7 +40,6 @@ export class LandingPageController {
     }
     
     return {
-      data: result,
       message: 'Landing page creada',
     };
   }
@@ -55,7 +54,7 @@ export class LandingPageController {
     }
 
     return {
-      data: result,
+      data: result.getValue(),
       message: 'Landing pages obtenidas',
     };
   }
@@ -70,7 +69,7 @@ export class LandingPageController {
   }
 
     return {
-      data: result,
+      data: result.getValue(),
       message: 'Landing page obtenida',
     };
   }
@@ -88,7 +87,6 @@ export class LandingPageController {
     }
 
     return {
-      data: result,
       message: 'Landing page actualizada',
     };
   }
@@ -103,7 +101,6 @@ export class LandingPageController {
     }
 
     return {
-      data: result,
       message: 'Landing page eliminada',
     };
   }
