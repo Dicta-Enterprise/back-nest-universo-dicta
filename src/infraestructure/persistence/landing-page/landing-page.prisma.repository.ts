@@ -21,7 +21,7 @@ export class LandingPagePrismaRepository implements LandingPageRepository {
   }
 
   async findById(id: string): Promise<LandingPage | null> {
-    const data = await this.prisma.landingPage.findUnique({
+    const data = await this.prisma.landingPage.findFirst({
       where: { id },
       include: {
         itemImagenesLanding: true,
@@ -33,7 +33,7 @@ export class LandingPagePrismaRepository implements LandingPageRepository {
   }
 
   async findBySlug(slug: string): Promise<LandingPage | null> {
-    const data = await this.prisma.landingPage.findUnique({
+    const data = await this.prisma.landingPage.findFirst({
       where: { slug },
     });
 
@@ -73,11 +73,8 @@ export class LandingPagePrismaRepository implements LandingPageRepository {
     return this.landingPageFactory.crearDesdePrismaConRelaciones(data);
   }
 
-  async findAllActive(): Promise<LandingPage[]> {
+  async findAll(): Promise<LandingPage[]> {
     const landingPages = await this.prisma.landingPage.findMany({
-      where: {
-        estado: true,
-      },
       include: {
         itemImagenesLanding: true,
         itemColores: true,

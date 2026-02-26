@@ -219,12 +219,12 @@ type Color {
 
 model LandingPage {
   id                  String             @id @default(auto()) @map("_id") @db.ObjectId
-  titulo              String             @unique
+  titulo              String             
   descripcion         String
   imagenPrincipal     String
   contenido           String[]
   estado              Boolean            @default(true)
-  slug                String             @unique
+  slug                String             
   metaKeywords        String
   landingUrl          String
   fechaCreacion       DateTime           @default(now())

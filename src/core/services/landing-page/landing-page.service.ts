@@ -21,41 +21,30 @@ export class LandingPageService {
   async create(dto: CreateLandingPageDto): Promise<LandingPage> {
     await this.validator.validate(dto, CreateLandingPageDto);
 
-    const existe = await this.repository.findByTitulo(dto.titulo);
-    if (existe) {
-      throw new BussinesRuleException(
-        'Landing page ya existe con ese título',
-        HttpStatus.BAD_REQUEST,
-        {
-          titulo: dto.titulo,
-          codigoError: 'LANDING_PAGE_DUPLICADA',
-        },
-      );
-    }
     const landingPage = new LandingPage(
       null,
       dto.titulo,
       dto.descripcion,
       dto.imagenPrincipal,
       dto.contenido,
-      dto.estado || true,
+      dto.estado ?? true,
       dto.slug,
       dto.metaKeywords,
       dto.landingUrl,
       new Date(),
       new Date(),
-      (dto.itemImagenesLanding || []).map((img) =>
-        new ItemImagenLanding(null, img.url),
+      (dto.itemImagenesLanding || []).map(
+        (img) => new ItemImagenLanding(null, img.url),
       ),
-      (dto.itemColores || []).map((color) =>
-        new ItemColores(null, color.color),
+      (dto.itemColores || []).map(
+        (color) => new ItemColores(null, color.color),
       ),
     );
     return this.repository.save(landingPage);
   }
 
   async findAll(): Promise<LandingPage[]> {
-    return this.repository.findAllActive();
+    return this.repository.findAll();
   }
 
   async findOne(id: string) {
@@ -77,26 +66,32 @@ export class LandingPageService {
   async update(id: string, dto: UpdateLandingPageDto): Promise<LandingPage> {
     await this.validator.validate(dto, UpdateLandingPageDto);
 
-    const landingPage = new LandingPage(
-      null,
-      dto.titulo,
-      dto.descripcion,
-      dto.imagenPrincipal,
-      dto.contenido,
-      dto.estado || true,
-      dto.slug,
-      dto.metaKeywords,
-      dto.landingUrl,
+    const landingActual = await this.repository.findById(id);
+
+    if (!landingActual) {
+      throw new BussinesRuleException(
+        'Landing no encontrada',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    const landingActualizada = new LandingPage(
+      id,
+      dto.titulo ?? landingActual.titulo,
+      dto.descripcion ?? landingActual.descripcion,
+      dto.imagenPrincipal ?? landingActual.imagenPrincipal,
+      dto.contenido ?? landingActual.contenido,
+      dto.estado ?? landingActual.estado,
+      dto.slug ?? landingActual.slug,
+      dto.metaKeywords ?? landingActual.metaKeywords,
+      dto.landingUrl ?? landingActual.landingUrl,
+      landingActual.fechaCreacion,
       new Date(),
-      new Date(),
-      (dto.itemImagenesLanding || []).map((img) =>
-        new ItemImagenLanding(null, img.url),
-      ),
-      (dto.itemColores || []).map((color) =>
-        new ItemColores(null, color.color),
-      ),
+      landingActual.itemImagenesLanding,
+      landingActual.itemColores,
     );
-    return this.repository.update(id, landingPage);
+
+    return this.repository.update(id, landingActualizada);
   }
 
   async remove(id: string) {
