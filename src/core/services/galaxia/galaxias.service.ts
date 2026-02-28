@@ -14,6 +14,8 @@ import { Galaxia3DResponseDto } from 'src/application/dto/galaxia/response-galax
 import { GalaxiasPorCategoriaResponseDto } from 'src/application/dto/galaxia/galaxia-por-categoria-response.dto';
 import { plainToInstance } from 'class-transformer';
 import { generarTemaDesdeNombre } from 'src/shared/helper/galaxias.helper';
+import { GALAXIA_FACTORY } from '@constants/factories';
+import { GalaxiaFactory } from 'src/core/fabricas/galaxia/galaxia.factory';
 
 @Injectable()
 export class GalaxiasService {
@@ -22,6 +24,8 @@ export class GalaxiasService {
     private repository: GalaxiaRepository,
     private categoriaService: CategoriaService,
     private readonly validator: ValidatorService,
+    @Inject(GALAXIA_FACTORY) private readonly galaxiaFactory: GalaxiaFactory,
+
   ) {}
 
   async crearGalaxia(createGalaxiaDto: CreateGalaxiaDto): Promise<Galaxia> {
@@ -57,7 +61,8 @@ export class GalaxiasService {
       );
     }
 
-    const temaGalaxia = createGalaxiaDto.tema || generarTemaDesdeNombre(createGalaxiaDto.nombre);
+    const temaGalaxia =
+      createGalaxiaDto.tema || generarTemaDesdeNombre(createGalaxiaDto.nombre);
 
     const galaxia = new Galaxia(
       null,
@@ -70,80 +75,26 @@ export class GalaxiasService {
       createGalaxiaDto.estado ?? true,
       createGalaxiaDto.fechaCreacion ?? new Date(),
       createGalaxiaDto.fechaActualizacion ?? new Date(),
-      createGalaxiaDto.categoria,
       createGalaxiaDto.categoriaId,
       createGalaxiaDto.color,
       createGalaxiaDto.posicion,
-      createGalaxiaDto.rotacion, 
+      createGalaxiaDto.rotacion,
     );
 
     return this.repository.save(galaxia);
   }
 
-  async listarGalaxia(galaxiaPaginationDto: GalaxiaPaginationDto): Promise<Galaxia[]> {
+  async listarGalaxia(
+    galaxiaPaginationDto: GalaxiaPaginationDto,
+  ): Promise<Galaxia[]> {
     return this.repository.findAllActive(galaxiaPaginationDto);
   }
 
-  async crearMultiplesGalaxias(dto: CreateMultipleGalaxiasDto): Promise<Galaxia[]> {
-    await this.validator.validate(dto, CreateMultipleGalaxiasDto);
+  async crearMultiplesGalaxias(
+    dto: CreateMultipleGalaxiasDto,
+  ): Promise<Galaxia[]> {
 
-    const { nombre: nombreGrupo, descripcion: descripcionGrupo, galaxias: galaxiasData } = dto;
-    
-    const categoriasIds = [...new Set(galaxiasData.map(g => g.categoriaId))];
-    
-    for (const categoriaId of categoriasIds) {
-      const categoria = await this.categoriaService.obtenerUnaCategoria(categoriaId);
-      if (!categoria) {
-        throw new BussinesRuleException(
-          `La categoría con ID ${categoriaId} no existe`,
-          HttpStatus.BAD_REQUEST,
-          { categoriaId, codigoError: 'CATEGORIA_NO_ENCONTRADA' },
-        );
-      }
-    }
-
-    for (const galaxiaData of galaxiasData) {
-      const nombreGalaxia = galaxiaData.nombre || nombreGrupo;
-      const existe = await this.repository.findByNombreYCategoria(
-        nombreGalaxia,
-        galaxiaData.categoriaId,
-      );
-
-      if (existe) {
-        throw new BussinesRuleException(
-          `Ya existe una galaxia con el mismo nombre ${nombreGalaxia} en la categoría ${galaxiaData.categoriaId}`,
-          HttpStatus.BAD_REQUEST,
-          {
-            nombre: nombreGalaxia,
-            categoriaId: galaxiaData.categoriaId,
-            codigoError: 'GALAXIA_DUPLICADA_EN_CATEGORIA',
-          },
-        );
-      }
-    }
-
-    const galaxias: Galaxia[] = galaxiasData.map(galaxiaData => {
-      const nombreGalaxia = galaxiaData.nombre || nombreGrupo;
-      const temaGalaxia = galaxiaData.tema || generarTemaDesdeNombre(nombreGalaxia);
-
-      return new Galaxia(
-        null,
-        nombreGalaxia,
-        temaGalaxia,
-        galaxiaData.descripcion || descripcionGrupo,
-        galaxiaData.imagen ?? null,
-        galaxiaData.url,
-        galaxiaData.textura,
-        galaxiaData.estado ?? true,
-        new Date(),
-        new Date(),
-        galaxiaData.categoria,
-        galaxiaData.categoriaId,
-        galaxiaData.color,
-        galaxiaData.posicion,
-        galaxiaData.rotacion,
-      );
-    });
+    const galaxias = this.galaxiaFactory.crearRequest(dto);
 
     return this.repository.saveMultiple(galaxias);
   }
@@ -152,30 +103,33 @@ export class GalaxiasService {
     const existe = await this.repository.findById(id);
 
     if (!existe) {
-      throw new BussinesRuleException(
-        'Error',
-        HttpStatus.NOT_FOUND,
-      );
+      throw new BussinesRuleException('Error', HttpStatus.NOT_FOUND);
     }
     return existe;
   }
 
   async obtenerGalaxiaPara3D(id: string): Promise<Galaxia3DResponseDto> {
     const galaxia = await this.obtenerGalaxia(id);
-    
-    return plainToInstance(Galaxia3DResponseDto, {
-      ...galaxia,
-      id: galaxia.id,
-      tema: galaxia.tema || generarTemaDesdeNombre(galaxia.nombre),
-      active: galaxia.estado,
-      
-    }, {
-      excludeExtraneousValues: true,
-    });
+
+    return plainToInstance(
+      Galaxia3DResponseDto,
+      {
+        ...galaxia,
+        id: galaxia.id,
+        tema: galaxia.tema || generarTemaDesdeNombre(galaxia.nombre),
+        active: galaxia.estado,
+      },
+      {
+        excludeExtraneousValues: true,
+      },
+    );
   }
 
-  async obtenerGalaxiasPorCategoriaPara3D(categoriaId: string): Promise<GalaxiasPorCategoriaResponseDto> {
-    const categoria = await this.categoriaService.obtenerUnaCategoria(categoriaId);
+  async obtenerGalaxiasPorCategoriaPara3D(
+    categoriaId: string,
+  ): Promise<GalaxiasPorCategoriaResponseDto> {
+    const categoria =
+      await this.categoriaService.obtenerUnaCategoria(categoriaId);
     if (!categoria) {
       throw new BussinesRuleException(
         `Categoría con ID ${categoriaId} no encontrada`,
@@ -184,17 +138,21 @@ export class GalaxiasService {
     }
 
     const galaxias = await this.repository.findByCategoriaId(categoriaId);
-    const galaxiasActivas = galaxias.filter(g => g.estado !== false);
+    const galaxiasActivas = galaxias.filter((g) => g.estado !== false);
 
-    const galaxiasFormateadas = galaxiasActivas.map(galaxia => 
-      plainToInstance(Galaxia3DResponseDto, {
-        ...galaxia,
-        id: galaxia.id,
-        tema: galaxia.tema || generarTemaDesdeNombre(galaxia.nombre),
-        active: galaxia.estado,
-      }, {
-        excludeExtraneousValues: true,
-      })
+    const galaxiasFormateadas = galaxiasActivas.map((galaxia) =>
+      plainToInstance(
+        Galaxia3DResponseDto,
+        {
+          ...galaxia,
+          id: galaxia.id,
+          tema: galaxia.tema || generarTemaDesdeNombre(galaxia.nombre),
+          active: galaxia.estado,
+        },
+        {
+          excludeExtraneousValues: true,
+        },
+      ),
     );
 
     return {
@@ -210,13 +168,13 @@ export class GalaxiasService {
     const galaxiaExistente = await this.repository.findById(id);
 
     if (!galaxiaExistente) {
-      throw new BussinesRuleException(
-        'Error',
-        HttpStatus.NOT_FOUND,
-      );
+      throw new BussinesRuleException('Error', HttpStatus.NOT_FOUND);
     }
 
-    const temaGalaxia = dto.tema || galaxiaExistente.tema || generarTemaDesdeNombre(dto.nombre || galaxiaExistente.nombre);
+    const temaGalaxia =
+      dto.tema ||
+      galaxiaExistente.tema ||
+      generarTemaDesdeNombre(dto.nombre || galaxiaExistente.nombre);
 
     const galaxiaActualizada = new Galaxia(
       id,
@@ -229,11 +187,10 @@ export class GalaxiasService {
       dto.estado ?? galaxiaExistente.estado,
       galaxiaExistente.fechaCreacion,
       new Date(),
-      galaxiaExistente.categoria,
       dto.categoriaId ?? galaxiaExistente.categoriaId,
       dto.color ?? galaxiaExistente.color,
-      posicionFormateada,
-      rotacionFormateada,
+      dto.posicion,
+      dto.rotacion,
     );
 
     return this.repository.update(id, galaxiaActualizada);
@@ -245,13 +202,9 @@ export class GalaxiasService {
     try {
       return await this.repository.delete(id, false);
     } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : 'Error desconocido';
-      throw new CustomError(
-        'Error',
-        message,
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      const message =
+        error instanceof Error ? error.message : 'Error desconocido';
+      throw new CustomError('Error', message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
-
 }
