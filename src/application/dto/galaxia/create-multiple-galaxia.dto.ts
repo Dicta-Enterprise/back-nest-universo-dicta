@@ -6,39 +6,50 @@ import {
   IsBoolean,
   IsMongoId,
   IsNotEmpty,
-  IsOptional,
   IsString,
   IsUrl,
   ValidateNested,
 } from 'class-validator';
 import { Vector3Dto } from './vector/vector-galaxia.dto';
-import { Categoria } from '@entities/categoria/categoria.entity';
 
 export class GalaxiaDataDto {
-  @ApiPropertyOptional({ example: 'salud-mental', description: 'Tema de la galaxia para motor 3D' })
+  @ApiPropertyOptional({
+    example: 'salud-mental',
+    description: 'Tema de la galaxia para motor 3D',
+  })
   @IsString()
-  @IsOptional()
-  tema?: string;
+  @IsNotEmpty()
+  tema: string;
 
-  @ApiPropertyOptional({ example: 'Salud Social 1', description: 'Nombre individual de la galaxia (opcional, hereda del grupo si no se especifica)' })
+  @ApiPropertyOptional({
+    example: 'Salud Social 1',
+    description:
+      'Nombre individual de la galaxia (opcional, hereda del grupo si no se especifica)',
+  })
   @IsString()
-  @IsOptional()
-  nombre?: string;
+  @IsNotEmpty()
+  nombre: string;
 
-  @ApiPropertyOptional({ example: 'Descripción específica de esta galaxia', description: 'Descripción individual (opcional, hereda del grupo)' })
+  @ApiPropertyOptional({
+    example: 'Descripción específica de esta galaxia',
+    description: 'Descripción individual (opcional, hereda del grupo)',
+  })
   @IsString()
-  @IsOptional()
-  descripcion?: string;
+  @IsNotEmpty()
+  descripcion: string;
 
-  @ApiProperty({ example: '689e130abb9772d4bb7b983f', description: 'ID de la categoría' })
+  @ApiProperty({
+    example: '689e130abb9772d4bb7b983f',
+    description: 'ID de la categoría',
+  })
   @IsMongoId()
   @IsNotEmpty()
   categoriaId: string;
 
   @ApiPropertyOptional({ example: null, nullable: true })
   @IsString()
-  @IsOptional()
-  imagen?: string | null;
+  @IsNotEmpty()
+  imagen: string | null;
 
   @ApiProperty({ example: 'https://example.com/salud-social' })
   @IsUrl()
@@ -57,7 +68,7 @@ export class GalaxiaDataDto {
 
   @ApiProperty({ example: true, default: true })
   @IsBoolean()
-  @IsOptional()
+  @IsNotEmpty()
   estado?: boolean;
 
   @ApiProperty({ example: { x: -13, y: 1, z: 3 } })
@@ -71,23 +82,9 @@ export class GalaxiaDataDto {
   @Type(() => Vector3Dto)
   @IsNotEmpty()
   rotacion: Vector3Dto;
-
-  @ApiProperty({ example: 'Jovenes', description: 'Categoría a la que pertenece la galaxia' })
-  @IsNotEmpty()
-  categoria: Categoria;
 }
 
 export class CreateMultipleGalaxiasDto {
-  @ApiProperty({ example: 'Salud Social', description: 'Nombre del grupo de galaxias (se usará como nombre base para cada galaxia si no tienen nombre individual)' })
-  @IsString()
-  @IsNotEmpty()
-  nombre: string;
-
-  @ApiProperty({ example: 'Galaxia sobre relaciones interpersonales y comunidad', description: 'Descripción del grupo (se usará como descripción base para cada galaxia si no tienen descripción individual)' })
-  @IsString()
-  @IsNotEmpty()
-  descripcion: string;
-
   @ApiProperty({
     type: [GalaxiaDataDto],
     description: 'Array de galaxias a crear',
@@ -105,8 +102,8 @@ export class CreateMultipleGalaxiasDto {
         tema: 'salud-social-infantil',
         estado: true,
         categoria: 'Jovenes',
-      }
-    ]
+      },
+    ],
   })
   @IsArray()
   @ValidateNested({ each: true })

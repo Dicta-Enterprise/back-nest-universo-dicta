@@ -1,4 +1,3 @@
-import { Categoria } from '../categoria/categoria.entity';
 import { VectorGalaxia } from './vector.entity';
 
 export class Galaxia {
@@ -13,7 +12,6 @@ export class Galaxia {
     public estado: boolean,
     public fechaCreacion: Date,
     public fechaActualizacion: Date,
-    public categoria: Categoria | null,
     public categoriaId: string,
     public color: string,
     public posicion: VectorGalaxia | null,
