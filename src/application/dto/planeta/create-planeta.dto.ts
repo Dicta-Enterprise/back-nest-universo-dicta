@@ -1,13 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Transform, Type } from 'class-transformer';
+import {  Type } from 'class-transformer';
 import {
   IsArray,
-  IsDate,
   IsEnum,
   IsMongoId,
   IsNotEmpty,
   IsOptional,
   IsString,
+  IsUrl,
   ValidateNested,
 } from 'class-validator';
 import { InfoPlanetaDto } from './Informacion/infoPlanetaDto';
@@ -22,7 +22,6 @@ export class CreatePlanetaDto {
   })
   @IsString()
   @IsNotEmpty()
-  @Transform(({ value }) => value?.trim())
   nombre: string;
 
   @ApiProperty({
@@ -31,16 +30,7 @@ export class CreatePlanetaDto {
   })
   @IsString()
   @IsNotEmpty()
-  @Transform(({ value }) => value?.trim())
-  grupo: string;
-
-  @ApiProperty({
-    example: 'Calmito el mejor',
-    description: 'Nombre específico del planeta en el universo',
-  })
-  @IsString()
-  @IsNotEmpty()
-  @Transform(({ value }) => value?.trim())
+  categoria: string;
 
 
   @ApiProperty({
@@ -49,8 +39,7 @@ export class CreatePlanetaDto {
   })
   @IsString()
   @IsNotEmpty()
-  @Transform(({ value }) => value?.trim())
-  tema: string;
+  galaxia: string;
 
   @ApiProperty({
     example: '/assets/2k_neptune.jpg',
@@ -58,16 +47,14 @@ export class CreatePlanetaDto {
   })
   @IsString()
   @IsNotEmpty()
-  @Transform(({ value }) => value?.trim())
   textura: string;
 
   @ApiProperty({
-    example: '/galaxia/ninos/salud-mental/calmito',
+    example: 'https://images.unsplash.com/photo-1581822261290-991b38693d1b?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8YXN0cm9uYXV0fGVufDB8fDB8fHww',
     description: 'URL del planeta',
   })
-  @IsString()
+  @IsUrl()
   @IsNotEmpty()
-  @Transform(({ value }) => value?.trim())
   url: string;
 
   @ApiProperty({
@@ -76,17 +63,8 @@ export class CreatePlanetaDto {
   })
   @IsString()
   @IsNotEmpty()
-  @Transform(({ value }) => value?.trim())
   imagenResumen: string;
 
-  @ApiProperty({
-    example: 'https://tn.com.ar/resizer/v2/cual-es-el-sueldo-de-un-astronauta-de-la-nasa-foto-adobestock-OVP5HZHY7NHB3PWLAVL5ARG66A.png?auth=a3e77c7ff1be7c62dfc79ca3276dbc43d99ec81620644ed5637f4993c154dad4&width=767',
-    description: 'URL de la imagen de beneficios del planeta',
-  })
-  @IsString()
-  @IsNotEmpty()
-  @Transform(({ value }) => value?.trim())
-  imagenBeneficios: string;
 
   @ApiProperty({
     example: 'Este curso te llevará a través de los conceptos básicos y avanzados del planeta Kio, explorando: Geografía única, clima extremo y desafíos tecnológicos.',
@@ -94,7 +72,6 @@ export class CreatePlanetaDto {
   })
   @IsString()
   @IsNotEmpty()
-  @Transform(({ value }) => value?.trim())
   resumenCurso: string;
 
   @ApiProperty({
@@ -166,33 +143,12 @@ export class CreatePlanetaDto {
   @IsOptional()
   beneficios?: BeneficioDto[];
 
-  @ApiProperty({
-    example: '2025-10-01T10:30:00.000Z',
-    description: 'Fecha de creación del planeta',
-    type: Date,
-    required: false,
-  })
-  @IsDate()
-  @IsOptional()
-  @Type(() => Date)
-  fechaCreacion?: Date;
 
   @ApiProperty({
-    example: '2025-10-01T10:30:00.000Z',
-    description: 'Fecha de última actualización del planeta',
-    type: Date,
-    required: false,
-  })
-  @IsDate()
-  @IsOptional()
-  @Type(() => Date)
-  fechaActualizacion?: Date;
-
-  @ApiProperty({
-    example: '64f27cdb7b97a2e89f2f7c12',
+    example: '6997c5ad82bdf1267be250a6',
     description: 'ID de la galaxia a la que pertenece el planeta (ObjectId de MongoDB)',
   })
-  @IsMongoId({ message: 'El campo GalaxiaId debe ser un ID de Mongo válido' })
-  @IsNotEmpty({ message: 'La Galaxia es obligatoria' })
+  @IsMongoId()
+  @IsNotEmpty()
   galaxiaId: string;
 }

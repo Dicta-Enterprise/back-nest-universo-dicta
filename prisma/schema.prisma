@@ -99,20 +99,16 @@ model Profesor {
 
 model Planeta {
   id                 String         @id @default(auto()) @map("_id") @db.ObjectId
-  grupo              String
+  categoria             String
   nombre             String         @unique
   estado             EstadoGenerico @default(ACTIVO)
-  tema               String
   textura            String
   url                String
   imagenResumen      String
-  imagenBeneficios   String
   resumenCurso       String
   info               InfoPlaneta?
   peligros           Peligro[]
   beneficios         Beneficio[]
-  fechaCreacion      DateTime       @default(now())
-  fechaActualizacion DateTime       @updatedAt
   galaxia            Galaxia        @relation(fields: [galaxiaId], references: [id])
   galaxiaId          String         @db.ObjectId
   cursos             Curso[]

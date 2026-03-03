@@ -1,3 +1,4 @@
+import { CreateMultiplesPlanetaDto } from '@dto/planeta/crear-multiples-planetas.dto';
 import {
   Body,
   Controller,
@@ -32,6 +33,7 @@ export class planetasController {
     private getOnePlanetaUseCase: useCase.GetOnePlanetaUseCase,
     private updatePlanetaUseCase: useCase.UpdatePlanetaUseCase,
     private deletePlanetaUseCase: useCase.DeletePlanetaUseCase,
+    private createMultiplePlanetaUseCase: useCase.CreateMultiplePlanetaUseCase,
   ) {}
 
   @Post()
@@ -54,6 +56,15 @@ export class planetasController {
       message: 'Planeta creado',
     };
   }
+@Post('multiples')
+@ApiOperation({ summary: 'Crear múltiples planetas a la vez' })
+async crearPlanetas(@Body() multiplesDto: CreateMultiplesPlanetaDto) {
+  const planetas = await this.createMultiplePlanetaUseCase.execute(multiplesDto.planetas);
+  return {
+    data: planetas,
+    message: 'Planetas creados',
+  };
+}
 
   @Get()
   @ApiOperation({ summary: 'Listar todos los planetas activos' })
