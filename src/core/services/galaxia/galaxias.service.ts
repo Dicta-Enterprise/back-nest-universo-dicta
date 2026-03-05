@@ -100,13 +100,20 @@ export class GalaxiasService {
   }
 
   async obtenerGalaxia(id: string): Promise<Galaxia> {
-    const existe = await this.repository.findById(id);
+  const existe = await this.repository.findById(id);
 
-    if (!existe) {
-      throw new BussinesRuleException('Error', HttpStatus.NOT_FOUND);
-    }
-    return existe;
+  if (!existe) {
+    throw new BussinesRuleException(
+      `La galaxia con ID ${id} no existe`,  
+      HttpStatus.NOT_FOUND,
+      {
+        id,
+        codigoError: 'GALAXIA_NO_ENCONTRADA',
+      },
+    );
   }
+  return existe;
+}
 
   async obtenerGalaxiaPara3D(id: string): Promise<Galaxia3DResponseDto> {
     const galaxia = await this.obtenerGalaxia(id);
