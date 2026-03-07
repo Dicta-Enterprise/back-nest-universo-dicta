@@ -1,20 +1,22 @@
 import { LandingPage } from '@entities/landing-page/landing-page.entity';
 import { Prisma, LandingPage as PrismaLandingPage } from '@prisma/client';
+import { ItemImagenLanding } from '@entities/landing-page/item-imagen-landing.entity';
+import { ItemColores } from '@entities/landing-page/item-colores.entity';
 
-type LandingPageConCursos = Prisma.LandingPageGetPayload<{
+type LandingPageConRelaciones = Prisma.LandingPageGetPayload<{
   include: {
-    itemColores: {
-      select: { color: true };
-    };
+    itemColores: true;
+    itemImagenesLanding: true;
   };
 }>;
 
 export interface LandingPageFactory {
   crearDesdePrisma(prisma: PrismaLandingPage): LandingPage;
-  crearDesdePrismaConCursos(prisma: LandingPageConCursos): LandingPage;
+  crearDesdePrismaConRelaciones(prisma: LandingPageConRelaciones): LandingPage;
 }
 
 export class DefaultLandingPageFactory implements LandingPageFactory {
+
   crearDesdePrisma(prisma: PrismaLandingPage): LandingPage {
     return new LandingPage(
       prisma.id,
@@ -28,11 +30,12 @@ export class DefaultLandingPageFactory implements LandingPageFactory {
       prisma.landingUrl,
       prisma.fechaCreacion,
       prisma.fechaActualizacion,
-      null,
-      null,
+      [],
+      [],
     );
   }
-  crearDesdePrismaConCursos(prisma: LandingPageConCursos): LandingPage {
+
+  crearDesdePrismaConRelaciones(prisma: LandingPageConRelaciones): LandingPage {
     return new LandingPage(
       prisma.id,
       prisma.titulo,
@@ -45,8 +48,18 @@ export class DefaultLandingPageFactory implements LandingPageFactory {
       prisma.landingUrl,
       prisma.fechaCreacion,
       prisma.fechaActualizacion,
-      null,
-      null,
+      prisma.itemImagenesLanding.map(
+        (img) => new ItemImagenLanding(
+          img.id,
+          img.imagenUrl
+        )
+      ),
+      prisma.itemColores.map(
+        (color) => new ItemColores(
+          color.id,
+          color.color
+        )
+      ),
     );
   }
 }
