@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import {
+  CreateMultiplePlanetaUseCase,
   CreatePlanetaUseCase,
   DeletePlanetaUseCase,
   GetAllPlanetaUseCase,
@@ -14,10 +15,11 @@ import { SharedModule } from 'src/shared/shared.module';
 import { planetasController } from './planetas.controller';
 import { PLANETA_FACTORY } from '@constants/factories';
 import { DefaultPlanetaFactory } from 'src/core/fabricas/planeta/planeta.factory';
+import { GalaxiasModule } from '@controllers/galaxia/galaxias.module';
 
 @Module({
-  imports: [SharedModule, PrismaModule],
-  controllers: [planetasController],
+  imports: [SharedModule, PrismaModule,GalaxiasModule],
+  controllers: [planetasController],  
   providers: [
     {
       provide: PLANETA_REPOSITORY,
@@ -33,6 +35,7 @@ import { DefaultPlanetaFactory } from 'src/core/fabricas/planeta/planeta.factory
     GetOnePlanetaUseCase,
     UpdatePlanetaUseCase,
     DeletePlanetaUseCase,
+    CreateMultiplePlanetaUseCase,
   ],
   exports: [PlanetasService],
 })

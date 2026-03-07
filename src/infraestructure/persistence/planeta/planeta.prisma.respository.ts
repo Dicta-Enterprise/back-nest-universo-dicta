@@ -7,6 +7,8 @@ import { PlanetaFactory } from 'src/core/fabricas/planeta/planeta.factory';
 import { PlanetaRepository } from 'src/core/repositories/planeta/planeta.respository';
 import { PrismaService } from 'src/core/services/prisma/prisma.service';
 
+const galaxiaInclude = { galaxia: { select: { nombre: true } } } as const;
+
 @Injectable()
 export class PlanetaPrismaRepository implements PlanetaRepository {
   constructor(
@@ -18,6 +20,7 @@ export class PlanetaPrismaRepository implements PlanetaRepository {
   async findById(id: string): Promise<Planeta | null> {
     const data = await this.prisma.planeta.findUnique({
       where: { id },
+      include: galaxiaInclude,
     });
     return data ? this.planetaFactory.crearDesdePrisma(data) : null;
   }
@@ -25,6 +28,7 @@ export class PlanetaPrismaRepository implements PlanetaRepository {
   async findByName(nombre: string): Promise<Planeta | null> {
     const data = await this.prisma.planeta.findUnique({
       where: { nombre },
+      include: galaxiaInclude,
     });
     return data ? this.planetaFactory.crearDesdePrisma(data) : null;
   }
@@ -32,14 +36,12 @@ export class PlanetaPrismaRepository implements PlanetaRepository {
   async save(planeta: Planeta): Promise<Planeta> {
     const data = await this.prisma.planeta.create({
       data: {
-        grupo: planeta.grupo,
         nombre: planeta.nombre,
-        tema: planeta.tema,
+        categoria: planeta.categoria,
         galaxia: { connect: { id: planeta.galaxiaId } },
         textura: planeta.textura,
         url: planeta.url,
         imagenResumen: planeta.imagenResumen,
-        imagenBeneficios: planeta.imagenBeneficios,
         resumenCurso: planeta.resumenCurso,
         estado: planeta.estado ?? EstadoGenerico.ACTIVO,
 
@@ -70,6 +72,7 @@ export class PlanetaPrismaRepository implements PlanetaRepository {
           descripcion: b.descripcion,
         })),
       },
+      include: galaxiaInclude,
     });
 
     return this.planetaFactory.crearDesdePrisma(data);
@@ -85,9 +88,11 @@ export class PlanetaPrismaRepository implements PlanetaRepository {
       take: limit,
       where: {
         estado: EstadoGenerico.ACTIVO,
-        ...(galaxiaId && { galaxiaId: galaxiaId }),
+        ...(galaxiaId && { galaxiaId }),
       },
+      include: galaxiaInclude,
     });
+
     if (!planetas || planetas.length === 0) {
       throw new NotFoundException(
         galaxiaId
@@ -95,6 +100,7 @@ export class PlanetaPrismaRepository implements PlanetaRepository {
           : 'No existen planetas activos',
       );
     }
+
     return planetas.map((p) => this.planetaFactory.crearDesdePrisma(p));
   }
 
@@ -102,14 +108,11 @@ export class PlanetaPrismaRepository implements PlanetaRepository {
     const data = await this.prisma.planeta.update({
       where: { id },
       data: {
-        grupo: planeta.grupo,
         nombre: planeta.nombre,
-        tema: planeta.tema,
         galaxiaId: planeta.galaxiaId,
         textura: planeta.textura,
         url: planeta.url,
         imagenResumen: planeta.imagenResumen,
-        imagenBeneficios: planeta.imagenBeneficios,
         resumenCurso: planeta.resumenCurso,
         estado: planeta.estado,
 
@@ -153,6 +156,7 @@ export class PlanetaPrismaRepository implements PlanetaRepository {
                 })),
               },
       },
+      include: galaxiaInclude,
     });
 
     return this.planetaFactory.crearDesdePrisma(data);
@@ -162,6 +166,7 @@ export class PlanetaPrismaRepository implements PlanetaRepository {
     const data = await this.prisma.planeta.update({
       where: { id },
       data: { estado },
+      include: galaxiaInclude,
     });
     return this.planetaFactory.crearDesdePrisma(data);
   }

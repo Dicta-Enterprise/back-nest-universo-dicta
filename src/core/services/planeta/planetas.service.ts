@@ -4,11 +4,11 @@ import { CreatePlanetaDto } from 'src/application/dto/planeta/create-planeta.dto
 import { PlanetaPaginationDto } from 'src/application/dto/planeta/PlanetaPagination.dto';
 import { UpdatePlanetaDto } from 'src/application/dto/planeta/update-planeta.dto';
 import { PLANETA_REPOSITORY } from 'src/core/constants/constants';
-import { InfoPlaneta } from 'src/core/entities/planeta/infoPlaneta/infoPlaneta.entity';
 import { Planeta } from 'src/core/entities/planeta/planeta.entity';
 import { PlanetaRepository } from 'src/core/repositories/planeta/planeta.respository';
 import { ValidatorService } from 'src/shared/application/validation/validator.service';
 import { BussinesRuleException } from 'src/shared/domain/exceptions/business-rule.exception';
+import { GalaxiasService } from 'src/core/services/galaxia/galaxias.service';
 
 @Injectable()
 export class PlanetasService {
@@ -16,6 +16,7 @@ export class PlanetasService {
     @Inject(PLANETA_REPOSITORY)
     private repository: PlanetaRepository,
     private readonly validator: ValidatorService,
+    private readonly galaxiasService: GalaxiasService,
   ) {}
 
   async crearPlaneta(dtoPlaneta: CreatePlanetaDto): Promise<Planeta> {
@@ -32,37 +33,33 @@ export class PlanetasService {
         },
       );
     }
+    const galaxia = await this.galaxiasService.obtenerGalaxia(dtoPlaneta.galaxiaId);
+    if (!galaxia) {
+      throw new BussinesRuleException(
+        `La galaxia con ID ${dtoPlaneta.galaxiaId} no existe`,
+        HttpStatus.BAD_REQUEST,
+        {
+          galaxiaId: dtoPlaneta.galaxiaId,
+          codigoError: 'GALAXIA_NO_ENCONTRADA',
+        },
+      );
+    }
 
-    const info = dtoPlaneta.info
-      ? new InfoPlaneta(
-          dtoPlaneta.info.tipoRiesgo,
-          dtoPlaneta.info.tamano,
-          dtoPlaneta.info.composicion,
-          dtoPlaneta.info.riesgo,
-          dtoPlaneta.info.nivel,
-          dtoPlaneta.info.ambiente,
-          dtoPlaneta.info.temperatura,
-          dtoPlaneta.info.villano,
-        )
-      : null;
 
     const planeta = new Planeta(
-      null, // id
+      null,
       dtoPlaneta.nombre,
-      dtoPlaneta.grupo,
-      dtoPlaneta.tema,
+      dtoPlaneta.categoria,
+      galaxia.nombre,
       dtoPlaneta.textura,
       dtoPlaneta.url,
       dtoPlaneta.imagenResumen,
-      dtoPlaneta.imagenBeneficios,
       dtoPlaneta.resumenCurso,
       dtoPlaneta.estado ?? EstadoGenerico.ACTIVO,
-      info,
+      dtoPlaneta.galaxiaId,
+      dtoPlaneta.info,
       dtoPlaneta.peligros ?? [],
       dtoPlaneta.beneficios ?? [],
-      new Date(),
-      new Date(),
-      dtoPlaneta.galaxiaId,
     );
 
     return this.repository.save(planeta);
@@ -123,36 +120,33 @@ export class PlanetasService {
         },
       );
     }
-    const info = dtoPlaneta.info
-      ? new InfoPlaneta(
-          dtoPlaneta.info.tipoRiesgo,
-          dtoPlaneta.info.tamano,
-          dtoPlaneta.info.composicion,
-          dtoPlaneta.info.riesgo,
-          dtoPlaneta.info.nivel,
-          dtoPlaneta.info.ambiente,
-          dtoPlaneta.info.temperatura,
-          dtoPlaneta.info.villano,
-        )
-      : null;
+
+        const galaxia = await this.galaxiasService.obtenerGalaxia(dtoPlaneta.galaxiaId);
+    if (!galaxia) {
+      throw new BussinesRuleException(
+        `La galaxia con ID ${dtoPlaneta.galaxiaId} no existe`,
+        HttpStatus.BAD_REQUEST,
+        {
+          galaxiaId: dtoPlaneta.galaxiaId,
+          codigoError: 'GALAXIA_NO_ENCONTRADA',
+        },
+      );
+    }
 
     const planeta = new Planeta(
-      null, // id (lo maneja Prisma)
+      null,
       dtoPlaneta.nombre,
-      dtoPlaneta.grupo,
-      dtoPlaneta.tema,
+      dtoPlaneta.categoria,
+      dtoPlaneta.galaxia,
       dtoPlaneta.textura,
       dtoPlaneta.url,
       dtoPlaneta.imagenResumen,
-      dtoPlaneta.imagenBeneficios,
       dtoPlaneta.resumenCurso,
       dtoPlaneta.estado ?? EstadoGenerico.ACTIVO,
-      info,
+      dtoPlaneta.galaxiaId,
+      dtoPlaneta.info,
       dtoPlaneta.peligros ?? [],
       dtoPlaneta.beneficios ?? [],
-      new Date(),
-      new Date(),
-      dtoPlaneta.galaxiaId,
     );
 
     return this.repository.update(id, planeta);
