@@ -20,20 +20,11 @@ export class PlanetasService {
   ) {}
 
   async crearPlaneta(dtoPlaneta: CreatePlanetaDto): Promise<Planeta> {
+
     await this.validator.validate(dtoPlaneta, CreatePlanetaDto);
 
-    const existe = await this.repository.findByName(dtoPlaneta.nombre);
-    if (existe) {
-      throw new BussinesRuleException(
-        `El planeta con el nombre ${dtoPlaneta.nombre} ya existe en esta galaxia `,
-        HttpStatus.BAD_REQUEST,
-        {
-          nombre: dtoPlaneta.nombre,
-          codigoError: 'PLANETA_DUPLICADO',
-        },
-      );
-    }
     const galaxia = await this.galaxiasService.obtenerGalaxia(dtoPlaneta.galaxiaId);
+
     if (!galaxia) {
       throw new BussinesRuleException(
         `La galaxia con ID ${dtoPlaneta.galaxiaId} no existe`,
@@ -44,7 +35,6 @@ export class PlanetasService {
         },
       );
     }
-
 
     const planeta = new Planeta(
       null,
@@ -108,20 +98,34 @@ export class PlanetasService {
     id: string,
     dtoPlaneta: UpdatePlanetaDto,
   ): Promise<Planeta> {
+
     await this.validator.validate(dtoPlaneta, UpdatePlanetaDto);
-    const existe = await this.repository.findByName(dtoPlaneta.nombre);
-    if (existe) {
+
+    const planetaExistente = await this.repository.findById(id);
+
+    if (!planetaExistente) {
       throw new BussinesRuleException(
-        `No puedes editar el planeta. Ya existe otro con el nombre ${dtoPlaneta.nombre} en esta galaxia`,
-        HttpStatus.BAD_REQUEST,
+        'El planeta no existe.',
+        HttpStatus.NOT_FOUND,
         {
-          nombre: dtoPlaneta.nombre,
-          codigoError: 'PLANETA_DUPLICADO',
+          id: id,
+          codigoError: 'PLANETA_NO_ENCONTRADO',
         },
       );
     }
 
-        const galaxia = await this.galaxiasService.obtenerGalaxia(dtoPlaneta.galaxiaId);
+    if (!dtoPlaneta.galaxiaId) {
+      throw new BussinesRuleException(
+        'Debe enviar galaxiaId para actualizar el planeta',
+        HttpStatus.BAD_REQUEST,
+        {
+          codigoError: 'GALAXIA_ID_REQUERIDO',
+        },
+      );
+    }
+
+    const galaxia = await this.galaxiasService.obtenerGalaxia(dtoPlaneta.galaxiaId);
+
     if (!galaxia) {
       throw new BussinesRuleException(
         `La galaxia con ID ${dtoPlaneta.galaxiaId} no existe`,
@@ -134,19 +138,19 @@ export class PlanetasService {
     }
 
     const planeta = new Planeta(
-      null,
-      dtoPlaneta.nombre,
-      dtoPlaneta.categoria,
-      dtoPlaneta.galaxia,
-      dtoPlaneta.textura,
-      dtoPlaneta.url,
-      dtoPlaneta.imagenResumen,
-      dtoPlaneta.resumenCurso,
-      dtoPlaneta.estado ?? EstadoGenerico.ACTIVO,
+      id,
+      dtoPlaneta.nombre ?? planetaExistente.nombre,
+      dtoPlaneta.categoria ?? planetaExistente.categoria,
+      galaxia.nombre,
+      dtoPlaneta.textura ?? planetaExistente.textura,
+      dtoPlaneta.url ?? planetaExistente.url,
+      dtoPlaneta.imagenResumen ?? planetaExistente.imagenResumen,
+      dtoPlaneta.resumenCurso ?? planetaExistente.resumenCurso,
+      dtoPlaneta.estado ?? planetaExistente.estado,
       dtoPlaneta.galaxiaId,
-      dtoPlaneta.info,
-      dtoPlaneta.peligros ?? [],
-      dtoPlaneta.beneficios ?? [],
+      dtoPlaneta.info ?? planetaExistente.info,
+      dtoPlaneta.peligros ?? planetaExistente.peligros,
+      dtoPlaneta.beneficios ?? planetaExistente.beneficios,
     );
 
     return this.repository.update(id, planeta);

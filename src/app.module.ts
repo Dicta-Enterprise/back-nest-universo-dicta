@@ -23,7 +23,7 @@ import { LandingPageModule } from './infraestructure/http/landing-page/landing-p
     IdiomaModule,
     ProfesorModule,
     AzureModule,
-    ParametersModule
+    ParametersModule,
     MenuModule,
     LandingPageModule
   ],
