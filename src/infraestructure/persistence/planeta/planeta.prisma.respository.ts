@@ -18,7 +18,8 @@ export class PlanetaPrismaRepository implements PlanetaRepository {
   ) {}
 
   async findById(id: string): Promise<Planeta | null> {
-    const data = await this.prisma.planeta.findUnique({
+    if (!id) return null;
+    const data = await this.prisma.planeta.findFirst({
       where: { id },
       include: galaxiaInclude,
     });
@@ -26,7 +27,7 @@ export class PlanetaPrismaRepository implements PlanetaRepository {
   }
 
   async findByName(nombre: string): Promise<Planeta | null> {
-    const data = await this.prisma.planeta.findUnique({
+    const data = await this.prisma.planeta.findFirst({
       where: { nombre },
       include: galaxiaInclude,
     });
