@@ -31,23 +31,6 @@ export class GalaxiasService {
   async crearGalaxia(createGalaxiaDto: CreateGalaxiaDto): Promise<Galaxia> {
     await this.validator.validate(createGalaxiaDto, CreateGalaxiaDto);
 
-    const existe = await this.repository.findByNombreYCategoria(
-      createGalaxiaDto.nombre,
-      createGalaxiaDto.categoriaId,
-    );
-
-    if (existe) {
-      throw new BussinesRuleException(
-        'Ya existe una galaxia con ese nombre en la misma categoría',
-        HttpStatus.BAD_REQUEST,
-        {
-          nombre: createGalaxiaDto.nombre,
-          categoriaId: createGalaxiaDto.categoriaId,
-          codigoError: 'GALAXIA_DUPLICADA_EN_CATEGORIA',
-        },
-      );
-    }
-
     const categoria = await this.categoriaService.obtenerUnaCategoria(
       createGalaxiaDto.categoriaId,
     );
