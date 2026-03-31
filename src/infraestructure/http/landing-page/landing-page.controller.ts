@@ -40,6 +40,7 @@ export class LandingPageController {
     }
     
     return {
+      data: result.getValue(), 
       message: 'Landing page creada',
     };
   }
@@ -54,7 +55,7 @@ export class LandingPageController {
     }
 
     return {
-      data: result.getValue(),
+      data: result.getValue(), 
       message: 'Landing pages obtenidas',
     };
   }
@@ -64,12 +65,12 @@ export class LandingPageController {
   async findOne(@Param('id', ParseObjectIdPipe) id: string) {
     const result = await this.getOneUseCase.execute(id);
 
-  if (result.isFailure) {
-    throw new HttpException(result.error.message, HttpStatus.BAD_REQUEST);
-  }
+    if (result.isFailure) {
+      throw new HttpException(result.error.message, HttpStatus.BAD_REQUEST);
+    }
 
     return {
-      data: result.getValue(),
+      data: result.getValue(), 
       message: 'Landing page obtenida',
     };
   }
@@ -87,6 +88,7 @@ export class LandingPageController {
     }
 
     return {
+      data: result.getValue(), 
       message: 'Landing page actualizada',
     };
   }
@@ -101,6 +103,7 @@ export class LandingPageController {
     }
 
     return {
+      data: result.getValue(), 
       message: 'Landing page eliminada',
     };
   }
