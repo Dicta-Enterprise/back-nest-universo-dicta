@@ -100,7 +100,8 @@ model Profesor {
 model Planeta {
   id                 String         @id @default(auto()) @map("_id") @db.ObjectId
   categoria          String
-  nombre             String         
+  nombre             String
+  codigo             String         @unique         
   estado             EstadoGenerico @default(ACTIVO)
   textura            String
   url                String

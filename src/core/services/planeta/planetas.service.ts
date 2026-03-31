@@ -20,8 +20,19 @@ export class PlanetasService {
   ) {}
 
   async crearPlaneta(dtoPlaneta: CreatePlanetaDto): Promise<Planeta> {
-
     await this.validator.validate(dtoPlaneta, CreatePlanetaDto);
+
+    const planetaExistente = await this.repository.findByCodigo(dtoPlaneta.codigo);
+    if (planetaExistente) {
+      throw new BussinesRuleException(
+        `El código ${dtoPlaneta.codigo} ya está en uso`,
+        HttpStatus.BAD_REQUEST,
+        {
+          codigo: dtoPlaneta.codigo,
+          codigoError: 'CODIGO_DUPLICADO',
+        },
+      );
+    }
 
     const galaxia = await this.galaxiasService.obtenerGalaxia(dtoPlaneta.galaxiaId);
 
@@ -38,6 +49,7 @@ export class PlanetasService {
 
     const planeta = new Planeta(
       null,
+      dtoPlaneta.codigo,
       dtoPlaneta.nombre,
       dtoPlaneta.categoria,
       galaxia.nombre,
@@ -98,7 +110,6 @@ export class PlanetasService {
     id: string,
     dtoPlaneta: UpdatePlanetaDto,
   ): Promise<Planeta> {
-
     await this.validator.validate(dtoPlaneta, UpdatePlanetaDto);
 
     const planetaExistente = await this.repository.findById(id);
@@ -112,6 +123,20 @@ export class PlanetasService {
           codigoError: 'PLANETA_NO_ENCONTRADO',
         },
       );
+    }
+
+    if (dtoPlaneta.codigo && dtoPlaneta.codigo !== planetaExistente.codigo) {
+      const planetaConCodigo = await this.repository.findByCodigo(dtoPlaneta.codigo);
+      if (planetaConCodigo) {
+        throw new BussinesRuleException(
+          `El código ${dtoPlaneta.codigo} ya está en uso`,
+          HttpStatus.BAD_REQUEST,
+          {
+            codigo: dtoPlaneta.codigo,
+            codigoError: 'CODIGO_DUPLICADO',
+          },
+        );
+      }
     }
 
     if (!dtoPlaneta.galaxiaId) {
@@ -139,6 +164,7 @@ export class PlanetasService {
 
     const planeta = new Planeta(
       id,
+      dtoPlaneta.codigo ?? planetaExistente.codigo,
       dtoPlaneta.nombre ?? planetaExistente.nombre,
       dtoPlaneta.categoria ?? planetaExistente.categoria,
       galaxia.nombre,

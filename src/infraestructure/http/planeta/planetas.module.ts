@@ -18,8 +18,8 @@ import { DefaultPlanetaFactory } from 'src/core/fabricas/planeta/planeta.factory
 import { GalaxiasModule } from '@controllers/galaxia/galaxias.module';
 
 @Module({
-  imports: [SharedModule, PrismaModule,GalaxiasModule],
-  controllers: [planetasController],  
+  imports: [SharedModule, PrismaModule, GalaxiasModule],
+  controllers: [planetasController],
   providers: [
     {
       provide: PLANETA_REPOSITORY,

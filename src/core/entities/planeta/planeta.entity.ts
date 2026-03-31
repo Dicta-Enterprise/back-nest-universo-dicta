@@ -6,6 +6,7 @@ import { Beneficio } from './beneficio/beneficio.entity';
 export class Planeta {
   constructor(
     public id: string,
+    public codigo: string,
     public nombre: string,
     public categoria: string,
     public galaxia: string,
@@ -18,6 +19,5 @@ export class Planeta {
     public info: InfoPlaneta,
     public peligros: Peligro[],
     public beneficios: Beneficio[],
-
   ) {}
 }

@@ -18,6 +18,7 @@ export class DefaultPlanetaFactory implements PlanetaFactory {
   crearDesdePrisma(prisma: PlanetaConGalaxia): Planeta {
     return new Planeta(
       prisma.id,
+      prisma.codigo,
       prisma.nombre,
       prisma.categoria,
       prisma.galaxia.nombre,
@@ -36,6 +37,7 @@ export class DefaultPlanetaFactory implements PlanetaFactory {
   crearDesdePrismaConGalaxias(prisma: PlanetaConGalaxia): Planeta {
     return new Planeta(
       prisma.id,
+      prisma.codigo,
       prisma.nombre,
       prisma.categoria,
       prisma.galaxia.nombre,
