@@ -44,8 +44,8 @@ export class planetasController {
     status: 400,
     description: 'Datos inválidos o planeta duplicado.',
   })
-  async create(@Body() dto: dto.CreatePlanetaDto) {
-    const result = await this.createUseCase.execute(dto);
+  async create(@Body() createDto: dto.CreatePlanetaDto) {
+    const result = await this.createUseCase.execute(createDto);
 
     if (result.isFailure) {
       throw new HttpException(result.error.message, HttpStatus.BAD_REQUEST);
@@ -56,15 +56,21 @@ export class planetasController {
       message: 'Planeta creado',
     };
   }
-@Post('multiples')
-@ApiOperation({ summary: 'Crear múltiples planetas a la vez' })
-async crearPlanetas(@Body() multiplesDto: CreateMultiplesPlanetaDto) {
-  const planetas = await this.createMultiplePlanetaUseCase.execute(multiplesDto.planetas);
-  return {
-    data: planetas,
-    message: 'Planetas creados',
-  };
-}
+
+  @Post('multiples')
+  @ApiOperation({ summary: 'Crear múltiples planetas a la vez' })
+  async crearPlanetas(@Body() multiplesDto: CreateMultiplesPlanetaDto) {
+    const result = await this.createMultiplePlanetaUseCase.execute(multiplesDto.planetas);
+
+    if (result.isFailure) {
+      throw new HttpException(result.error.message, HttpStatus.BAD_REQUEST);
+    }
+
+    return {
+      data: result.getValue(),
+      message: 'Planetas creados exitosamente',
+    };
+  }
 
   @Get()
   @ApiOperation({ summary: 'Listar todos los planetas activos' })
@@ -94,15 +100,14 @@ async crearPlanetas(@Body() multiplesDto: CreateMultiplesPlanetaDto) {
     example: '66cf2c6a2df0a0135b7c0c1e',
   })
   async getAll(@Query() planetaPaginationDto: PlanetaPaginationDto) {
-    const result =
-      await this.getAllPlanetaUseCase.execute(planetaPaginationDto);
+    const result = await this.getAllPlanetaUseCase.execute(planetaPaginationDto);
 
     if (result.isFailure) {
       throw new HttpException(result.error.message, HttpStatus.BAD_REQUEST);
     }
 
     return {
-      data: result,
+      data: result.getValue(),
       message: 'Planetas obtenidos',
     };
   }
@@ -123,12 +128,12 @@ async crearPlanetas(@Body() multiplesDto: CreateMultiplesPlanetaDto) {
     const result = await this.getOnePlanetaUseCase.execute(id);
 
     if (result.isFailure) {
-      throw new HttpException(result.error.message, HttpStatus.BAD_REQUEST);
+      throw new HttpException(result.error.message, HttpStatus.NOT_FOUND);
     }
 
     return {
-      data: result,
-      message: 'Planeta obtenida',
+      data: result.getValue(),
+      message: 'Planeta obtenido',
     };
   }
 
@@ -159,7 +164,7 @@ async crearPlanetas(@Body() multiplesDto: CreateMultiplesPlanetaDto) {
     }
 
     return {
-      data: result,
+      data: result.getValue(),
       message: 'Planeta actualizado',
     };
   }
@@ -177,12 +182,12 @@ async crearPlanetas(@Body() multiplesDto: CreateMultiplesPlanetaDto) {
     const result = await this.deletePlanetaUseCase.execute(id);
 
     if (result.isFailure) {
-      throw new HttpException(result.error.message, HttpStatus.BAD_REQUEST);
+      throw new HttpException(result.error.message, HttpStatus.NOT_FOUND);
     }
 
     return {
-      data: result,
-      message: 'Planeta eliminada',
+      data: result.getValue(),
+      message: 'Planeta eliminado',
     };
   }
 }

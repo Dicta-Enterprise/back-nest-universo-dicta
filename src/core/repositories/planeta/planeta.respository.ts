@@ -4,6 +4,7 @@ import { Planeta } from 'src/core/entities/planeta/planeta.entity';
 
 export interface PlanetaRepository {
   findById(id: string): Promise<Planeta | null>;
+  findByCodigo(codigo: string): Promise<Planeta | null>;
   findByName(nombre: string): Promise<Planeta | null>;
   findAllActive(planetaPaginationDto: PlanetaPaginationDto): Promise<Planeta[]>;
   save(planeta: Planeta): Promise<Planeta>;

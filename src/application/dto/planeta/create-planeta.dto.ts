@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {  Type } from 'class-transformer';
+import { Type } from 'class-transformer';
 import {
   IsArray,
   IsEnum,
@@ -17,6 +17,14 @@ import { EstadoGenerico } from '@prisma/client';
 
 export class CreatePlanetaDto {
   @ApiProperty({
+    example: 'PLAN-001',
+    description: 'Código único del planeta',
+  })
+  @IsString()
+  @IsNotEmpty()
+  codigo: string;
+
+  @ApiProperty({
     example: 'Planeta de Comunicación Asertiva',
     description: 'Nombre del planeta',
   })
@@ -31,7 +39,6 @@ export class CreatePlanetaDto {
   @IsString()
   @IsNotEmpty()
   categoria: string;
-
 
   @ApiProperty({
     example: 'SALUD_MENTAL',
@@ -64,7 +71,6 @@ export class CreatePlanetaDto {
   @IsString()
   @IsNotEmpty()
   imagenResumen: string;
-
 
   @ApiProperty({
     example: 'Este curso te llevará a través de los conceptos básicos y avanzados del planeta Kio, explorando: Geografía única, clima extremo y desafíos tecnológicos.',
@@ -142,7 +148,6 @@ export class CreatePlanetaDto {
   @Type(() => BeneficioDto)
   @IsOptional()
   beneficios?: BeneficioDto[];
-
 
   @ApiProperty({
     example: '6997c5ad82bdf1267be250a6',
