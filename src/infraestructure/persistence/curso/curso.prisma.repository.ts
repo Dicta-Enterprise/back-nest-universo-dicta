@@ -109,6 +109,8 @@ export class CursoPrismaRepository implements CursoRepository {
         data: {
           nombre: curso.nombre,
           descripcion: curso.descripcion,
+          resumenDescripcion: curso.resumenDescripcion,  
+          valoracion: curso.valoracion ?? 0,              
           beneficios: curso.beneficios,
           fechaInicio: curso.fechaInicio,
           fechaFinal: curso.fechaFinal,
@@ -172,6 +174,8 @@ export class CursoPrismaRepository implements CursoRepository {
       const dataUpdate: Record<string, unknown> = {
         nombre: curso.nombre,
         descripcion: curso.descripcion,
+        resumenDescripcion: curso.resumenDescripcion,  
+        valoracion: curso.valoracion,                   
         beneficios: curso.beneficios,
         fechaInicio: curso.fechaInicio,
         fechaFinal: curso.fechaFinal,

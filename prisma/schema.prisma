@@ -144,13 +144,15 @@ model Curso {
   id              String      @id @default(auto()) @map("_id") @db.ObjectId
   nombre          String      @unique
   descripcion     String
+  resumenDescripcion String?   
+  valoracion      Float?      @default(0) 
   beneficios      Beneficio[]
   fechaCreacion   DateTime    @default(now())
   fechaInicio     DateTime?
   fechaFinal      DateTime?
   precio          Float
   estado          Boolean     @default(true)
-  imagen          String      @unique
+  imagen          String      
   duracionSemanas Float?
 
   profesor    Profesor?  @relation(fields: [profesorId], references: [id])
