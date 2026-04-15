@@ -57,6 +57,36 @@ export class CreateCursoDto {
   descripcion: string;
 
   @ApiProperty({
+    example: 'Curso completo de matemáticas básicas para principiantes',
+    description: 'Resumen breve del curso para mostrar en tarjetas.'
+  })
+  @MinLength(10, { message: 'El resumen debe tener al menos 10 caracteres.' })
+  @MaxLength(200, { message: 'El resumen debe tener menos de 200 caracteres.' })
+  @IsString({ message: 'El resumen debe ser un dato de tipo String.' })
+  @IsOptional()
+  @Matches(/^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9 .,:;()\-]+$/, {
+    message: 'El resumen solo puede contener letras, números y signos básicos',
+  })
+  resumenDescripcion?: string;
+
+  @ApiProperty({
+    example: 4.5,
+    description: 'Valoración del curso (0-5)',
+    minimum: 0,
+    maximum: 5
+  })
+  @Min(0, { message: 'La valoración debe ser mayor o igual a 0.' })
+  @Max(5, { message: 'La valoración debe ser menor o igual a 5.' })
+  @IsNumber({}, { message: 'La valoración debe ser un valor de tipo Number.' })
+  @IsOptional()
+  @Transform(({ value }) =>
+    value !== null && value !== undefined
+      ? parseFloat(String(value).trim())
+      : value
+  )
+  valoracion?: number;
+
+  @ApiProperty({
     example: '2025-05-31T05:11:55.496Z',
     description: 'Fecha de creación del curso.'
   })

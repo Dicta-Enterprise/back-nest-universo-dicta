@@ -16,6 +16,8 @@ export class Curso {
     public duracionSemanas: number,
     public profesorId: string,
     public categoriaId: string,
+    public resumenDescripcion?: string,  
+    public valoracion?: number,           
     public profesor?: Profesor,
     public categoria?: Categoria,
     public beneficios?: Beneficio[],

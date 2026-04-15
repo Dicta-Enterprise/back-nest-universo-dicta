@@ -46,8 +46,11 @@ export class DefaultCursoFactory implements CursoFactory {
       prisma.duracionSemanas,
       prisma.profesorId,
       prisma.categoriaId,
+      prisma.resumenDescripcion,  
+      prisma.valoracion,          
     );
   }
+  
   crearDesdePrismaConMasData(prisma: CursoConPlaneta): Curso {
     return new Curso(
       prisma.id,
@@ -62,6 +65,8 @@ export class DefaultCursoFactory implements CursoFactory {
       prisma.duracionSemanas,
       prisma.profesorId,
       prisma.categoriaId,
+      prisma.resumenDescripcion,  
+      prisma.valoracion,           
     );
   }
 }
