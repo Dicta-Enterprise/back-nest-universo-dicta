@@ -47,9 +47,7 @@ export class CursosService {
       );
     }
 
-    /**
-     * VALIDAR PLANETA
-     */
+  
     if (dtoCurso.planetaId) {
 
       const planeta = await this.prisma.planeta.findUnique({
