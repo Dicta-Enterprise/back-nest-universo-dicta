@@ -1,6 +1,14 @@
-import { Beneficio } from './../planeta/beneficio/beneficio.entity';
 import { Categoria } from '../categoria/categoria.entity';
 import { Profesor } from '../profesor/profesor.entity';
+import { Planeta } from '../planeta/planeta.entity';
+
+// Tipo embebido propio del curso (refleja el type Beneficio de Prisma)
+export class BeneficioCurso {
+  constructor(
+    public titulo: string,
+    public descripcion: string,
+  ) {}
+}
 
 export class Curso {
   constructor(
@@ -16,10 +24,12 @@ export class Curso {
     public duracionSemanas: number,
     public profesorId: string,
     public categoriaId: string,
-    public resumenDescripcion?: string,  
-    public valoracion?: number,           
+    public resumenDescripcion?: string,
+    public valoracion?: number,
+    public planetaId?: string,
     public profesor?: Profesor,
     public categoria?: Categoria,
-    public beneficios?: Beneficio[],
+    public planeta?: Planeta,
+    public beneficios?: BeneficioCurso[],
   ) {}
 }
