@@ -8,7 +8,7 @@ export interface ImagenesVersion{
   secundaria: string;
 }
 
-export interface CursoImagenes{
+export interface CursoImagenes{ 
   mobile: ImagenesVersion;
   tablet: ImagenesVersion;
   pc: ImagenesVersion;

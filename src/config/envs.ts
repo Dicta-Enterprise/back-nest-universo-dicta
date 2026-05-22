@@ -34,6 +34,6 @@ export const envs = {
   azureBlobStorageEndpoint: envVars.AZURE_BLOB_STORAGE_ENDPOINT,
   azureStorageAccountName: envVars.AZURE_STORAGE_ACCOUNT_NAME,
   azureStorageAccountKey: envVars.AZURE_STORAGE_ACCOUNT_KEY,
-  azureBlobContainerName: envVars.AZURE_BLOB_CONTAINER_NAME,
+  azureBlobContainerName: envVars.AZURE_BLOB_CONTAINER_NAME, 
   
 };
