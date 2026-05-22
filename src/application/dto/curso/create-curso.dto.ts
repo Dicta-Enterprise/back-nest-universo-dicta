@@ -28,8 +28,31 @@ class BeneficioDto {
   descripcion: string;
 }
 
-export class CreateCursoDto {
+class ImagenesVersionDto {
+  @IsUrl({}, { message: 'Debe ser una URL válida.' })
+  @IsNotEmpty()
+  principal: string;
 
+  @IsUrl({}, { message: 'Debe ser una URL válida.' })
+  @IsNotEmpty()
+  secundaria: string;
+}
+
+class CursoImagenesDto {
+  @ValidateNested()
+  @Type(() => ImagenesVersionDto)
+  mobile: ImagenesVersionDto;
+
+  @ValidateNested()
+  @Type(() => ImagenesVersionDto)
+  tablet: ImagenesVersionDto;
+
+  @ValidateNested()
+  @Type(() => ImagenesVersionDto)
+  pc: ImagenesVersionDto;
+}
+
+export class CreateCursoDto {
   @ApiProperty({
     example: 'Matemática básica.',
     description: 'Nombre del curso.'
@@ -55,6 +78,25 @@ export class CreateCursoDto {
     message: 'La descripción solo puede contener letras, números y signos básicos',
   })
   descripcion: string;
+
+  @ApiProperty({ 
+    description: 'URL de la imagen principal original (Opcional si se sube como archivo físico).',
+    required: false 
+  })
+  @IsString()
+  @IsOptional()
+  urlPrincipalOriginal?: string;
+
+  @ApiProperty({ 
+    description: 'URL de la imagen secundaria original (Opcional si se sube como archivo físico).',
+    required: false 
+  })
+  @IsString()
+  @IsOptional()
+  urlSecundariaOriginal?: string;
+
+  @IsOptional()
+  imagenes?: CursoImagenesDto; 
 
   @ApiProperty({
     example: 'Curso completo de matemáticas básicas para principiantes',
@@ -119,7 +161,6 @@ export class CreateCursoDto {
   })
   @Min(0.0, { message: 'El precio debe ser mayor a 0.' })
   @Max(12000000, { message: 'El precio debe ser menor a 12 millones.' })
-  @IsNumber({}, { message: 'El precio debe ser un valor de tipo Number(Integer/Float/Decimal).' })
   @IsNotEmpty({ message: 'El precio no debe estar vacío.' })
   @Transform(({ value }) =>
     value !== null && value !== undefined
@@ -137,24 +178,11 @@ export class CreateCursoDto {
   estado: boolean;
 
   @ApiProperty({
-    example: 'https://www.example.com/matematica_icono.png',
-    description: 'Imagen del curso.'
-  })
-  @MinLength(2, { message: 'La imagen debe tener mas de 1 carácter.' })
-  @MaxLength(250, { message: 'La imagen debe tener menos de 250 caracteres.' })
-  @IsString({ message: 'La imagen debe ser un dato de tipo String.' })
-  @IsUrl({}, { message: 'La imagen debe ser un URL.' })
-  @IsNotEmpty({ message: 'La imagen no debe estar vacía.' })
-  @Transform(({ value }) => value.trim().replace(/\s+/g, ' '))
-  imagen: string;
-
-  @ApiProperty({
     example: 5.5,
     description: 'Duración del curso medido por semanas.'
   })
   @Min(0.0, { message: 'La duración debe ser mayor a 0.' })
   @Max(101.0, { message: 'La duración debe ser menor a 101.' })
-  @IsNumber({}, { message: 'La duración debe ser un valor de tipo Number(Integer/Float/Decimal).' })
   @IsOptional()
   @Transform(({ value }) =>
     value !== null && value !== undefined
@@ -195,6 +223,7 @@ export class CreateCursoDto {
     required: false,
     type: [BeneficioDto],
   })
+  @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => BeneficioDto)

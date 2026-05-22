@@ -4,7 +4,7 @@ import { UpdateCursoDto } from 'src/application/dto/curso/update-curso.dto';
 import { CURSO_REPOSITORY } from 'src/core/constants/constants';
 import { CursoRepository } from '../../repositories/curso/curso.respository';
 import { ValidatorService } from 'src/shared/application/validation/validator.service';
-import { Curso } from 'src/core/entities/curso/curso.entity';
+import { Curso, CursoImagenes } from 'src/core/entities/curso/curso.entity';
 import { BussinesRuleException } from 'src/shared/domain/exceptions/business-rule.exception';
 
 @Injectable()
@@ -36,19 +36,19 @@ export class CursosService {
       dtoCurso.nombre,
       dtoCurso.descripcion || '',
       new Date(),
-      new Date() || null,
-      new Date() || null,
+      dtoCurso.fechaInicio || new Date(),
+      dtoCurso.fechaFinal || new Date(),
       dtoCurso.precio,
       true,
-      dtoCurso.imagen || '',
+      dtoCurso.imagenes as unknown as CursoImagenes, 
       dtoCurso.duracionSemanas,
       dtoCurso.profesorId,
       dtoCurso.categoriaId,
       dtoCurso.resumenDescripcion,  
       dtoCurso.valoracion ?? 0,      
-      undefined,
-      undefined,
-      dtoCurso.beneficios,
+      undefined,                  
+      undefined,                    
+      dtoCurso.beneficios,           
     );
 
     return this.repository.save(curso);
@@ -83,19 +83,19 @@ export class CursosService {
       dtoCurso.nombre,
       dtoCurso.descripcion || '',
       new Date(),
-      new Date() || null,
-      new Date() || null,
+      dtoCurso.fechaInicio || null,
+      dtoCurso.fechaFinal || null,
       dtoCurso.precio,
       true,
-      dtoCurso.imagen,
+      dtoCurso.imagenes as unknown as CursoImagenes, 
       dtoCurso.duracionSemanas,
       dtoCurso.profesorId,
       dtoCurso.categoriaId,
-      dtoCurso.resumenDescripcion,  
-      dtoCurso.valoracion,           
-      undefined,
-      undefined,
-      dtoCurso.beneficios,
+      dtoCurso.resumenDescripcion,
+      dtoCurso.valoracion, 
+      undefined,       
+      undefined,             
+      dtoCurso.beneficios,       
     );
 
     return this.repository.update(id, curso);

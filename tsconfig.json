@@ -1,7 +1,10 @@
 {
   "compilerOptions": {
     "module": "commonjs",
+    "moduleResolution": "node",
     "declaration": true,
+    "baseUrl": "./",
+    "types": ["node", "multer"], // <--- ESTA ES LA LÍNEA QUE SOLUCIONA EL ERROR
     "paths": {
       "@adapters/*": ["src/application/adapters/*"],
       "@dto/*": ["src/application/dto/*"],
@@ -20,7 +23,7 @@
       "@domain/*": ["src/shared/domain/*"],
       "@enums/*": ["src/shared/enums/*"],
       "@pipes/*": ["src/shared/pipes/*"],
-      "@types/*": ["src/shared/types/*"],
+      "@types/*": ["src/shared/types/*"]
     },
     "removeComments": true,
     "emitDecoratorMetadata": true,
@@ -29,7 +32,6 @@
     "target": "ES2021",
     "sourceMap": true,
     "outDir": "./dist",
-    "baseUrl": "./",
     "incremental": true,
     "skipLibCheck": true,
     "strictNullChecks": false,
@@ -42,5 +44,5 @@
     "watchFile": "dynamicPriorityPolling",
     "watchDirectory": "dynamicPriorityPolling",
     "excludeDirectories": ["**/node_modules", "dist"]
- }
+  }
 }

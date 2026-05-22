@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -8,141 +9,126 @@ import {
   Param,
   Patch,
   Post,
+  UploadedFiles,
+  UseInterceptors,
 } from '@nestjs/common';
-
-// import { CursosService } from '../../../core/services/curso/cursos.service';
+import { FileFieldsInterceptor } from '@nestjs/platform-express'; 
 import * as useCase from 'src/application/uses-cases/curso';
 import { ParseObjectIdPipe } from 'src/shared/pipes/parse-object-id.pipe';
 import * as dto from 'src/application/dto/curso';
-import * as azureCase from 'src/application/uses-cases/azure';
-// import { RequiredFile } from 'src/shared/decorator/required-file.decorator';
-import { ApiBody, ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
-// import { plainToInstance } from 'class-transformer';
+import { ApiConsumes, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'; 
 import { RequestListarCurso } from 'src/shared/enums/request-list-curso-enum';
+import { ImageProcessingService } from 'src/application/services/image-processing.service';
+
+@ApiTags('Cursos')
 @Controller('cursos')
 export class CursosController {
   constructor(
-      private createUseCase: useCase.CreateCursoUseCase,
-      private getAllCursoUseCase: useCase.GetAllCursoUseCase,
-      private getOneCursoUseCase: useCase.GetOneCursoUseCase,
-      private updateCursoUseCase: useCase.UpdateCursoUseCase,
-      private deleteCursoUseCase: useCase.DeleteCursoUseCase,
-      private readonly saveImageStorageUseCase: azureCase.SaveImageStorageUseCase,
-      private readonly deleteImageStorageUseCase: azureCase.DeleteImageStorageUseCase,
-    ) {}
+    private createUseCase: useCase.CreateCursoUseCase,
+    private getAllCursoUseCase: useCase.GetAllCursoUseCase,
+    private getOneCursoUseCase: useCase.GetOneCursoUseCase,
+    private updateCursoUseCase: useCase.UpdateCursoUseCase,
+    private deleteCursoUseCase: useCase.DeleteCursoUseCase,
+    private readonly imageProcessingService: ImageProcessingService, 
+  ) {}
 
   @Post()
-  @ApiOperation({ summary: 'Crea un nuevo curso' })
-  @ApiBody({ type: dto.CreateCursoDto })
-  @ApiResponse({ status: 201, description: 'El curso fue creado exitosamente.' })
-  @ApiResponse({ status: 400, description: 'Datos inválidos' })
-  async create(/*@RequiredFile() file: Express.Multer.File,*/ @Body() dtoCurso: dto.CreateCursoDto,) {
-    /*const imageResult = await this.saveImageStorageUseCase.execute(file, 'cursos');
-    
-      if (imageResult.isFailure) {
-          throw new HttpException(
-            imageResult.error.message,
-            HttpStatus.BAD_REQUEST,
-          );
-      }*/
-    
+  @UseInterceptors(FileFieldsInterceptor([ 
+    { name: 'principal', maxCount: 1 },
+    { name: 'secundaria', maxCount: 1 },
+  ]))
+  @ApiConsumes('multipart/form-data') 
+  @ApiOperation({ summary: 'Crea un curso procesando 2 archivos físicos desde la PC hacia Cloudinary en 6 versiones WebP' })
+  @ApiResponse({ status: 201, description: 'Curso creado con imágenes redimensionadas.' })
+  async create(
+    @Body() dtoCurso: dto.CreateCursoDto,
+    @UploadedFiles() files: { principal?: Express.Multer.File[], secundaria?: Express.Multer.File[] }
+  ) {
+    if (!files || !files.principal || !files.secundaria) {
+      throw new BadRequestException('Se requieren obligatoriamente ambos archivos físicos (principal y secundaria) desde la PC.');
+    }
+
+    try {
+      const imagenesProcesadas = await this.imageProcessingService.processFromFiles(
+        files.principal[0],
+        files.secundaria[0]
+      );
+      
+      dtoCurso.imagenes = imagenesProcesadas; 
+
+      if (dtoCurso.precio) dtoCurso.precio = Number(dtoCurso.precio);
+
       const result = await this.createUseCase.execute(dtoCurso);
-    
-      if (result.isFailure) {
-          //await this.deleteImageStorageUseCase.execute(imageResult.getValue());
-          throw new HttpException(result.error.message, HttpStatus.BAD_REQUEST);
-      }
-    
-      return {
-          data: result.getValue(),
-          message: 'Curso creado',
-      };
-  }
+      if (result.isFailure) throw new HttpException(result.error.message, HttpStatus.BAD_REQUEST);
 
-  @Get()
-  @ApiOperation({ summary: 'Recibe todos los cursos que se encuentren activos(estado = true).' })
-  async findAll() {
-    const result = await this.getAllCursoUseCase.execute(RequestListarCurso.LISTAR_CURSOS_ADMIN);
-    if (result.isFailure) {
-      throw new HttpException(result.error.message, HttpStatus.BAD_REQUEST);
+      return { data: result.getValue(), message: 'Curso creado y procesado correctamente desde archivos locales' };
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Error desconocido';
+      throw new HttpException(
+        `Fallo en procesamiento de imágenes: ${message}`, 
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
     }
-    return {
-      data: result,
-      message: 'Cursos obtenidos.',
-    };
-  }
-
-  @Get('angular')
-  @ApiOperation({ summary: 'Lista de cursos para angular' })
-  async findAllLite() {
-    const result = await this.getAllCursoUseCase.execute(RequestListarCurso.LISTAR_CURSOS_ANGULAR);
-    if (result.isFailure) {
-      throw new HttpException(result.error.message, HttpStatus.BAD_REQUEST);
-    }
-    return {
-      data: result,
-      message: 'Cursos angular obtenidos.',
-    };
-  }
-
-  @Get(':id')
-  @ApiOperation({ summary: 'Recibe a un curso mediante su ID.' })
-  @ApiParam({ name: 'id', example: '5f43e9b5e3f1c530d8b6f8a9', description: 'ID del curso.' })
-  @ApiResponse({ status: 200, description: 'Curso encontrado.' })
-  @ApiResponse({ status: 404, description: 'No se encontró el curso con el ID proporcionado.' })
-  async findOne(@Param('id', ParseObjectIdPipe) id: string) {
-    const result = await this.getOneCursoUseCase.execute(id);
-
-    if (result.isFailure) {
-      throw new HttpException(result.error.message, HttpStatus.BAD_REQUEST);
-    }
-
-    return {
-      data: result,
-      message: 'Curso obtenido.',
-    };
   }
 
   @Patch(':id')
-  @ApiOperation({ summary: 'Actualiza los datos de un curso y cambia o mantiene su estado en true(activo).' })
-  @ApiParam({ name: 'id', example: '5f43e9b5e3f1c530d8b6f8a9', description: 'ID del curso.' })
-  @ApiBody({ type: dto.UpdateCursoDto })
-  @ApiResponse({ status: 200, description: 'Curso actualizado correctamente.' })
-  @ApiResponse({ status: 404, description: 'No se encontró el curso con el ID proporcionado.' })
+  @UseInterceptors(FileFieldsInterceptor([ 
+    { name: 'principal', maxCount: 1 },
+    { name: 'secundaria', maxCount: 1 },
+  ]))
+  @ApiConsumes('multipart/form-data')
+  @ApiOperation({ summary: 'Actualiza curso y redimensiona nuevos archivos físicos si se proporcionan' })
   async update(
     @Param('id', ParseObjectIdPipe) id: string,
     @Body() updateCursoDto: dto.UpdateCursoDto,
+    @UploadedFiles() files: { principal?: Express.Multer.File[], secundaria?: Express.Multer.File[] } 
   ) {
-    const result = await this.updateCursoUseCase.execute(
-      id,
-      updateCursoDto,
-    );
+    const cursoActual = await this.getOneCursoUseCase.execute(id);
+    if (cursoActual.isFailure) throw new HttpException('Curso no encontrado', HttpStatus.NOT_FOUND);
 
-    if (result.isFailure) {
-      throw new HttpException(result.error.message, HttpStatus.BAD_REQUEST);
+    try {
+      if (files && (files.principal || files.secundaria)) {
+        
+        if (files.principal && files.secundaria) {
+          updateCursoDto.imagenes = await this.imageProcessingService.processFromFiles(
+            files.principal[0],
+            files.secundaria[0]
+          );
+        } else {
+          throw new BadRequestException('Para actualizar las imágenes, debes cargar tanto el archivo principal como el secundario en el formulario.');
+        }
+      }
+
+      if (updateCursoDto.precio) updateCursoDto.precio = Number(updateCursoDto.precio);
+
+      const result = await this.updateCursoUseCase.execute(id, updateCursoDto);
+      if (result.isFailure) throw new HttpException(result.error.message, HttpStatus.BAD_REQUEST);
+
+      return { data: result, message: 'Curso actualizado correctamente' };
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Error desconocido';
+      throw new HttpException(message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+  }
 
-    return {
-      data: result,
-      message: 'Curso actualizado',
-    };
+  @Get()
+  async findAll() {
+    const result = await this.getAllCursoUseCase.execute(RequestListarCurso.LISTAR_CURSOS_ADMIN);
+    if (result.isFailure) throw new HttpException(result.error.message, HttpStatus.BAD_REQUEST);
+    return { data: result, message: 'Cursos obtenidos.' };
+  }
+
+  @Get(':id')
+  async findOne(@Param('id', ParseObjectIdPipe) id: string) {
+    const result = await this.getOneCursoUseCase.execute(id);
+    if (result.isFailure) throw new HttpException(result.error.message, HttpStatus.BAD_REQUEST);
+    return { data: result, message: 'Curso obtenido.' };
   }
 
   @Delete(':id')
-  @ApiOperation({ summary: 'Cambia el estado de un curso a false(curso inactivo).' })
-  @ApiParam({ name: 'id', example: '5f43e9b5e3f1c530d8b6f8a9', description: 'ID del curso.' })
-  @ApiResponse({ status: 200, description: 'Curso eliminado correctamente.' })
-  @ApiResponse({ status: 404, description: 'No se encontró el curso con el ID proporcionado.' })
   async remove(@Param('id', ParseObjectIdPipe) id: string) {
     const result = await this.deleteCursoUseCase.execute(id);
-
-    if (result.isFailure) {
-      throw new HttpException(result.error.message, HttpStatus.BAD_REQUEST);
-    }
-
-    return {
-      data: result,
-      message: 'Curso eliminado',
-    };
+    if (result.isFailure) throw new HttpException(result.error.message, HttpStatus.BAD_REQUEST);
+    return { data: result, message: 'Curso eliminado' };
   }
 }

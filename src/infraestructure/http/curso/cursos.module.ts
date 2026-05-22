@@ -10,6 +10,7 @@ import { SharedModule } from 'src/shared/shared.module';
 import { PrismaModule } from 'src/core/services/prisma/prisma.module';
 import { CURSO_FACTORY } from '@constants/factories';
 import { DefaultCursoFactory } from 'src/core/fabricas/curso/curso.factory';
+import { ImageProcessingService } from 'src/application/services/image-processing.service';
 
 @Module({
   imports: [SharedModule, PrismaModule],
@@ -32,6 +33,7 @@ import { DefaultCursoFactory } from 'src/core/fabricas/curso/curso.factory';
     azureCase.SaveImageStorageUseCase,
     azureCase.DeleteImageStorageUseCase,
     AzureStorageService,
+    ImageProcessingService,
   ],
 })
 export class CursosModule {}

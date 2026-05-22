@@ -5,6 +5,7 @@ import { CursoFactory } from 'src/core/fabricas/curso/curso.factory';
 import { CursoRepository } from 'src/core/repositories/curso/curso.respository';
 import { PrismaService } from 'src/core/services/prisma/prisma.service';
 import { ValidationError } from 'src/shared/domain/errors/validation.error';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class CursoPrismaRepository implements CursoRepository {
@@ -116,7 +117,7 @@ export class CursoPrismaRepository implements CursoRepository {
           fechaFinal: curso.fechaFinal,
           precio: curso.precio,
           estado: curso.estado,
-          imagen: curso.imagen,
+          imagenes: curso.imagenes as unknown as Prisma.InputJsonValue,
           duracionSemanas: curso.duracionSemanas,
           profesor: {
             connect: {
@@ -181,7 +182,7 @@ export class CursoPrismaRepository implements CursoRepository {
         fechaFinal: curso.fechaFinal,
         precio: curso.precio,
         estado: curso.estado,
-        imagen: curso.imagen,
+        imagenes: curso.imagenes as unknown as Prisma.InputJsonValue,
         duracionSemanas: curso.duracionSemanas,
       };
 

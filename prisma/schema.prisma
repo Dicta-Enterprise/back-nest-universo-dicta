@@ -152,7 +152,7 @@ model Curso {
   fechaFinal      DateTime?
   precio          Float
   estado          Boolean     @default(true)
-  imagen          String      
+  imagenes          Json?      
   duracionSemanas Float?
 
   profesor    Profesor?  @relation(fields: [profesorId], references: [id])
