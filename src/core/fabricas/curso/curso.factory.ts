@@ -6,20 +6,57 @@ import { Beneficio } from '@entities/planeta/beneficio/beneficio.entity';
 
 export type CursoConDataRelacionada = Prisma.CursoGetPayload<{
   include: {
-    profesor: true;
-    categoria: true;
-    planeta: true;
+    profesor: {
+      select: {
+        id: true;
+        nombre: true;
+        dni: true;
+        apellido_materno: true;
+        apellido_paterno: true;
+        estado_p: true;
+        email: true;
+        cursos: true;
+      };
+    };
+    categoria: {
+      select: {
+        id: true;
+        nombre: true;
+        descripcion: true;
+        url: true;
+        estado: true;
+      };
+    };
+    planeta: {
+      select: {
+        id: true;
+        nombre: true;
+        descripcion: true;
+        url: true;
+        estado: true;
+      };
+    };
   };
 }>;
 
+type CursoConRelaciones = CursoConDataRelacionada;
+
 export interface CursoFactory {
   crearDesdePrisma(prisma: PrismaCurso): Curso;
-  crearDesdePrismaConMasData(prisma: CursoConDataRelacionada): Curso;
+  crearDesdePrismaConMasData(prisma: CursoConRelaciones): Curso;
+}
+
+interface ConstructorCursoDinamico {
+  new (...args: unknown[]): Curso;
 }
 
 export class DefaultCursoFactory implements CursoFactory {
+
   crearDesdePrisma(prisma: PrismaCurso): Curso {
-    return new Curso(
+    const datosExtensos = prisma as unknown as Record<string, unknown>;
+    const CursoInstanciable = Curso as unknown as ConstructorCursoDinamico;
+
+    return new CursoInstanciable(
       prisma.id,
       prisma.nombre,
       prisma.descripcion,
@@ -34,11 +71,14 @@ export class DefaultCursoFactory implements CursoFactory {
       prisma.categoriaId ?? '',
       prisma.resumenDescripcion ?? '',
       prisma.valoracion ?? 0,
+      datosExtensos.planetaId as string ?? undefined,
+      undefined as unknown as Profesor, 
+      datosExtensos.beneficios as Beneficio[] ?? undefined,
     );
   }
 
-  crearDesdePrismaConMasData(prisma: CursoConDataRelacionada): Curso {
-    const curso = this.crearDesdePrisma(prisma);
+  crearDesdePrismaConMasData(prisma: CursoConRelaciones): Curso {
+    const curso = this.crearDesdePrisma(prisma as unknown as PrismaCurso);
 
     if (prisma.profesor) {
       curso.profesor = prisma.profesor as unknown as Profesor;
@@ -48,9 +88,15 @@ export class DefaultCursoFactory implements CursoFactory {
       curso.categoria = prisma.categoria as unknown as Categoria;
     }
     
-    const datosExtesos = prisma as unknown as Record<string, unknown>;
-    if (datosExtesos.beneficios && Array.isArray(datosExtesos.beneficios)) { 
-      curso.beneficios = datosExtesos.beneficios as unknown as Beneficio[];
+    const datosDinamicos = curso as unknown as Record<string, unknown>;
+    const datosPlaneta = prisma as unknown as Record<string, unknown>;
+    
+    if (datosPlaneta.planeta && ('planeta' in curso)) {
+      datosDinamicos.planeta = datosPlaneta.planeta;
+    }
+
+    if (datosPlaneta.beneficios && Array.isArray(datosPlaneta.beneficios)) { 
+      curso.beneficios = datosPlaneta.beneficios as unknown as Beneficio[];
     }
 
     return curso;

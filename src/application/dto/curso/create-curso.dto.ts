@@ -216,6 +216,19 @@ export class CreateCursoDto {
   categoriaId: string;
 
   @ApiProperty({
+    example: '7a21b3c4d5e6f7a8b9c0d1e2',
+    description: 'Id del planeta asignado al curso.',
+    required: false,
+  })
+  @IsMongoId({ message: 'planetaId debe ser MongoID.' })
+  @IsString({ message: 'planetaId debe ser un dato de tipo String.' })
+  @IsOptional()
+  @Transform(({ value }) =>
+    (value as string).trim().toLowerCase().replaceAll(' ', '')
+  )
+  planetaId?: string;
+
+  @ApiProperty({
     example: [
       { titulo: 'Aprender sumas', descripcion: 'Sumar correctamente' }
     ],
