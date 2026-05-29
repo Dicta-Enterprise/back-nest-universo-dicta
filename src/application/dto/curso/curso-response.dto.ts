@@ -1,3 +1,4 @@
+import { CursoImagenes } from '@entities/curso/curso.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { Expose, Transform } from 'class-transformer';
 
@@ -39,7 +40,7 @@ export class CursoResponseDto {
   @Expose()
   beneficios: BeneficioLiteDto[];
 
-  @ApiProperty() @Expose() imagen: string;
+  @ApiProperty() @Expose() imagenes: CursoImagenes;
 
   @ApiProperty()
   @Expose()

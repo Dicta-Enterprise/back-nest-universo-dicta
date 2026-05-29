@@ -10,6 +10,18 @@ export class BeneficioCurso {
   ) {}
 }
 
+
+export interface ImagenesVersion{
+  principal: string;
+  secundaria: string;
+}
+
+export interface CursoImagenes{ 
+  mobile: ImagenesVersion;
+  tablet: ImagenesVersion;
+  pc: ImagenesVersion;
+}
+
 export class Curso {
   constructor(
     public id: string,
@@ -20,7 +32,7 @@ export class Curso {
     public fechaFinal: Date,
     public precio: number,
     public estado: boolean,
-    public imagen: string,
+    public imagenes: CursoImagenes,
     public duracionSemanas: number,
     public profesorId: string,
     public categoriaId: string,
