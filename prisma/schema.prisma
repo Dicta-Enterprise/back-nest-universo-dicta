@@ -113,6 +113,7 @@ model Planeta {
   galaxia            Galaxia        @relation(fields: [galaxiaId], references: [id])
   galaxiaId          String         @db.ObjectId
   cursos             Curso[]
+  landingPage        LandingPage[]
 }
 
 type InfoPlaneta {
@@ -216,18 +217,27 @@ type Color {
 
 model LandingPage {
   id                  String             @id @default(auto()) @map("_id") @db.ObjectId
+ //informacion principal
   titulo              String             
   descripcion         String
+  slug                String 
+  //imagen principal
   imagenPrincipal     String
-  contenido           String[]
-  estado              Boolean            @default(true)
-  slug                String             
-  metaKeywords        String
-  landingUrl          String
+  //contenido dinamico aqui al ser un json puede ir varios datos y imagenes
+  secciones           Json?
+  //activo o inactivo
+  estado              Boolean            @default(true)      
+  //este sirve para la busqueda dentro de google es como metaKeywords pero con mas alcanze     
+  seo                 Json?
+  //auditoria
   fechaCreacion       DateTime           @default(now())
   fechaActualizacion  DateTime           @updatedAt
+  //recursos visuales adicionales
   itemImagenesLanding ItemImagenLading[]
   itemColores         ItemColores[]
+  //relacion con planeta aqui se jalara la categorio, galaxia y planeta para los filtros
+  planeta     Planeta?   @relation(fields: [planetaId], references: [id])
+  planetaId String? @db.ObjectId
 }
 
 model ItemImagenLading {
