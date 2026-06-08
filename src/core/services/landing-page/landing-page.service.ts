@@ -4,7 +4,7 @@ import { CreateLandingPageDto } from 'src/application/dto/lading-page/create-lan
 import { UpdateLandingPageDto } from 'src/application/dto/lading-page/update-landing-page.dto';
 import { LANDING_PAGE_REPOSITORY } from 'src/core/constants/constants';
 import { LandingPage } from 'src/core/entities/landing-page/landing-page.entity';
-import { LandingPageRepository } from 'src/core/repositories/landing-page/landing-page.repository';
+import { LandingPageFilters, LandingPageRepository } from 'src/core/repositories/landing-page/landing-page.repository';
 import { BussinesRuleException } from 'src/shared/domain/exceptions/business-rule.exception';
 import { ValidatorService } from 'src/shared/application/validation/validator.service';
 import { ItemImagenLanding } from 'src/core/entities/landing-page/item-imagen-landing.entity';
@@ -26,11 +26,8 @@ export class LandingPageService {
       dto.titulo,
       dto.descripcion,
       dto.imagenPrincipal,
-      dto.contenido,
       dto.estado ?? true,
       dto.slug,
-      dto.metaKeywords,
-      dto.landingUrl,
       new Date(),
       new Date(),
       (dto.itemImagenesLanding || []).map(
@@ -39,12 +36,15 @@ export class LandingPageService {
       (dto.itemColores || []).map(
         (color) => new ItemColores(null, color.color),
       ),
+      dto.secciones,
+      dto.seo,
+      dto.planetaId,
     );
     return this.repository.save(landingPage);
   }
 
-  async findAll(): Promise<LandingPage[]> {
-    return this.repository.findAll();
+  async findAll(filters?: LandingPageFilters): Promise<LandingPage[]> {
+    return this.repository.findAll(filters);
   }
 
   async findOne(id: string) {
@@ -80,15 +80,15 @@ export class LandingPageService {
       dto.titulo ?? landingActual.titulo,
       dto.descripcion ?? landingActual.descripcion,
       dto.imagenPrincipal ?? landingActual.imagenPrincipal,
-      dto.contenido ?? landingActual.contenido,
       dto.estado ?? landingActual.estado,
       dto.slug ?? landingActual.slug,
-      dto.metaKeywords ?? landingActual.metaKeywords,
-      dto.landingUrl ?? landingActual.landingUrl,
       landingActual.fechaCreacion,
       new Date(),
       landingActual.itemImagenesLanding,
       landingActual.itemColores,
+      dto.secciones !== undefined ? dto.secciones : landingActual.secciones,
+      dto.seo !== undefined ? dto.seo : landingActual.seo,
+      dto.planetaId !== undefined ? dto.planetaId : landingActual.planetaId,
     );
 
     return this.repository.update(id, landingActualizada);

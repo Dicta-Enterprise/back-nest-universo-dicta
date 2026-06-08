@@ -8,11 +8,11 @@ import {
   Param,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
 import { ParseObjectIdPipe } from 'src/shared/pipes/parse-object-id.pipe';
 import * as useCase from 'src/application/uses-cases/landing-page';
 
-// Importar los DTOs correspondientes:
 import { UpdateLandingPageDto } from 'src/application/dto/lading-page/update-landing-page.dto';
 import { CreateLandingPageDto } from 'src/application/dto/lading-page/create-landing-page.dto';
 
@@ -27,7 +27,6 @@ export class LandingPageController {
     private readonly deleteUseCase: useCase.DeleteLandingPageUseCase,
   ) {}
 
-  // Método POST para crear una nueva landing page
   @Post()
   async create(@Body() createDto: CreateLandingPageDto) {
     const result = await this.createUseCase.execute(createDto);
@@ -45,10 +44,14 @@ export class LandingPageController {
     };
   }
 
-  // Método GET para obtener todas las landing pages
   @Get()
-  async getAll() {
-    const result = await this.getAllUseCase.execute();
+  async getAll(
+    @Query('planetaId') planetaId?: string,
+    @Query('galaxiaId') galaxiaId?: string,
+    @Query('categoriaId') categoriaId?: string,
+  ) {
+    const filters = { planetaId, galaxiaId, categoriaId };
+    const result = await this.getAllUseCase.execute(filters);
 
     if (result.isFailure) {
       throw new HttpException(result.error.message, HttpStatus.BAD_REQUEST);
@@ -60,7 +63,6 @@ export class LandingPageController {
     };
   }
 
-  // Método GET para obtener una landing page por su ID
   @Get(':id')
   async findOne(@Param('id', ParseObjectIdPipe) id: string) {
     const result = await this.getOneUseCase.execute(id);
@@ -75,7 +77,6 @@ export class LandingPageController {
     };
   }
 
-  // Método PATCH para actualizar una landing page existente
   @Patch(':id')
   async update(
     @Param('id', ParseObjectIdPipe) id: string,
@@ -93,7 +94,6 @@ export class LandingPageController {
     };
   }
 
-  // Método DELETE para eliminar una landing page por su ID
   @Delete(':id')
   async remove(@Param('id', ParseObjectIdPipe) id: string) {
     const result = await this.deleteUseCase.execute(id);
