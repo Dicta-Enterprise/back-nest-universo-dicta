@@ -2,6 +2,8 @@ import {
   ArrayMinSize,
   IsArray,
   IsBoolean,
+  IsMongoId,
+  IsObject,
   IsOptional,
   IsString,
   IsUrl,
@@ -29,12 +31,11 @@ export class CreateLandingPageDto {
   imagenPrincipal: string;
 
   @ApiProperty({
-    example: ['Bloque 1', 'Bloque 2'],
+    example: { header: 'Bienvenido', body: 'Contenido principal' },
   })
-  @IsArray()
-  @ArrayMinSize(1)
-  @IsString({ each: true })
-  contenido: string[];
+  @IsOptional()
+  @IsObject()
+  secciones?: Record<string, unknown>;
 
   @ApiProperty({
     example: true,
@@ -49,14 +50,18 @@ export class CreateLandingPageDto {
   @Length(3, 200)
   slug: string;
 
-  @ApiProperty({ example: 'curso, ingles, intensivo' })
-  @IsString()
-  @Length(3, 300)
-  metaKeywords: string;
+  @ApiProperty({ example: { keywords: ['curso', 'ingles'], title: 'Curso SEO' } })
+  @IsOptional()
+  @IsObject()
+  seo?: Record<string, unknown>;
 
-  @ApiProperty({ example: 'https://midominio.com/curso-ingles' })
-  @IsUrl()
-  landingUrl: string;
+  @ApiProperty({
+    example: '60c72b2f9b1e8a001c8e4c1a',
+    required: false,
+  })
+  @IsOptional()
+  @IsMongoId()
+  planetaId?: string;
 
   @ApiProperty({
     type: [CreateItemImagenLandingDto],
