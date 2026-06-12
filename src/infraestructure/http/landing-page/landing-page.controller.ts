@@ -10,13 +10,14 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
+import { ApiBadRequestResponse, ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { ParseObjectIdPipe } from 'src/shared/pipes/parse-object-id.pipe';
 import * as useCase from 'src/application/uses-cases/landing-page';
 
 import { UpdateLandingPageDto } from 'src/application/dto/lading-page/update-landing-page.dto';
 import { CreateLandingPageDto } from 'src/application/dto/lading-page/create-landing-page.dto';
 
-
+@ApiTags('Landing Page')
 @Controller('landing-page')
 export class LandingPageController {
   constructor(
@@ -28,6 +29,9 @@ export class LandingPageController {
   ) {}
 
   @Post()
+  @ApiOperation({ summary: 'Creación de Landing Page' })
+  @ApiCreatedResponse({ description: 'La Landing Page ha sido creada exitosamente.' })
+  @ApiBadRequestResponse({ description: 'Datos de entrada inválidos o error en la lógica de negocio.' })
   async create(@Body() createDto: CreateLandingPageDto) {
     const result = await this.createUseCase.execute(createDto);
 
@@ -45,6 +49,9 @@ export class LandingPageController {
   }
 
   @Get()
+  @ApiOperation({ summary: 'Listado de Landing Pages' })
+  @ApiOkResponse({ description: 'Lista de Landing Pages obtenida exitosamente.' })
+  @ApiBadRequestResponse({ description: 'Error al obtener la lista de Landing Pages.' })
   async getAll(
     @Query('planetaId') planetaId?: string,
     @Query('galaxiaId') galaxiaId?: string,
@@ -64,6 +71,11 @@ export class LandingPageController {
   }
 
   @Get(':id')
+  @ApiOperation({ summary: 'Consulta de Landing Page por ID' })
+  @ApiParam({ name: 'id', description: 'ID de la Landing Page (MongoDB ObjectID)', type: String })
+  @ApiOkResponse({ description: 'Landing Page encontrada exitosamente.' })
+  @ApiNotFoundResponse({ description: 'Landing Page no encontrada.' })
+  @ApiBadRequestResponse({ description: 'El formato del ID no es válido o hubo un error.' })
   async findOne(@Param('id', ParseObjectIdPipe) id: string) {
     const result = await this.getOneUseCase.execute(id);
 
@@ -78,6 +90,10 @@ export class LandingPageController {
   }
 
   @Patch(':id')
+  @ApiOperation({ summary: 'Actualización de Landing Page' })
+  @ApiParam({ name: 'id', description: 'ID de la Landing Page a actualizar (MongoDB ObjectID)', type: String })
+  @ApiOkResponse({ description: 'Landing Page actualizada exitosamente.' })
+  @ApiBadRequestResponse({ description: 'Datos de entrada inválidos, formato del ID incorrecto o error en la actualización.' })
   async update(
     @Param('id', ParseObjectIdPipe) id: string,
     @Body() updateDto: UpdateLandingPageDto,  
@@ -95,6 +111,10 @@ export class LandingPageController {
   }
 
   @Delete(':id')
+  @ApiOperation({ summary: 'Eliminación de Landing Page' })
+  @ApiParam({ name: 'id', description: 'ID de la Landing Page a eliminar (MongoDB ObjectID)', type: String })
+  @ApiOkResponse({ description: 'Landing Page eliminada exitosamente.' })
+  @ApiBadRequestResponse({ description: 'Formato del ID incorrecto o error al eliminar.' })
   async remove(@Param('id', ParseObjectIdPipe) id: string) {
     const result = await this.deleteUseCase.execute(id);
 
