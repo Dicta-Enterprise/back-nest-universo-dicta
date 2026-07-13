@@ -100,7 +100,7 @@ export class PlanetaPrismaRepository implements PlanetaRepository {
       },
       include: galaxiaInclude,
       orderBy: {
-        nombre: 'asc',
+        createdAt: 'desc',
       },
     });
 
