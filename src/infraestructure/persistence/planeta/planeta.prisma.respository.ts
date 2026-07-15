@@ -91,18 +91,16 @@ export class PlanetaPrismaRepository implements PlanetaRepository {
   async findAllActive(
     planetaPaginationDto: PlanetaPaginationDto,
   ): Promise<Planeta[]> {
-    const { page, limit, galaxiaId } = planetaPaginationDto;
+    const { galaxiaId } = planetaPaginationDto;
 
     const planetas = await this.prisma.planeta.findMany({
-      skip: (page - 1) * limit,
-      take: limit,
       where: {
         estado: EstadoGenerico.ACTIVO,
         ...(galaxiaId && { galaxiaId }),
       },
       include: galaxiaInclude,
       orderBy: {
-        nombre: 'asc',
+        createdAt: 'desc',
       },
     });
 
