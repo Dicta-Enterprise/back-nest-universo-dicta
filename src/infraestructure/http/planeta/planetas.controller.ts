@@ -44,6 +44,11 @@ export class planetasController {
     status: 400,
     description: 'Datos inválidos o planeta duplicado.',
   })
+  @ApiResponse({
+    status: HttpStatus.CONFLICT,
+    description:
+      'Ya existe un planeta con el mismo nombre en esta categoría y galaxia.',
+  })
   async create(@Body() createDto: dto.CreatePlanetaDto) {
     const result = await this.createUseCase.execute(createDto);
 
