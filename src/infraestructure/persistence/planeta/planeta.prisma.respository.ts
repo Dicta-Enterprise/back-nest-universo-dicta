@@ -34,9 +34,17 @@ export class PlanetaPrismaRepository implements PlanetaRepository {
     return data ? this.planetaFactory.crearDesdePrisma(data) : null;
   }
 
-  async findByName(nombre: string): Promise<Planeta | null> {
+  async findByNombreCategoriaYGalaxia(
+    nombre: string,
+    categoria: string,
+    galaxiaId: string,
+  ): Promise<Planeta | null> {
     const data = await this.prisma.planeta.findFirst({
-      where: { nombre },
+      where: {
+        nombre,
+        categoria,
+        galaxiaId,
+      },
       include: galaxiaInclude,
     });
     return data ? this.planetaFactory.crearDesdePrisma(data) : null;

@@ -34,6 +34,25 @@ export class PlanetasService {
       );
     }
 
+    const planetaConNombreCategoriaGalaxia =
+      await this.repository.findByNombreCategoriaYGalaxia(
+        dtoPlaneta.nombre,
+        dtoPlaneta.categoria,
+        dtoPlaneta.galaxiaId,
+      );
+    if (planetaConNombreCategoriaGalaxia) {
+      throw new BussinesRuleException(
+        'El nombre del planeta ya se encuentra registrado en esta categoría y galaxia',
+        HttpStatus.CONFLICT,
+        {
+          nombre: dtoPlaneta.nombre,
+          categoria: dtoPlaneta.categoria,
+          galaxiaId: dtoPlaneta.galaxiaId,
+          codigoError: 'NOMBRE_CATEGORIA_GALAXIA_DUPLICADO',
+        },
+      );
+    }
+
     const galaxia = await this.galaxiasService.obtenerGalaxia(dtoPlaneta.galaxiaId);
 
     if (!galaxia) {
@@ -134,6 +153,34 @@ export class PlanetasService {
           {
             codigo: dtoPlaneta.codigo,
             codigoError: 'CODIGO_DUPLICADO',
+          },
+        );
+      }
+    }
+
+    if (
+      dtoPlaneta.nombre &&
+      dtoPlaneta.categoria &&
+      dtoPlaneta.galaxiaId &&
+      (dtoPlaneta.nombre !== planetaExistente.nombre ||
+        dtoPlaneta.categoria !== planetaExistente.categoria ||
+        dtoPlaneta.galaxiaId !== planetaExistente.galaxiaId)
+    ) {
+      const planetaConNombreCategoriaGalaxia =
+        await this.repository.findByNombreCategoriaYGalaxia(
+          dtoPlaneta.nombre,
+          dtoPlaneta.categoria,
+          dtoPlaneta.galaxiaId,
+        );
+      if (planetaConNombreCategoriaGalaxia) {
+        throw new BussinesRuleException(
+          'El nombre del planeta ya se encuentra registrado en esta categoría y galaxia',
+          HttpStatus.CONFLICT,
+          {
+            nombre: dtoPlaneta.nombre,
+            categoria: dtoPlaneta.categoria,
+            galaxiaId: dtoPlaneta.galaxiaId,
+            codigoError: 'NOMBRE_CATEGORIA_GALAXIA_DUPLICADO',
           },
         );
       }
