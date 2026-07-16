@@ -22,6 +22,26 @@ export class PlanetasService {
   async crearPlaneta(dtoPlaneta: CreatePlanetaDto): Promise<Planeta> {
     await this.validator.validate(dtoPlaneta, CreatePlanetaDto);
 
+    if (!dtoPlaneta.peligros || dtoPlaneta.peligros.length === 0) {
+      throw new BussinesRuleException(
+        'El planeta debe tener al menos un peligro registrado',
+        HttpStatus.BAD_REQUEST,
+        {
+          codigoError: 'PELIGROS_VACIO',
+        },
+      );
+    }
+
+    if (!dtoPlaneta.beneficios || dtoPlaneta.beneficios.length === 0) {
+      throw new BussinesRuleException(
+        'El planeta debe tener al menos un beneficio registrado',
+        HttpStatus.BAD_REQUEST,
+        {
+          codigoError: 'BENEFICIOS_VACIO',
+        },
+      );
+    }
+
     const planetaExistente = await this.repository.findByCodigo(dtoPlaneta.codigo);
     if (planetaExistente) {
       throw new BussinesRuleException(

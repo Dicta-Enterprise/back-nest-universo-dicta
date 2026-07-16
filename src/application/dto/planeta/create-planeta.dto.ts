@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
+  ArrayMinSize,
   IsArray,
   IsEnum,
   IsMongoId,
@@ -124,13 +125,13 @@ export class CreatePlanetaDto {
     ],
     description: 'Lista de peligros del planeta',
     type: [PeligroDto],
-    required: false,
+    required: true,
   })
   @IsArray()
+  @ArrayMinSize(1, { message: 'El planeta debe tener al menos un peligro registrado' })
   @ValidateNested({ each: true })
   @Type(() => PeligroDto)
-  @IsOptional()
-  peligros?: PeligroDto[];
+  peligros: PeligroDto[];
 
   @ApiProperty({
     example: [
@@ -141,13 +142,13 @@ export class CreatePlanetaDto {
     ],
     description: 'Lista de beneficios del planeta',
     type: [BeneficioDto],
-    required: false,
+    required: true,
   })
   @IsArray()
+  @ArrayMinSize(1, { message: 'El planeta debe tener al menos un beneficio registrado' })
   @ValidateNested({ each: true })
   @Type(() => BeneficioDto)
-  @IsOptional()
-  beneficios?: BeneficioDto[];
+  beneficios: BeneficioDto[];
 
   @ApiProperty({
     example: '6997c5ad82bdf1267be250a6',
