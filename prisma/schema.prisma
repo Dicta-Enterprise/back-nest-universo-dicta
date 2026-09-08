@@ -58,6 +58,22 @@ enum TipoUsuario {
   DESARROLLADOR
 }
 
+enum TipoCertificacion {
+  RECONOCIMIENTO
+  JOVEN
+  NINO
+}
+
+enum EstadoCertificacion {
+  EMITIDA
+  ANULADA
+}
+
+enum EstadoPlantilla {
+  ACTIVA
+  INACTIVA
+}
+
 model Categoria {
   id          String @id @default(auto()) @map("_id") @db.ObjectId
   nombre      String @unique
@@ -98,24 +114,24 @@ model Profesor {
 }
 
 model Planeta {
-  id                 String         @id @default(auto()) @map("_id") @db.ObjectId
-  categoria          String
-  nombre             String
-  codigo             String         @unique         
-  estado             EstadoGenerico @default(ACTIVO)
-  textura            String
-  url                String
-  imagenResumen      String
-  resumenCurso       String
-  info               InfoPlaneta?
-  peligros           Peligro[]
-  beneficios         Beneficio[]
-  galaxia            Galaxia        @relation(fields: [galaxiaId], references: [id])
-  galaxiaId          String         @db.ObjectId
-  cursos             Curso[]
-  landingPage        LandingPage[]
-  createdAt          DateTime?      @default(now()) @map("created_at")
-  updatedAt          DateTime?      @updatedAt      @map("updated_at")
+  id            String         @id @default(auto()) @map("_id") @db.ObjectId
+  categoria     String
+  nombre        String
+  codigo        String         @unique
+  estado        EstadoGenerico @default(ACTIVO)
+  textura       String
+  url           String
+  imagenResumen String
+  resumenCurso  String
+  info          InfoPlaneta?
+  peligros      Peligro[]
+  beneficios    Beneficio[]
+  galaxia       Galaxia        @relation(fields: [galaxiaId], references: [id])
+  galaxiaId     String         @db.ObjectId
+  cursos        Curso[]
+  landingPage   LandingPage[]
+  createdAt     DateTime?      @default(now()) @map("created_at")
+  updatedAt     DateTime?      @updatedAt @map("updated_at")
 }
 
 type InfoPlaneta {
@@ -144,19 +160,19 @@ type Beneficio {
 }
 
 model Curso {
-  id              String      @id @default(auto()) @map("_id") @db.ObjectId
-  nombre          String      @unique
-  descripcion     String
-  resumenDescripcion String?   
-  valoracion      Float?      @default(0) 
-  beneficios      Beneficio[]
-  fechaCreacion   DateTime    @default(now())
-  fechaInicio     DateTime?
-  fechaFinal      DateTime?
-  precio          Float
-  estado          Boolean     @default(true)
-  imagenes          Json?      
-  duracionSemanas Float?
+  id                 String      @id @default(auto()) @map("_id") @db.ObjectId
+  nombre             String      @unique
+  descripcion        String
+  resumenDescripcion String?
+  valoracion         Float?      @default(0)
+  beneficios         Beneficio[]
+  fechaCreacion      DateTime    @default(now())
+  fechaInicio        DateTime?
+  fechaFinal         DateTime?
+  precio             Float
+  estado             Boolean     @default(true)
+  imagenes           Json?
+  duracionSemanas    Float?
 
   profesor    Profesor?  @relation(fields: [profesorId], references: [id])
   profesorId  String?    @db.ObjectId
@@ -166,6 +182,79 @@ model Curso {
   idiomaId    String?    @db.ObjectId
   planeta     Planeta?   @relation(fields: [planetaId], references: [id])
   planetaId   String?    @db.ObjectId
+
+  certificaciones Certificacion[]
+}
+
+model PlantillaCertificacion {
+  id                String            @id @default(auto()) @map("_id") @db.ObjectId
+  nombre            String
+  descripcion       String?
+  tipoCertificacion TipoCertificacion
+  urlPlantilla      String
+  configuracion     Json
+  estado            EstadoPlantilla   @default(ACTIVA)
+
+  fechaCreacion      DateTime @default(now())
+  fechaActualizacion DateTime @updatedAt
+
+  certificaciones Certificacion[]
+
+  @@index([tipoCertificacion])
+  @@index([estado])
+  @@map("plantillas_certificacion")
+}
+
+model Certificacion {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  // Titular
+  idUsuario        Int
+  idCuentaAsociada String?
+
+  // Origen de la certificación
+  idCurso     String @db.ObjectId
+  idPlantilla String @db.ObjectId
+
+  // Información del certificado
+  codigoCertificado String            @unique
+  nombreCertificado String
+  tipoCertificacion TipoCertificacion
+
+  // Emisión
+  fechaEmision DateTime @default(now())
+
+  // Archivos
+  urlCertificado String?
+  urlCodigoQr    String?
+
+  // Snapshot de la plantilla utilizada
+  configuracionSnapshot Json?
+  urlPlantillaSnapshot  String?
+
+  // Estado
+  estado EstadoCertificacion @default(EMITIDA)
+
+  // Anulación
+  fechaAnulacion  DateTime?
+  motivoAnulacion String?
+
+  fechaCreacion      DateTime @default(now())
+  fechaActualizacion DateTime @updatedAt
+
+  // Relaciones dentro de Back Nest
+  curso     Curso                  @relation(fields: [idCurso], references: [id])
+  plantilla PlantillaCertificacion @relation(fields: [idPlantilla], references: [id])
+
+  @@unique([idUsuario, idCuentaAsociada, idCurso, tipoCertificacion])
+  @@index([idUsuario])
+  @@index([idCuentaAsociada])
+  @@index([idCurso])
+  @@index([idPlantilla])
+  @@index([tipoCertificacion])
+  @@index([estado])
+  @@index([fechaEmision])
+  @@map("certificaciones")
 }
 
 model Galaxia {
@@ -219,16 +308,16 @@ type Color {
 
 model LandingPage {
   id                  String             @id @default(auto()) @map("_id") @db.ObjectId
- //informacion principal
-  titulo              String             
+  //informacion principal
+  titulo              String
   descripcion         String
-  slug                String 
+  slug                String
   //imagen principal
   imagenPrincipal     String
   //contenido dinamico aqui al ser un json puede ir varios datos y imagenes
   secciones           Json?
   //activo o inactivo
-  estado              Boolean            @default(true)      
+  estado              Boolean            @default(true)
   //este sirve para la busqueda dentro de google es como metaKeywords pero con mas alcanze     
   seo                 Json?
   //auditoria
@@ -238,8 +327,8 @@ model LandingPage {
   itemImagenesLanding ItemImagenLading[]
   itemColores         ItemColores[]
   //relacion con planeta aqui se jalara la categorio, galaxia y planeta para los filtros
-  planeta     Planeta?   @relation(fields: [planetaId], references: [id])
-  planetaId String? @db.ObjectId
+  planeta             Planeta?           @relation(fields: [planetaId], references: [id])
+  planetaId           String?            @db.ObjectId
 }
 
 model ItemImagenLading {
@@ -257,14 +346,14 @@ model ItemColores {
 }
 
 model MenuSidebar {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  name      String
-  icon      String?
-  route     String?
-  code      String   @unique
-  node      String
-  typeMenu  String   
-  parentId  String?  @db.ObjectId
-  order     Int      @default(0)
-  active    Boolean  @default(true)
+  id       String  @id @default(auto()) @map("_id") @db.ObjectId
+  name     String
+  icon     String?
+  route    String?
+  code     String  @unique
+  node     String
+  typeMenu String
+  parentId String? @db.ObjectId
+  order    Int     @default(0)
+  active   Boolean @default(true)
 }
