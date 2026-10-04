@@ -1,4 +1,4 @@
-import { Curso, CursoImagenes } from '@entities/curso/curso.entity';
+import { Curso, CursoImagenes, ModuloCurso } from '@entities/curso/curso.entity';
 import { Prisma, Curso as PrismaCurso } from '@prisma/client';
 import { Profesor } from '@entities/profesor/profesor.entity';
 import { Categoria } from '@entities/categoria/categoria.entity';
@@ -71,9 +71,12 @@ export class DefaultCursoFactory implements CursoFactory {
       prisma.categoriaId ?? '',
       prisma.resumenDescripcion ?? '',
       prisma.valoracion ?? 0,
-      datosExtensos.planetaId as string ?? undefined,
-      undefined as unknown as Profesor, 
+      datosExtensos.planetaId as string ?? undefined,   // profesorId ya cubierto arriba; este es planetaId
+      undefined as unknown as Profesor,                  // profesor (se completa en crearDesdePrismaConMasData)
+      undefined,                                          // categoria (se completa en crearDesdePrismaConMasData)
+      undefined,                                          // planeta (se completa en crearDesdePrismaConMasData)
       datosExtensos.beneficios as Beneficio[] ?? undefined,
+      datosExtensos.modulos as ModuloCurso[] ?? undefined,
     );
   }
 

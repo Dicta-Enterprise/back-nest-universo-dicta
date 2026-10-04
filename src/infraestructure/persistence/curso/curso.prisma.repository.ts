@@ -6,6 +6,17 @@ import { CursoRepository } from 'src/core/repositories/curso/curso.respository';
 import { PrismaService } from 'src/core/services/prisma/prisma.service';
 import { ValidationError } from 'src/shared/domain/errors/validation.error';
 import { Prisma } from '@prisma/client';
+import { Types } from 'mongoose';
+
+// Los tipos embebidos de Mongo (Modulo) no generan su propio id automáticamente
+// como sí lo hacen los modelos de nivel superior, así que se asigna aquí.
+function conIdsGenerados(modulos: unknown): unknown {
+  if (!Array.isArray(modulos)) return modulos;
+  return modulos.map((modulo: Record<string, unknown>) => ({
+    ...modulo,
+    id: modulo.id || new Types.ObjectId().toString(),
+  }));
+}
 
 @Injectable()
 export class CursoPrismaRepository implements CursoRepository {
@@ -45,6 +56,7 @@ export class CursoPrismaRepository implements CursoRepository {
           resumenDescripcion: curso.resumenDescripcion,  
           valoracion: curso.valoracion ?? 0,              
           beneficios: curso.beneficios as unknown as Prisma.CursoCreateInput['beneficios'],
+          modulos: conIdsGenerados(curso.modulos) as Prisma.CursoCreateInput['modulos'],
           fechaInicio: curso.fechaInicio,
           fechaFinal: curso.fechaFinal,
           precio: curso.precio,
@@ -91,6 +103,7 @@ export class CursoPrismaRepository implements CursoRepository {
         resumenDescripcion: curso.resumenDescripcion,  
         valoracion: curso.valoracion,                    
         beneficios: curso.beneficios as unknown as Prisma.CursoUpdateInput['beneficios'],
+        modulos: curso.modulos ? (conIdsGenerados(curso.modulos) as Prisma.CursoUpdateInput['modulos']) : undefined,
         fechaInicio: curso.fechaInicio,
         fechaFinal: curso.fechaFinal,
         precio: curso.precio,

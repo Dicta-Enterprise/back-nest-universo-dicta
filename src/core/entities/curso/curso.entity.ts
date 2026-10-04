@@ -10,6 +10,25 @@ export class BeneficioCurso {
   ) {}
 }
 
+// Tipos embebidos propios del curso (reflejan los type Quiz/Modulo de Prisma)
+export class QuizModulo {
+  constructor(
+    public pregunta: string,
+    public opciones: string[],
+    public respuestaCorrecta: string,
+  ) {}
+}
+
+export class ModuloCurso {
+  constructor(
+    public id: string,
+    public nombre: string,
+    public bunnyVideoId: string,
+    public orden: number,
+    public quizzes?: QuizModulo[],
+  ) {}
+}
+
 
 export interface ImagenesVersion{
   principal: string;
@@ -43,5 +62,6 @@ export class Curso {
     public categoria?: Categoria,
     public planeta?: Planeta,
     public beneficios?: BeneficioCurso[],
+    public modulos?: ModuloCurso[],
   ) {}
 }

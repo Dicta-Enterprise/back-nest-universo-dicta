@@ -7,6 +7,13 @@ interface EnvVars {
   AZURE_STORAGE_ACCOUNT_NAME: string;
   AZURE_STORAGE_ACCOUNT_KEY: string;
   AZURE_BLOB_CONTAINER_NAME: string;
+  JWT_SECRET: string;
+  BUNNY_LIBRARY_ID: string;
+  BUNNY_TOKEN_AUTH_KEY: string;
+  BUNNY_CDN_HOSTNAME: string;
+  LRS_ENDPOINT: string;
+  LRS_KEY: string;
+  LRS_SECRET: string;
 }
 
 const envSchema = joi
@@ -17,6 +24,13 @@ const envSchema = joi
     AZURE_STORAGE_ACCOUNT_NAME: joi.string().required(),
     AZURE_STORAGE_ACCOUNT_KEY: joi.string().required(),
     AZURE_BLOB_CONTAINER_NAME: joi.string().required(),
+    JWT_SECRET: joi.string().required(),
+    BUNNY_LIBRARY_ID: joi.string().allow('').default(''),
+    BUNNY_TOKEN_AUTH_KEY: joi.string().allow('').default(''),
+    BUNNY_CDN_HOSTNAME: joi.string().allow('').default(''),
+    LRS_ENDPOINT: joi.string().allow('').default(''),
+    LRS_KEY: joi.string().allow('').default(''),
+    LRS_SECRET: joi.string().allow('').default(''),
   })
   .unknown(true);
 
@@ -34,6 +48,12 @@ export const envs = {
   azureBlobStorageEndpoint: envVars.AZURE_BLOB_STORAGE_ENDPOINT,
   azureStorageAccountName: envVars.AZURE_STORAGE_ACCOUNT_NAME,
   azureStorageAccountKey: envVars.AZURE_STORAGE_ACCOUNT_KEY,
-  azureBlobContainerName: envVars.AZURE_BLOB_CONTAINER_NAME, 
-  
+  azureBlobContainerName: envVars.AZURE_BLOB_CONTAINER_NAME,
+  jwtSecret: envVars.JWT_SECRET,
+  bunnyLibraryId: envVars.BUNNY_LIBRARY_ID,
+  bunnyTokenAuthKey: envVars.BUNNY_TOKEN_AUTH_KEY,
+  bunnyCdnHostname: envVars.BUNNY_CDN_HOSTNAME,
+  lrsEndpoint: envVars.LRS_ENDPOINT,
+  lrsKey: envVars.LRS_KEY,
+  lrsSecret: envVars.LRS_SECRET,
 };
