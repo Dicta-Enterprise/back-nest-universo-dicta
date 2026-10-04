@@ -5,6 +5,7 @@ import { Logger, ValidationPipe } from '@nestjs/common';
 import { envs } from './config/envs';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as path from 'path';
+import * as cookieParser from 'cookie-parser';
 import { apiReference } from '@scalar/nestjs-api-reference';
 
 async function bootstrap() {
@@ -13,6 +14,7 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   app.setGlobalPrefix('api');
+  app.use(cookieParser());
 
   app.enableCors({
     origin: 'http://localhost:4200',
@@ -36,6 +38,7 @@ async function bootstrap() {
     .setTitle('API Universo Dicta')
     .setDescription('API de la aplicacion de universo dicta')
     .setVersion('1.0')
+    .addCookieAuth('accessToken')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

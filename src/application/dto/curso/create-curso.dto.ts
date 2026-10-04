@@ -17,6 +17,7 @@ import {
   MinLength,
   ValidateNested,
 } from 'class-validator';
+import { ModuloDto } from '../modulo/modulo.dto';
 
 class BeneficioDto {
   @IsString()
@@ -241,4 +242,15 @@ export class CreateCursoDto {
   @ValidateNested({ each: true })
   @Type(() => BeneficioDto)
   beneficios: BeneficioDto[];
+
+  @ApiProperty({
+    description: 'Módulos del curso (video + quizzes de cada uno).',
+    required: false,
+    type: [ModuloDto],
+  })
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => ModuloDto)
+  modulos?: ModuloDto[];
 }

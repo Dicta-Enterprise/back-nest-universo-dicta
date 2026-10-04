@@ -12,6 +12,8 @@ import { AzureModule } from './infraestructure/http/azure/azure.module';
 import { ProfesorModule } from './infraestructure/http/profesor/profesor.module';
 import { ParametersModule } from './infraestructure/http/parameters/parameters.module';
 import { LandingPageModule } from './infraestructure/http/landing-page/landing-page.module';
+import { BunnyModule } from './infraestructure/http/bunny/bunny.module';
+import { XapiModule } from './infraestructure/http/xapi/xapi.module';
 
 @Module({
   imports: [
@@ -25,7 +27,9 @@ import { LandingPageModule } from './infraestructure/http/landing-page/landing-p
     AzureModule,
     ParametersModule,
     MenuModule,
-    LandingPageModule
+    LandingPageModule,
+    BunnyModule,
+    XapiModule
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -143,13 +143,28 @@ type Beneficio {
   descripcion String
 }
 
+type Quiz {
+  pregunta          String
+  opciones          String[]
+  respuestaCorrecta String
+}
+
+type Modulo {
+  id           String
+  nombre       String
+  bunnyVideoId String
+  orden        Int
+  quizzes      Quiz[]
+}
+
 model Curso {
   id              String      @id @default(auto()) @map("_id") @db.ObjectId
   nombre          String      @unique
   descripcion     String
-  resumenDescripcion String?   
-  valoracion      Float?      @default(0) 
+  resumenDescripcion String?
+  valoracion      Float?      @default(0)
   beneficios      Beneficio[]
+  modulos         Modulo[]
   fechaCreacion   DateTime    @default(now())
   fechaInicio     DateTime?
   fechaFinal      DateTime?
