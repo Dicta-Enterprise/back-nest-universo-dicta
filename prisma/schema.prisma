@@ -74,6 +74,11 @@ enum EstadoPlantilla {
   INACTIVA
 }
 
+enum EstadoProgresoCurso {
+  EN_PROGRESO
+  COMPLETADO
+}
+
 model Categoria {
   id          String @id @default(auto()) @map("_id") @db.ObjectId
   nombre      String @unique
@@ -184,6 +189,7 @@ model Curso {
   planetaId   String?    @db.ObjectId
 
   certificaciones Certificacion[]
+  progresos       ProgresoCurso[]
 }
 
 model PlantillaCertificacion {
@@ -210,7 +216,7 @@ model Certificacion {
 
   // Titular
   idUsuario        Int
-  idCuentaAsociada String?
+  idCuentaAsociada Int?
 
   // Origen de la certificación
   idCurso     String @db.ObjectId
@@ -219,6 +225,7 @@ model Certificacion {
   // Información del certificado
   codigoCertificado String            @unique
   nombreCertificado String
+  nombreTitular     String
   tipoCertificacion TipoCertificacion
 
   // Emisión
@@ -255,6 +262,31 @@ model Certificacion {
   @@index([estado])
   @@index([fechaEmision])
   @@map("certificaciones")
+}
+
+model ProgresoCurso {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  // Titular (referencias lógicas hacia Back Auth)
+  idUsuario        Int
+  idCuentaAsociada Int?
+
+  idCurso String @db.ObjectId
+
+  porcentaje      Float               @default(0)
+  estado          EstadoProgresoCurso @default(EN_PROGRESO)
+  fechaCompletado DateTime?
+
+  fechaCreacion      DateTime @default(now())
+  fechaActualizacion DateTime @updatedAt
+
+  curso Curso @relation(fields: [idCurso], references: [id])
+
+  @@unique([idUsuario, idCuentaAsociada, idCurso])
+  @@index([idUsuario])
+  @@index([idCuentaAsociada])
+  @@index([idCurso])
+  @@map("progresos_curso")
 }
 
 model Galaxia {

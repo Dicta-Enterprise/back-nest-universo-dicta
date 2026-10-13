@@ -13,6 +13,7 @@ import { ProfesorModule } from './infraestructure/http/profesor/profesor.module'
 import { ParametersModule } from './infraestructure/http/parameters/parameters.module';
 import { LandingPageModule } from './infraestructure/http/landing-page/landing-page.module';
 import { PlantillasCertificacionModule } from './infraestructure/http/plantilla-certificacion/plantillas-certificacion.module';
+import { ProgresoCursoModule } from './infraestructure/http/progreso-curso/progreso-curso.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { PlantillasCertificacionModule } from './infraestructure/http/plantilla-
     MenuModule,
     LandingPageModule,
     PlantillasCertificacionModule,
+    ProgresoCursoModule,
   ],
   controllers: [AppController],
   providers: [AppService],
