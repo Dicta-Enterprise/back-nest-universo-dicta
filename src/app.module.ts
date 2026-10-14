@@ -14,6 +14,7 @@ import { ParametersModule } from './infraestructure/http/parameters/parameters.m
 import { LandingPageModule } from './infraestructure/http/landing-page/landing-page.module';
 import { BunnyModule } from './infraestructure/http/bunny/bunny.module';
 import { XapiModule } from './infraestructure/http/xapi/xapi.module';
+import { ProgresoModule } from './infraestructure/http/progreso/progreso.module';
 
 @Module({
   imports: [
@@ -29,7 +30,8 @@ import { XapiModule } from './infraestructure/http/xapi/xapi.module';
     MenuModule,
     LandingPageModule,
     BunnyModule,
-    XapiModule
+    XapiModule,
+    ProgresoModule,
   ],
   controllers: [AppController],
   providers: [AppService],

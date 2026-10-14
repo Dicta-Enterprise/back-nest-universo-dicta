@@ -5,3 +5,5 @@ export const GALAXIA_REPOSITORY = 'GALAXIA_REPOSITORY';
 export const IDIOMA_REPOSITORY = 'IDIOMA_REPOSITORY';
 export const LANDING_PAGE_REPOSITORY = 'LANDING_PAGE_REPOSITORY';
 export const PROFESOR_REPOSITORY = 'PROFESOR_REPOSITORY';
+export const PROGRESO_MODULO_REPOSITORY = 'PROGRESO_MODULO_REPOSITORY';
+export const ROL_ADMIN_ID = 1; // roles de back-auth: 1 Administrador, 2 Trabajador, 3 Cliente, 4 UsuarioPendiente
