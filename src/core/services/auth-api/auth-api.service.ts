@@ -16,6 +16,37 @@ export interface FamiliaAuth {
   miembros: MiembroFamiliaAuth[];
 }
 
+export interface UsuarioAdminAuth {
+  id: number;
+  codigo: string;
+  tipo: 'P' | 'N' | 'J';
+  rol: 'PADRE' | 'NINO' | 'JOVEN';
+  nombre: string;
+  email: string;
+  estado: 'ACTIVA' | 'PENDIENTE' | 'INACTIVA' | 'BLOQUEADA';
+  familia: { id: number; codigo: string; nombre: string | null } | null;
+  fechaRegistro: string | null;
+}
+
+export interface ListaUsuariosAdminAuth {
+  items: UsuarioAdminAuth[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+export type FiltrosUsuariosAuth = Partial<{
+  q: string;
+  id: string;
+  rol: string;
+  estado: string;
+  familia: string;
+  desde: string;
+  hasta: string;
+  page: number;
+  limit: number;
+}>;
+
 const TIMEOUT_MS = 5000;
 
 // Cliente de los endpoints /internal de back-auth (quién es de qué familia, nombres, tipo de cuenta).
@@ -26,6 +57,18 @@ export class AuthApiService {
   async listarFamilias(): Promise<FamiliaAuth[]> {
     const response = await this.llamar('/api/internal/familias');
     return (await response.json()) as FamiliaAuth[];
+  }
+
+  async listarUsuarios(filtros: FiltrosUsuariosAuth = {}): Promise<ListaUsuariosAdminAuth> {
+    const parametros = new URLSearchParams();
+    for (const [clave, valor] of Object.entries(filtros)) {
+      if (valor !== undefined && valor !== null && valor !== '') {
+        parametros.append(clave, String(valor));
+      }
+    }
+    const consulta = parametros.toString();
+    const response = await this.llamar(`/api/internal/usuarios${consulta ? `?${consulta}` : ''}`);
+    return (await response.json()) as ListaUsuariosAdminAuth;
   }
 
   // Devuelve null si ese usuario todavía no tiene familia.

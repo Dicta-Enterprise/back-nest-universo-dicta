@@ -25,6 +25,20 @@ describe('AuthApiService', () => {
     expect(opciones.headers['x-internal-api-key']).toBe('clave-de-prueba-1234');
   });
 
+  it('lista usuarios mandando la clave y solo los filtros que vienen con valor', async () => {
+    fetchMock.mockResolvedValue(respuesta(200, { items: [], total: 0, page: 1, limit: 20 }));
+    await service.listarUsuarios({ q: 'sofía', rol: 'NINO', page: 2, estado: undefined, id: '' });
+    const [url, opciones] = fetchMock.mock.calls[0];
+    expect(url).toBe('http://auth.test/api/internal/usuarios?q=sof%C3%ADa&rol=NINO&page=2');
+    expect(opciones.headers['x-internal-api-key']).toBe('clave-de-prueba-1234');
+  });
+
+  it('lista usuarios sin signo de pregunta cuando no hay filtros', async () => {
+    fetchMock.mockResolvedValue(respuesta(200, { items: [], total: 0, page: 1, limit: 20 }));
+    await service.listarUsuarios();
+    expect(fetchMock.mock.calls[0][0]).toBe('http://auth.test/api/internal/usuarios');
+  });
+
   it('devuelve null si el padre no tiene familia (404)', async () => {
     fetchMock.mockResolvedValue(respuesta(404));
     await expect(service.obtenerFamiliaPorPadre(5)).resolves.toBeNull();

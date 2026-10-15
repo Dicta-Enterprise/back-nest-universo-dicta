@@ -15,6 +15,7 @@ import { LandingPageModule } from './infraestructure/http/landing-page/landing-p
 import { BunnyModule } from './infraestructure/http/bunny/bunny.module';
 import { XapiModule } from './infraestructure/http/xapi/xapi.module';
 import { ProgresoModule } from './infraestructure/http/progreso/progreso.module';
+import { AdminModule } from './infraestructure/http/admin/admin.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { ProgresoModule } from './infraestructure/http/progreso/progreso.module'
     BunnyModule,
     XapiModule,
     ProgresoModule,
+    AdminModule,
   ],
   controllers: [AppController],
   providers: [AppService],
