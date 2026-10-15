@@ -7,6 +7,9 @@ interface EnvVars {
   AZURE_STORAGE_ACCOUNT_NAME: string;
   AZURE_STORAGE_ACCOUNT_KEY: string;
   AZURE_BLOB_CONTAINER_NAME: string;
+  JWT_SECRET: string;
+  AUTH_API_URL: string;
+  TRANSACTION_API_URL: string;
 }
 
 const envSchema = joi
@@ -17,6 +20,9 @@ const envSchema = joi
     AZURE_STORAGE_ACCOUNT_NAME: joi.string().required(),
     AZURE_STORAGE_ACCOUNT_KEY: joi.string().required(),
     AZURE_BLOB_CONTAINER_NAME: joi.string().required(),
+    JWT_SECRET: joi.string().required(),
+    AUTH_API_URL: joi.string().required(),
+    TRANSACTION_API_URL: joi.string().required(),
   })
   .unknown(true);
 
@@ -35,5 +41,7 @@ export const envs = {
   azureStorageAccountName: envVars.AZURE_STORAGE_ACCOUNT_NAME,
   azureStorageAccountKey: envVars.AZURE_STORAGE_ACCOUNT_KEY,
   azureBlobContainerName: envVars.AZURE_BLOB_CONTAINER_NAME, 
-  
+  jwtSecret: envVars.JWT_SECRET,
+  authApiUrl: envVars.AUTH_API_URL,
+  transactionApiUrl: envVars.TRANSACTION_API_URL,
 };

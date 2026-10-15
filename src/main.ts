@@ -6,6 +6,7 @@ import { envs } from './config/envs';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as path from 'path';
 import { apiReference } from '@scalar/nestjs-api-reference';
+import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const logger = new Logger('API');
@@ -13,6 +14,7 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   app.setGlobalPrefix('api');
+  app.use(cookieParser());
 
   app.enableCors({
     origin: 'http://localhost:4200',
