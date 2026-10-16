@@ -23,6 +23,7 @@ export interface CursoResumen {
 
 export interface EstudianteResumen {
   idusuario: number;
+  uuid: string;
   codigo: string;
   alias: string | null;
   tipocuenta: string;
@@ -32,9 +33,10 @@ export interface EstudianteResumen {
 
 export interface FamiliaResumen {
   id: number;
+  uuid: string;
   codigo: string;
   nombre: string | null;
-  padre: { id: number; codigo: string; username: string };
+  padre: { id: number; uuid: string; codigo: string; username: string };
   estudiantes: EstudianteResumen[];
 }
 

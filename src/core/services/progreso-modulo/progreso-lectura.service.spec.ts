@@ -10,12 +10,14 @@ const periodo = { desde: new Date('2026-10-01'), hasta: new Date('2026-10-08') }
 
 const familia = (id: number, idpadre: number, idsHijos: number[]): FamiliaAuth => ({
   id,
+  uuid: `00000000-0000-4000-8001-${String(id).padStart(12, '0')}`,
   codigo: `FAM-00${id}`,
   nombre: id === 1 ? 'Familia Mendoza' : null,
-  padre: { id: idpadre, codigo: `USR-P-0${String(idpadre).padStart(2, '0')}`, username: `padre${idpadre}`, email: `p${idpadre}@x.co` },
+  padre: { id: idpadre, uuid: `00000000-0000-4000-8000-${String(idpadre).padStart(12, '0')}`, codigo: `USR-P-0${String(idpadre).padStart(2, '0')}`, username: `padre${idpadre}`, email: `p${idpadre}@x.co` },
   miembros: idsHijos.map((idusuario) => ({
     idcuenta: idusuario,
     idusuario,
+    uuid: `00000000-0000-4000-8000-${String(idusuario).padStart(12, '0')}`,
     codigo: `USR-N-0${String(idusuario).padStart(2, '0')}`,
     alias: `hijo${idusuario}`,
     tipocuenta: 'NINO',
@@ -48,6 +50,12 @@ describe('construirResumen', () => {
 
   it('incluye los códigos legibles de la familia, el padre y los estudiantes', () => {
     expect(r.familias[0]).toMatchObject({ codigo: 'FAM-001', padre: { codigo: 'USR-P-005' } });
+    expect(r.familias[0].uuid).toBe('00000000-0000-4000-8001-000000000001');
+    expect(r.familias[0].padre.uuid).toBe('00000000-0000-4000-8000-000000000005');
+    expect(r.familias[0].estudiantes.map((e) => e.uuid)).toEqual([
+      '00000000-0000-4000-8000-000000000010',
+      '00000000-0000-4000-8000-000000000011',
+    ]);
     expect(r.familias[0].estudiantes.map((e) => e.codigo)).toEqual(['USR-N-010', 'USR-N-011']);
   });
 

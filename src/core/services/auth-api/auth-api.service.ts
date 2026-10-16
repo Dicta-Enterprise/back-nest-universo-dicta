@@ -4,6 +4,7 @@ import { envs } from 'src/config/envs';
 export interface MiembroFamiliaAuth {
   idcuenta: number;
   idusuario: number;
+  uuid: string;
   codigo: string;
   alias: string | null;
   tipocuenta: string;
@@ -12,21 +13,23 @@ export interface MiembroFamiliaAuth {
 
 export interface FamiliaAuth {
   id: number;
+  uuid: string;
   codigo: string;
   nombre: string | null;
-  padre: { id: number; codigo: string; username: string; email: string };
+  padre: { id: number; uuid: string; codigo: string; username: string; email: string };
   miembros: MiembroFamiliaAuth[];
 }
 
 export interface UsuarioAdminAuth {
   id: number;
+  uuid: string;
   codigo: string;
   tipo: 'P' | 'N' | 'J';
   rol: 'PADRE' | 'NINO' | 'JOVEN';
   nombre: string;
   email: string;
   estado: 'ACTIVA' | 'PENDIENTE' | 'INACTIVA' | 'BLOQUEADA';
-  familia: { id: number; codigo: string; nombre: string | null } | null;
+  familia: { id: number; uuid: string; codigo: string; nombre: string | null } | null;
   fechaRegistro: string | null;
 }
 

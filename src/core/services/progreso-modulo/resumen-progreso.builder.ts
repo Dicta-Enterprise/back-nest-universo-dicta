@@ -82,6 +82,7 @@ export function construirResumen(
 
       return {
         idusuario: miembro.idusuario,
+        uuid: miembro.uuid,
         codigo: miembro.codigo,
         alias: miembro.alias,
         tipocuenta: miembro.tipocuenta,
@@ -93,9 +94,15 @@ export function construirResumen(
     if (activa) familiasActivas += 1;
     return {
       id: familia.id,
+      uuid: familia.uuid,
       codigo: familia.codigo,
       nombre: familia.nombre,
-      padre: { id: familia.padre.id, codigo: familia.padre.codigo, username: familia.padre.username },
+      padre: {
+        id: familia.padre.id,
+        uuid: familia.padre.uuid,
+        codigo: familia.padre.codigo,
+        username: familia.padre.username,
+      },
       estudiantes,
     };
   });

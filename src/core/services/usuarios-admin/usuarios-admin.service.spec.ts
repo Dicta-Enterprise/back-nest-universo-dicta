@@ -5,6 +5,7 @@ jest.mock('src/config/envs', () => ({ envs: {} }));
 
 const usuario = (id: number, rol: 'PADRE' | 'NINO' | 'JOVEN'): UsuarioAdminAuth => ({
   id,
+  uuid: `00000000-0000-4000-8000-${String(id).padStart(12, '0')}`,
   codigo: `USR-${rol[0]}-${String(id).padStart(3, '0')}`,
   tipo: rol === 'PADRE' ? 'P' : rol === 'NINO' ? 'N' : 'J',
   rol,
