@@ -10,11 +10,13 @@ const periodo = { desde: new Date('2026-10-01'), hasta: new Date('2026-10-08') }
 
 const familia = (id: number, idpadre: number, idsHijos: number[]): FamiliaAuth => ({
   id,
+  codigo: `FAM-00${id}`,
   nombre: id === 1 ? 'Familia Mendoza' : null,
-  padre: { id: idpadre, username: `padre${idpadre}`, email: `p${idpadre}@x.co` },
+  padre: { id: idpadre, codigo: `USR-P-0${String(idpadre).padStart(2, '0')}`, username: `padre${idpadre}`, email: `p${idpadre}@x.co` },
   miembros: idsHijos.map((idusuario) => ({
     idcuenta: idusuario,
     idusuario,
+    codigo: `USR-N-0${String(idusuario).padStart(2, '0')}`,
     alias: `hijo${idusuario}`,
     tipocuenta: 'NINO',
     estado: 'ACTIVA',
@@ -42,6 +44,11 @@ describe('construirResumen', () => {
   it('calcula el porcentaje por módulos completados (1 de 2 = 50%)', () => {
     const curso10 = r.familias[0].estudiantes[0].cursos[0];
     expect(curso10).toMatchObject({ modulosCompletados: 1, totalModulos: 2, porcentaje: 50 });
+  });
+
+  it('incluye los códigos legibles de la familia, el padre y los estudiantes', () => {
+    expect(r.familias[0]).toMatchObject({ codigo: 'FAM-001', padre: { codigo: 'USR-P-005' } });
+    expect(r.familias[0].estudiantes.map((e) => e.codigo)).toEqual(['USR-N-010', 'USR-N-011']);
   });
 
   it('un estudiante sin eventos queda sin cursos', () => {
