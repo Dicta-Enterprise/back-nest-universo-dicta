@@ -15,6 +15,7 @@ interface EnvVars {
   LRS_KEY: string;
   LRS_SECRET: string;
   AUTH_API_URL: string;
+  TRANSACTION_API_URL: string;
   INTERNAL_API_KEY: string;
 }
 
@@ -34,6 +35,7 @@ const envSchema = joi
     LRS_KEY: joi.string().allow('').default(''),
     LRS_SECRET: joi.string().allow('').default(''),
     AUTH_API_URL: joi.string().default('http://localhost:3002'),
+    TRANSACTION_API_URL: joi.string().default('http://localhost:3001'),
     INTERNAL_API_KEY: joi.string().min(16).required(),
   })
   .unknown(true);
@@ -61,5 +63,6 @@ export const envs = {
   lrsKey: envVars.LRS_KEY,
   lrsSecret: envVars.LRS_SECRET,
   authApiUrl: envVars.AUTH_API_URL,
+  transactionApiUrl: envVars.TRANSACTION_API_URL,
   internalApiKey: envVars.INTERNAL_API_KEY,
 };

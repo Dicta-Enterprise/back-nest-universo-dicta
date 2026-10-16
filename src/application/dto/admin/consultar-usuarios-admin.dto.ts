@@ -3,7 +3,8 @@ import { Type } from 'class-transformer';
 import { IsDateString, IsIn, IsInt, IsOptional, IsString, Max, MaxLength, Min } from 'class-validator';
 
 export const ROLES_USUARIO_FILTRO = ['PADRE', 'NINO', 'JOVEN'] as const;
-export const ESTADOS_USUARIO_FILTRO = ['ACTIVA', 'PENDIENTE', 'INACTIVA', 'BLOQUEADA'] as const;
+export const FILTRO_COMPRO = ['si', 'no'] as const;
+export const ESTADOS_USUARIO_FILTRO =['ACTIVA', 'PENDIENTE', 'INACTIVA', 'BLOQUEADA'] as const;
 
 export class ConsultarUsuariosAdminDto {
   @ApiPropertyOptional({ example: 'sofia', description: 'Busca en nombre, correo, código y nombre de familia.' })
@@ -43,6 +44,21 @@ export class ConsultarUsuariosAdminDto {
   @IsOptional()
   @IsDateString()
   hasta?: string;
+
+  @ApiPropertyOptional({ enum: FILTRO_COMPRO, description: 'si: solo quienes ya compraron. no: solo quienes no han comprado. Aplica a padres.' })
+  @IsOptional()
+  @IsIn(FILTRO_COMPRO)
+  compro?: (typeof FILTRO_COMPRO)[number];
+
+  @ApiPropertyOptional({ example: '2026-10-01', description: 'Primera compra desde esta fecha (implica que ya compró).' })
+  @IsOptional()
+  @IsDateString()
+  compraDesde?: string;
+
+  @ApiPropertyOptional({ example: '2026-10-31', description: 'Primera compra hasta esta fecha (implica que ya compró).' })
+  @IsOptional()
+  @IsDateString()
+  compraHasta?: string;
 
   @ApiPropertyOptional({ example: 1, default: 1 })
   @IsOptional()
