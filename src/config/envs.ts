@@ -14,16 +14,19 @@ interface EnvVars {
   BUNNY_TEXTURAS_ZONE: string;
   BUNNY_TEXTURAS_PASSWORD: string;
   BUNNY_TEXTURAS_CDN_URL: string;
+  JWT_SECRET: string;
+  AUTH_API_URL: string;
+  TRANSACTION_API_URL: string;
 }
 
 const envSchema = joi
   .object({
     PORT: joi.number().required(),
     DATABASE_URL: joi.string().required(),
-    AZURE_BLOB_STORAGE_ENDPOINT: joi.string().optional(),
-    AZURE_STORAGE_ACCOUNT_NAME: joi.string().optional(),
-    AZURE_STORAGE_ACCOUNT_KEY: joi.string().optional(),
-    AZURE_BLOB_CONTAINER_NAME: joi.string().optional(),
+    AZURE_BLOB_STORAGE_ENDPOINT: joi.string().required(),
+    AZURE_STORAGE_ACCOUNT_NAME: joi.string().required(),
+    AZURE_STORAGE_ACCOUNT_KEY: joi.string().required(),
+    AZURE_BLOB_CONTAINER_NAME: joi.string().required(),
     BUNNY_STORAGE_ENDPOINT: joi.string().required(),
     BUNNY_CURSOS_ZONE: joi.string().required(),
     BUNNY_CURSOS_PASSWORD: joi.string().required(),
@@ -31,6 +34,9 @@ const envSchema = joi
     BUNNY_TEXTURAS_ZONE: joi.string().required(),
     BUNNY_TEXTURAS_PASSWORD: joi.string().required(),
     BUNNY_TEXTURAS_CDN_URL: joi.string().required(),
+    JWT_SECRET: joi.string().required(),
+    AUTH_API_URL: joi.string().required(),
+    TRANSACTION_API_URL: joi.string().required(),
   })
   .unknown(true);
 
@@ -56,4 +62,7 @@ export const envs = {
   bunnyTexturasZone: envVars.BUNNY_TEXTURAS_ZONE,
   bunnyTexturasPassword: envVars.BUNNY_TEXTURAS_PASSWORD,
   bunnyTexturasCdnUrl: envVars.BUNNY_TEXTURAS_CDN_URL,
+  jwtSecret: envVars.JWT_SECRET,
+  authApiUrl: envVars.AUTH_API_URL,
+  transactionApiUrl: envVars.TRANSACTION_API_URL,
 };
