@@ -7,16 +7,30 @@ interface EnvVars {
   AZURE_STORAGE_ACCOUNT_NAME: string;
   AZURE_STORAGE_ACCOUNT_KEY: string;
   AZURE_BLOB_CONTAINER_NAME: string;
+  BUNNY_STORAGE_ENDPOINT: string;
+  BUNNY_CURSOS_ZONE: string;
+  BUNNY_CURSOS_PASSWORD: string;
+  BUNNY_CURSOS_CDN_URL: string;
+  BUNNY_TEXTURAS_ZONE: string;
+  BUNNY_TEXTURAS_PASSWORD: string;
+  BUNNY_TEXTURAS_CDN_URL: string;
 }
 
 const envSchema = joi
   .object({
     PORT: joi.number().required(),
     DATABASE_URL: joi.string().required(),
-    AZURE_BLOB_STORAGE_ENDPOINT: joi.string().required(),
-    AZURE_STORAGE_ACCOUNT_NAME: joi.string().required(),
-    AZURE_STORAGE_ACCOUNT_KEY: joi.string().required(),
-    AZURE_BLOB_CONTAINER_NAME: joi.string().required(),
+    AZURE_BLOB_STORAGE_ENDPOINT: joi.string().optional(),
+    AZURE_STORAGE_ACCOUNT_NAME: joi.string().optional(),
+    AZURE_STORAGE_ACCOUNT_KEY: joi.string().optional(),
+    AZURE_BLOB_CONTAINER_NAME: joi.string().optional(),
+    BUNNY_STORAGE_ENDPOINT: joi.string().required(),
+    BUNNY_CURSOS_ZONE: joi.string().required(),
+    BUNNY_CURSOS_PASSWORD: joi.string().required(),
+    BUNNY_CURSOS_CDN_URL: joi.string().required(),
+    BUNNY_TEXTURAS_ZONE: joi.string().required(),
+    BUNNY_TEXTURAS_PASSWORD: joi.string().required(),
+    BUNNY_TEXTURAS_CDN_URL: joi.string().required(),
   })
   .unknown(true);
 
@@ -34,6 +48,12 @@ export const envs = {
   azureBlobStorageEndpoint: envVars.AZURE_BLOB_STORAGE_ENDPOINT,
   azureStorageAccountName: envVars.AZURE_STORAGE_ACCOUNT_NAME,
   azureStorageAccountKey: envVars.AZURE_STORAGE_ACCOUNT_KEY,
-  azureBlobContainerName: envVars.AZURE_BLOB_CONTAINER_NAME, 
-  
+  azureBlobContainerName: envVars.AZURE_BLOB_CONTAINER_NAME,
+  bunnyStorageEndpoint: envVars.BUNNY_STORAGE_ENDPOINT,
+  bunnyCursosZone: envVars.BUNNY_CURSOS_ZONE,
+  bunnyCursosPassword: envVars.BUNNY_CURSOS_PASSWORD,
+  bunnyCursosCdnUrl: envVars.BUNNY_CURSOS_CDN_URL,
+  bunnyTexturasZone: envVars.BUNNY_TEXTURAS_ZONE,
+  bunnyTexturasPassword: envVars.BUNNY_TEXTURAS_PASSWORD,
+  bunnyTexturasCdnUrl: envVars.BUNNY_TEXTURAS_CDN_URL,
 };

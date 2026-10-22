@@ -12,6 +12,7 @@ import { AzureModule } from './infraestructure/http/azure/azure.module';
 import { ProfesorModule } from './infraestructure/http/profesor/profesor.module';
 import { ParametersModule } from './infraestructure/http/parameters/parameters.module';
 import { LandingPageModule } from './infraestructure/http/landing-page/landing-page.module';
+import { AstronautasModule } from './infraestructure/http/astronauta/astronautas.module';
 
 @Module({
   imports: [
@@ -25,7 +26,8 @@ import { LandingPageModule } from './infraestructure/http/landing-page/landing-p
     AzureModule,
     ParametersModule,
     MenuModule,
-    LandingPageModule
+    LandingPageModule,
+    AstronautasModule,
   ],
   controllers: [AppController],
   providers: [AppService],

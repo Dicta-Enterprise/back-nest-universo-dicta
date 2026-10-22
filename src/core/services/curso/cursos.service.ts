@@ -78,6 +78,8 @@ export class CursosService {
       dtoCurso.valoracion ?? 0,
       dtoDinamico.planetaId,
       undefined,
+      undefined,
+      undefined,
       dtoCurso.beneficios as unknown,
     );
 
@@ -159,6 +161,8 @@ export class CursosService {
       dtoCurso.resumenDescripcion ?? existe.resumenDescripcion,
       dtoCurso.valoracion ?? existe.valoracion,
       dtoDinamico.planetaId ?? cursoBaseDinamico.planetaId,
+      undefined,
+      undefined,
       undefined,
       (dtoCurso.beneficios as unknown) ?? existe.beneficios,
     );

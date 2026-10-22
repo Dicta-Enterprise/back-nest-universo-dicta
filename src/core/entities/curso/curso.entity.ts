@@ -11,15 +11,9 @@ export class BeneficioCurso {
 }
 
 
-export interface ImagenesVersion{
+// Una sola imagen por curso (ver nota en create-curso.dto.ts).
+export interface CursoImagenes {
   principal: string;
-  secundaria: string;
-}
-
-export interface CursoImagenes{ 
-  mobile: ImagenesVersion;
-  tablet: ImagenesVersion;
-  pc: ImagenesVersion;
 }
 
 export class Curso {

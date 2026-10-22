@@ -58,6 +58,27 @@ enum TipoUsuario {
   DESARROLLADOR
 }
 
+enum TipoAstronauta {
+  PAPA
+  MAMA
+  HIJO
+  HIJA
+}
+
+// Los 4 modelos 3D (.glb) de la familia que flota en la intro de universo-3d-react. Uno solo
+// por tipo (@unique) -- subir uno nuevo reemplaza el anterior, no se acumulan versiones viejas.
+// Pedido de Carlos, 15-oct-2026: gestionarlos desde el panel admin en vez de archivos sueltos
+// en el repositorio de universo-3d-react.
+model Astronauta {
+  id                 String         @id @default(auto()) @map("_id") @db.ObjectId
+  tipo               TipoAstronauta @unique
+  nombreArchivo      String
+  url                String
+  pesoBytes           Int
+  fechaActualizacion DateTime       @updatedAt
+  fechaCreacion      DateTime       @default(now())
+}
+
 model Categoria {
   id          String @id @default(auto()) @map("_id") @db.ObjectId
   nombre      String @unique
@@ -143,20 +164,33 @@ type Beneficio {
   descripcion String
 }
 
+// Módulo (clase/capítulo) de un curso. "esGratis" marca los módulos que se pueden ver sin
+// comprar el curso (vista previa) -- el candado en el reproductor y el flujo de pago/registro
+// gratis que usan esta bandera viven en el sitio del LMS de cara al estudiante, no en el admin.
+type Modulo {
+  id           String  @default(uuid())
+  nombre       String
+  bunnyVideoId String?
+  orden        Int
+  esGratis     Boolean @default(false)
+}
+
 model Curso {
   id              String      @id @default(auto()) @map("_id") @db.ObjectId
   nombre          String      @unique
   descripcion     String
-  resumenDescripcion String?   
-  valoracion      Float?      @default(0) 
+  resumenDescripcion String?
+  valoracion      Float?      @default(0)
   beneficios      Beneficio[]
+  modulos         Modulo[]
   fechaCreacion   DateTime    @default(now())
   fechaInicio     DateTime?
   fechaFinal      DateTime?
   precio          Float
   estado          Boolean     @default(true)
-  imagenes          Json?      
+  imagenes          Json?
   duracionSemanas Float?
+  duracionEstimadaMinutos Int?
 
   profesor    Profesor?  @relation(fields: [profesorId], references: [id])
   profesorId  String?    @db.ObjectId

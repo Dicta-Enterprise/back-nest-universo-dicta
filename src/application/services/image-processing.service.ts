@@ -1,58 +1,33 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { v2 as cloudinary } from 'cloudinary';
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-import sharp = require('sharp');
+import { BunnyStorageService, ZONA_CURSOS } from 'src/shared/services/bunny-storage.service';
+import { CursoImagenes } from 'src/core/entities/curso/curso.entity';
 
+/**
+ * Sube la imagen de un curso a Bunny (zona "tarjetas-cursos-mundo-dictariano").
+ *
+ * Antes este servicio redimensionaba 2 archivos (principal/secundaria) en 6 versiones WebP
+ * y las subía a Cloudinary. Se simplificó a UNA sola imagen por decisión de Carlos y Wilson
+ * (reunión del 30-sep-2026): "dejamos solamente una, simplemente arrastra la misma" tanto
+ * para el catálogo como para la LMS. El archivo ya llega validado como WebP de máximo 80 KB
+ * por `validarImagenWebp()` en el controlador, así que aquí no hace falta volver a procesarlo.
+ */
 @Injectable()
 export class ImageProcessingService {
-  constructor() {
-    cloudinary.config({
-      cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-      api_key: process.env.CLOUDINARY_API_KEY,
-      api_secret: process.env.CLOUDINARY_API_SECRET,
-    });
-  }
+  constructor(private readonly bunny: BunnyStorageService) {}
 
-  async processFromFiles(principalFile: Express.Multer.File, secundariaFile: Express.Multer.File) {
+  async processFromFiles(principalFile: Express.Multer.File): Promise<CursoImagenes> {
     try {
-      const bufferP = principalFile.buffer;
-      const bufferS = secundariaFile.buffer;
-
-      const [pcP, pcS, tabP, tabS, mobP, mobS] = await Promise.all([
-        this.resize(bufferP, 1920, 1080), this.resize(bufferS, 600, 250),
-        this.resize(bufferP, 1280, 720),  this.resize(bufferS, 400, 166),
-        this.resize(bufferP, 640, 360),    this.resize(bufferS, 300, 125),
-      ]);
-
-      const uploadToCloudinary = (buffer: Buffer, fileName: string): Promise<string> => {
-        return new Promise((resolve, reject) => {
-          const uploadStream = cloudinary.uploader.upload_stream(
-            { folder: 'cursos', public_id: `${Date.now()}-${fileName}`, format: 'webp' },
-            (error, result) => {
-              if (error) return reject(error);
-              resolve(result.secure_url);
-            }
-          );
-          uploadStream.end(buffer);
-        });
-      };
-
-      return {
-        pc:      { principal: await uploadToCloudinary(pcP, 'pcP'),  secundaria: await uploadToCloudinary(pcS, 'pcS') },
-        tablet:  { principal: await uploadToCloudinary(tabP, 'tabP'), secundaria: await uploadToCloudinary(tabS, 'tabS') },
-        mobile:  { principal: await uploadToCloudinary(mobP, 'mobP'), secundaria: await uploadToCloudinary(mobS, 'mobS') },
-      };
-
+      const nombreArchivo = `${Date.now()}-principal.webp`;
+      const principal = await this.bunny.subirArchivo(
+        ZONA_CURSOS,
+        nombreArchivo,
+        principalFile.buffer,
+        'image/webp',
+      );
+      return { principal };
     } catch (error: unknown) {
       const msg = error instanceof Error ? error.message : 'Error desconocido';
-      throw new BadRequestException(`Fallo al procesar imágenes: ${msg}`);
+      throw new BadRequestException(`Fallo al subir la imagen: ${msg}`);
     }
-  }
-
-  private async resize(buffer: Buffer, width: number, height: number): Promise<Buffer> {
-    return await sharp(buffer)
-      .resize(width, height, { fit: 'cover' })
-      .webp({ quality: 80 })
-      .toBuffer();
   }
 }

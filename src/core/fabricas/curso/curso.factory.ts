@@ -72,7 +72,9 @@ export class DefaultCursoFactory implements CursoFactory {
       prisma.resumenDescripcion ?? '',
       prisma.valoracion ?? 0,
       datosExtensos.planetaId as string ?? undefined,
-      undefined as unknown as Profesor, 
+      undefined as unknown as Profesor,
+      undefined,
+      undefined,
       datosExtensos.beneficios as Beneficio[] ?? undefined,
     );
   }

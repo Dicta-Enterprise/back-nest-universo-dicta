@@ -28,28 +28,13 @@ class BeneficioDto {
   descripcion: string;
 }
 
-class ImagenesVersionDto {
+// Una sola imagen por curso (decisión de Carlos/Wilson, reunión 30-sep-2026): se usa la misma
+// en el catálogo y en la LMS, en vez de las 6 versiones (principal/secundaria x pc/tablet/mobile)
+// que se subían antes a Cloudinary.
+class CursoImagenesDto {
   @IsUrl({}, { message: 'Debe ser una URL válida.' })
   @IsNotEmpty()
   principal: string;
-
-  @IsUrl({}, { message: 'Debe ser una URL válida.' })
-  @IsNotEmpty()
-  secundaria: string;
-}
-
-class CursoImagenesDto {
-  @ValidateNested()
-  @Type(() => ImagenesVersionDto)
-  mobile: ImagenesVersionDto;
-
-  @ValidateNested()
-  @Type(() => ImagenesVersionDto)
-  tablet: ImagenesVersionDto;
-
-  @ValidateNested()
-  @Type(() => ImagenesVersionDto)
-  pc: ImagenesVersionDto;
 }
 
 export class CreateCursoDto {

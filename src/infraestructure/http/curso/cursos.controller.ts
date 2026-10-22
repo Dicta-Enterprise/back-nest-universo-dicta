@@ -19,6 +19,7 @@ import * as dto from 'src/application/dto/curso';
 import { ApiConsumes, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'; 
 import { RequestListarCurso } from 'src/shared/enums/request-list-curso-enum';
 import { ImageProcessingService } from 'src/application/services/image-processing.service';
+import { MULTER_HARD_LIMIT_BYTES, validarImagenWebp } from 'src/shared/helper/imagen-webp.helper';
 
 @ApiTags('Cursos')
 @Controller('cursos')
@@ -33,28 +34,27 @@ export class CursosController {
   ) {}
 
   @Post()
-  @UseInterceptors(FileFieldsInterceptor([ 
+  @UseInterceptors(FileFieldsInterceptor([
     { name: 'principal', maxCount: 1 },
-    { name: 'secundaria', maxCount: 1 },
-  ]))
-  @ApiConsumes('multipart/form-data') 
-  @ApiOperation({ summary: 'Crea un curso procesando 2 archivos físicos desde la PC hacia Cloudinary en 6 versiones WebP' })
-  @ApiResponse({ status: 201, description: 'Curso creado con imágenes redimensionadas.' })
+  ], { limits: { fileSize: MULTER_HARD_LIMIT_BYTES } }))
+  @ApiConsumes('multipart/form-data')
+  @ApiOperation({ summary: 'Crea un curso subiendo una imagen (WebP, máx. 80 KB) a Bunny' })
+  @ApiResponse({ status: 201, description: 'Curso creado con su imagen.' })
   async create(
     @Body() dtoCurso: dto.CreateCursoDto,
-    @UploadedFiles() files: { principal?: Express.Multer.File[], secundaria?: Express.Multer.File[] }
+    @UploadedFiles() files: { principal?: Express.Multer.File[] }
   ) {
-    if (!files || !files.principal || !files.secundaria) {
-      throw new BadRequestException('Se requieren obligatoriamente ambos archivos físicos (principal y secundaria) desde la PC.');
+    if (!files || !files.principal) {
+      throw new BadRequestException('Se requiere obligatoriamente el archivo de imagen (principal) desde la PC.');
     }
+    validarImagenWebp(files.principal[0], 'principal');
 
     try {
       const imagenesProcesadas = await this.imageProcessingService.processFromFiles(
         files.principal[0],
-        files.secundaria[0]
       );
-      
-      dtoCurso.imagenes = imagenesProcesadas; 
+
+      dtoCurso.imagenes = imagenesProcesadas;
 
       if (dtoCurso.precio) dtoCurso.precio = Number(dtoCurso.precio);
 
@@ -72,31 +72,28 @@ export class CursosController {
   }
 
   @Patch(':id')
-  @UseInterceptors(FileFieldsInterceptor([ 
+  @UseInterceptors(FileFieldsInterceptor([
     { name: 'principal', maxCount: 1 },
-    { name: 'secundaria', maxCount: 1 },
-  ]))
+  ], { limits: { fileSize: MULTER_HARD_LIMIT_BYTES } }))
   @ApiConsumes('multipart/form-data')
-  @ApiOperation({ summary: 'Actualiza curso y redimensiona nuevos archivos físicos si se proporcionan' })
+  @ApiOperation({ summary: 'Actualiza curso y la imagen si se proporciona una nueva' })
   async update(
     @Param('id', ParseObjectIdPipe) id: string,
     @Body() updateCursoDto: dto.UpdateCursoDto,
-    @UploadedFiles() files: { principal?: Express.Multer.File[], secundaria?: Express.Multer.File[] } 
+    @UploadedFiles() files: { principal?: Express.Multer.File[] }
   ) {
+    if (files?.principal) {
+      validarImagenWebp(files.principal[0], 'principal');
+    }
+
     const cursoActual = await this.getOneCursoUseCase.execute(id);
     if (cursoActual.isFailure) throw new HttpException('Curso no encontrado', HttpStatus.NOT_FOUND);
 
     try {
-      if (files && (files.principal || files.secundaria)) {
-        
-        if (files.principal && files.secundaria) {
-          updateCursoDto.imagenes = await this.imageProcessingService.processFromFiles(
-            files.principal[0],
-            files.secundaria[0]
-          );
-        } else {
-          throw new BadRequestException('Para actualizar las imágenes, debes cargar tanto el archivo principal como el secundario en el formulario.');
-        }
+      if (files?.principal) {
+        updateCursoDto.imagenes = await this.imageProcessingService.processFromFiles(
+          files.principal[0],
+        );
       }
 
       if (updateCursoDto.precio) updateCursoDto.precio = Number(updateCursoDto.precio);
