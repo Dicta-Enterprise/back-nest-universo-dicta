@@ -1,6 +1,10 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { AuthApiService, FiltrosUsuariosAuth, UsuarioAdminAuth } from 'src/core/services/auth-api/auth-api.service';
-import { ResumenCompraUsuario, TransactionApiService } from 'src/core/services/transaction-api/transaction-api.service';
+import {
+  DetalleCompraUsuario,
+  ResumenCompraUsuario,
+  TransactionApiService,
+} from 'src/core/services/transaction-api/transaction-api.service';
 
 export type FiltroCompro = 'si' | 'no';
 
@@ -68,6 +72,20 @@ export function filtrarPorCompra(
   });
 }
 
+export interface ComprasDeUsuario {
+  usuario: { uuid: string; codigo: string; nombre: string; rol: UsuarioAdminAuth['rol'] };
+  compras: DetalleCompraUsuario[];
+  total: number;
+}
+
+/** Encuentra al usuario por UUID, código (USR-P-014) o id numérico; el filtro de back-auth también puede devolver familias. */
+export function buscarUsuario(usuarios: UsuarioAdminAuth[], identificador: string): UsuarioAdminAuth | undefined {
+  const buscado = identificador.trim().toLowerCase();
+  return usuarios.find(
+    (u) => u.uuid.toLowerCase() === buscado || u.codigo.toLowerCase() === buscado || String(u.id) === buscado,
+  );
+}
+
 export function paginar<T>(items: T[], page = 1, limit = LIMITE_POR_DEFECTO) {
   const limite = Math.min(Math.max(limit, 1), LIMITE_MAXIMO);
   const pagina = Math.max(page, 1);
@@ -105,6 +123,26 @@ export class UsuariosAdminService {
     const resumenes = await this.resumenesDePadres(candidatos);
     const filtrados = filtrarPorCompra(aplicarCompras(candidatos, resumenes), { compro, compraDesde, compraHasta });
     return { ...paginar(filtrados, filtros.page, filtros.limit), comprasDisponibles: true };
+  }
+
+  /**
+   * Compras de un usuario (fecha, país, ciudad y si salió bien o no) para la ventana de detalles del panel.
+   * Solo los padres compran: para un niño o joven la lista va vacía, sin consultar a back-transaction.
+   */
+  async comprasDeUsuario(identificador: string): Promise<ComprasDeUsuario> {
+    const { items } = await this.authApi.listarUsuarios({ id: identificador, page: 1, limit: LIMITE_MAXIMO });
+    const encontrado = buscarUsuario(items, identificador);
+
+    if (!encontrado) {
+      throw new NotFoundException('No se encontró el usuario.');
+    }
+
+    const compras = encontrado.rol === 'PADRE' ? await this.transactionApi.detalleCompras(encontrado.id) : [];
+    return {
+      usuario: { uuid: encontrado.uuid, codigo: encontrado.codigo, nombre: encontrado.nombre, rol: encontrado.rol },
+      compras,
+      total: compras.length,
+    };
   }
 
   private async resumenesDePadres(usuarios: UsuarioAdminAuth[]): Promise<ResumenCompraUsuario[]> {

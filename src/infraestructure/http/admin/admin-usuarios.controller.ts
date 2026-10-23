@@ -1,4 +1,4 @@
-import { Controller, Get, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
 import { ApiCookieAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { jwtAuthGuard } from 'src/shared/guard/jwtAuth.guard';
 import { AdminGuard } from 'src/shared/guard/admin.guard';
@@ -27,5 +27,21 @@ export class AdminUsuariosController {
   async listar(@Query() query: ConsultarUsuariosAdminDto) {
     const lista = await this.usuariosAdminService.listar(query);
     return { data: lista, message: 'Usuarios obtenidos con éxito.' };
+  }
+
+  @Get(':identificador/compras')
+  @ApiOperation({
+    summary:
+      'Detalle de las compras de un usuario: fecha y hora, país, ciudad y si fue exitosa o no. Identificador: UUID o código (USR-P-014).',
+  })
+  @ApiResponse({ status: 200, description: 'Compras del usuario (vacío si no es un padre o no ha comprado).' })
+  @ApiResponse({ status: 401, description: 'No autenticado.' })
+  @ApiResponse({ status: 403, description: 'Solo administradores.' })
+  @ApiResponse({ status: 404, description: 'No existe un usuario con ese identificador.' })
+  @ApiResponse({ status: 502, description: 'Un servicio interno respondió con un error.' })
+  @ApiResponse({ status: 503, description: 'No se pudo conectar con un servicio interno.' })
+  async compras(@Param('identificador') identificador: string) {
+    const detalle = await this.usuariosAdminService.comprasDeUsuario(identificador);
+    return { data: detalle, message: 'Compras obtenidas con éxito.' };
   }
 }

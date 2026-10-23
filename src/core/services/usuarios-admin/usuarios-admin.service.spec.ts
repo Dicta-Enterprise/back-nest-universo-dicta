@@ -1,4 +1,5 @@
-import { aplicarCompras, filtrarPorCompra, paginar, UsuariosAdminService } from './usuarios-admin.service';
+import { NotFoundException } from '@nestjs/common';
+import { aplicarCompras, buscarUsuario, filtrarPorCompra, paginar, UsuariosAdminService } from './usuarios-admin.service';
 import { UsuarioAdminAuth } from 'src/core/services/auth-api/auth-api.service';
 
 jest.mock('src/config/envs', () => ({ envs: {} }));
@@ -43,6 +44,20 @@ describe('filtrarPorCompra', () => {
   it('filtra por rango de fecha de la primera compra', () => {
     expect(filtrarPorCompra(conCompra, { compraDesde: '2026-09-01' }).map((u) => u.id)).toEqual([3]);
     expect(filtrarPorCompra(conCompra, { compraHasta: '2026-08-01' }).map((u) => u.id)).toEqual([1]);
+  });
+});
+
+describe('buscarUsuario', () => {
+  it('encuentra al usuario por UUID, por código o por id, sin importar mayúsculas', () => {
+    expect(buscarUsuario(lista, lista[1].uuid)?.id).toBe(2);
+    expect(buscarUsuario(lista, lista[1].uuid.toUpperCase())?.id).toBe(2);
+    expect(buscarUsuario(lista, 'usr-p-003')?.id).toBe(3);
+    expect(buscarUsuario(lista, '4')?.id).toBe(4);
+  });
+
+  it('devuelve undefined si no hay coincidencia exacta', () => {
+    expect(buscarUsuario(lista, 'USR-P-999')).toBeUndefined();
+    expect(buscarUsuario(lista, '')).toBeUndefined();
   });
 });
 
@@ -97,5 +112,60 @@ describe('UsuariosAdminService', () => {
     const transaction = { resumenCompras: jest.fn().mockRejectedValue(new Error('caído')) };
     const { service } = crear(transaction);
     await expect(service.listar({ compro: 'no' })).rejects.toThrow('caído');
+  });
+});
+
+describe('UsuariosAdminService.comprasDeUsuario', () => {
+  const compraDemo = {
+    idorden: 41,
+    fecha: '2026-07-22T19:05:00.000Z',
+    fechaLocal: '2026-07-22 14:05',
+    zonaHoraria: 'America/Bogota',
+    pais: 'Colombia',
+    ciudad: 'Bogotá',
+    estado: 'COMPLETADO',
+    resultado: 'EXITOSA' as const,
+    monto: 50000,
+    moneda: 'COP',
+    cursos: ['Cyberbullying - Niños'],
+  };
+
+  const crear = (detalle: jest.Mock = jest.fn().mockResolvedValue([compraDemo])) => {
+    const auth = { listarUsuarios: jest.fn().mockResolvedValue({ items: lista, total: 4, page: 1, limit: 100 }) };
+    const transaction = { detalleCompras: detalle, resumenCompras: jest.fn() };
+    return { service: new UsuariosAdminService(auth as never, transaction as never), auth, transaction };
+  };
+
+  it('devuelve las compras del padre usando su id interno, buscado por UUID o código', async () => {
+    const { service, auth, transaction } = crear();
+    const r = await service.comprasDeUsuario('usr-p-002');
+
+    expect(auth.listarUsuarios).toHaveBeenCalledWith({ id: 'usr-p-002', page: 1, limit: 100 });
+    expect(transaction.detalleCompras).toHaveBeenCalledWith(2);
+    expect(r).toEqual({
+      usuario: { uuid: lista[1].uuid, codigo: 'USR-P-002', nombre: 'u2', rol: 'PADRE' },
+      compras: [compraDemo],
+      total: 1,
+    });
+  });
+
+  it('un niño o joven no compra: lista vacía sin consultar a back-transaction', async () => {
+    const { service, transaction } = crear();
+    const r = await service.comprasDeUsuario(lista[3].uuid);
+
+    expect(r.compras).toEqual([]);
+    expect(r.total).toBe(0);
+    expect(transaction.detalleCompras).not.toHaveBeenCalled();
+  });
+
+  it('si no existe el usuario responde 404 y no consulta compras', async () => {
+    const { service, transaction } = crear();
+    await expect(service.comprasDeUsuario('USR-P-999')).rejects.toBeInstanceOf(NotFoundException);
+    expect(transaction.detalleCompras).not.toHaveBeenCalled();
+  });
+
+  it('si back-transaction falla, el error sale tal cual (no se inventa un listado vacío)', async () => {
+    const { service } = crear(jest.fn().mockRejectedValue(new Error('caído')));
+    await expect(service.comprasDeUsuario('USR-P-001')).rejects.toThrow('caído');
   });
 });
