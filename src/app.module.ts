@@ -16,6 +16,8 @@ import { BunnyModule } from './infraestructure/http/bunny/bunny.module';
 import { XapiModule } from './infraestructure/http/xapi/xapi.module';
 import { ProgresoModule } from './infraestructure/http/progreso/progreso.module';
 import { AdminModule } from './infraestructure/http/admin/admin.module';
+import { PlantillasCertificacionModule } from './infraestructure/http/plantilla-certificacion/plantillas-certificacion.module';
+import { ProgresoCursoModule } from './infraestructure/http/progreso-curso/progreso-curso.module';
 
 @Module({
   imports: [
@@ -34,6 +36,8 @@ import { AdminModule } from './infraestructure/http/admin/admin.module';
     XapiModule,
     ProgresoModule,
     AdminModule,
+    PlantillasCertificacionModule,
+    ProgresoCursoModule,
   ],
   controllers: [AppController],
   providers: [AppService],

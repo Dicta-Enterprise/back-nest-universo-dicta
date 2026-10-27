@@ -1,7 +1,7 @@
 import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
 import { ApiCookieAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { jwtAuthGuard } from 'src/shared/guard/jwtAuth.guard';
-import { AdminGuard } from 'src/shared/guard/admin.guard';
+import { JwtAuthGuard } from 'src/shared/auth/jwt-auth.guard';
+import { AdminGuard } from 'src/shared/auth/admin.guard';
 import { ConsultarUsuariosAdminDto } from 'src/application/dto/admin/consultar-usuarios-admin.dto';
 import { UsuariosAdminService } from 'src/core/services/usuarios-admin/usuarios-admin.service';
 
@@ -10,7 +10,7 @@ import { UsuariosAdminService } from 'src/core/services/usuarios-admin/usuarios-
 @ApiTags('Admin - Usuarios')
 @ApiCookieAuth('accessToken')
 @Controller('admin/usuarios')
-@UseGuards(jwtAuthGuard, AdminGuard)
+@UseGuards(JwtAuthGuard, AdminGuard)
 export class AdminUsuariosController {
   constructor(private readonly usuariosAdminService: UsuariosAdminService) {}
 

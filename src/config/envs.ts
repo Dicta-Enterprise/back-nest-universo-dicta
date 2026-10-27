@@ -34,8 +34,8 @@ const envSchema = joi
     LRS_ENDPOINT: joi.string().allow('').default(''),
     LRS_KEY: joi.string().allow('').default(''),
     LRS_SECRET: joi.string().allow('').default(''),
-    AUTH_API_URL: joi.string().default('http://localhost:3002'),
-    TRANSACTION_API_URL: joi.string().default('http://localhost:3001'),
+    AUTH_API_URL: joi.string().required(),
+    TRANSACTION_API_URL: joi.string().required(),
     INTERNAL_API_KEY: joi.string().min(16).required(),
   })
   .unknown(true);

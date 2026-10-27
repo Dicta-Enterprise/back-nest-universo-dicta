@@ -15,7 +15,7 @@ const VERBOS_URI: Record<VerboXapi, string> = {
 };
 
 interface UsuarioActual {
-  sub: string | number;
+  id: number;
   email?: string;
 }
 
@@ -35,7 +35,7 @@ export class XapiService {
 
     return {
       actor: {
-        name: usuario.email ?? String(usuario.sub),
+        name: usuario.email ?? String(usuario.id),
         mbox: usuario.email ? `mailto:${usuario.email}` : undefined,
       },
       verb: {

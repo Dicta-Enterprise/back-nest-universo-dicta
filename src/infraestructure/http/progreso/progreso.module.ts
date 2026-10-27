@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { AuthModule } from 'src/shared/auth/auth.module';
 import { ProgresoController } from './progreso.controller';
 import { ProgresoLecturaService } from 'src/core/services/progreso-modulo/progreso-lectura.service';
 import { ProgresoModuloPrismaRepository } from 'src/infraestructure/persistence/progreso-modulo/progreso-modulo.prisma.repository';
@@ -10,7 +11,7 @@ import { AuthApiModule } from 'src/core/services/auth-api/auth-api.module';
 import { PrismaModule } from 'src/core/services/prisma/prisma.module';
 
 @Module({
-  imports: [PrismaModule, AuthApiModule],
+  imports: [AuthModule, PrismaModule, AuthApiModule],
   controllers: [ProgresoController],
   providers: [
     ProgresoLecturaService,

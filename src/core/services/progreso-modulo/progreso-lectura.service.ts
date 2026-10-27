@@ -1,14 +1,16 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { CURSO_REPOSITORY, PROGRESO_MODULO_REPOSITORY, ROL_ADMIN_ID } from '@constants/constants';
+import { CURSO_REPOSITORY, PROGRESO_MODULO_REPOSITORY } from '@constants/constants';
+import { ROL_ADMINISTRADOR } from 'src/shared/auth/usuario-autenticado.interface';
 import { CursoRepository } from 'src/core/repositories/curso/curso.respository';
 import { ProgresoModuloRepository } from 'src/core/repositories/progreso-modulo/progreso-modulo.repository';
 import { ResumenProgreso } from 'src/core/entities/progreso-modulo/resumen-progreso';
 import { AuthApiService, FamiliaAuth } from 'src/core/services/auth-api/auth-api.service';
 import { construirResumen } from './resumen-progreso.builder';
 
+// Usuario de la sesión (lo que deja JwtAuthGuard en request.user).
 export interface UsuarioToken {
-  sub: string | number;
-  idrol?: string | number;
+  id: number;
+  idrol?: number;
 }
 
 @Injectable()
@@ -38,10 +40,10 @@ export class ProgresoLecturaService {
   }
 
   private async familiasVisibles(usuario: UsuarioToken): Promise<FamiliaAuth[]> {
-    if (Number(usuario.idrol) === ROL_ADMIN_ID) {
+    if (usuario.idrol === ROL_ADMINISTRADOR) {
       return this.authApi.listarFamilias();
     }
-    const familia = await this.authApi.obtenerFamiliaPorPadre(Number(usuario.sub));
+    const familia = await this.authApi.obtenerFamiliaPorPadre(usuario.id);
     return familia ? [familia] : [];
   }
 }

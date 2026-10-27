@@ -98,7 +98,7 @@ describe('ProgresoLecturaService (filtro por rol)', () => {
   beforeEach(() => jest.clearAllMocks());
 
   it('el administrador (idrol 1) ve todas las familias', async () => {
-    const r = await service.obtenerResumen({ sub: 1, idrol: 1 }, periodo);
+    const r = await service.obtenerResumen({ id: 1, idrol: 1 }, periodo);
     expect(authApi.listarFamilias).toHaveBeenCalled();
     expect(r.familias).toHaveLength(2);
     expect(progresoRepo.findByUsuarios).toHaveBeenCalledWith([10, 20]);
@@ -106,7 +106,7 @@ describe('ProgresoLecturaService (filtro por rol)', () => {
 
   it('un padre solo ve su familia y nunca pide la lista completa', async () => {
     authApi.obtenerFamiliaPorPadre.mockResolvedValue(todas[0]);
-    const r = await service.obtenerResumen({ sub: '5', idrol: 3 }, periodo);
+    const r = await service.obtenerResumen({ id: 5, idrol: 3 }, periodo);
     expect(authApi.listarFamilias).not.toHaveBeenCalled();
     expect(authApi.obtenerFamiliaPorPadre).toHaveBeenCalledWith(5);
     expect(r.familias.map((f) => f.id)).toEqual([1]);
@@ -115,7 +115,7 @@ describe('ProgresoLecturaService (filtro por rol)', () => {
 
   it('un usuario sin familia recibe una lista vacía', async () => {
     authApi.obtenerFamiliaPorPadre.mockResolvedValue(null);
-    const r = await service.obtenerResumen({ sub: 9, idrol: 3 }, periodo);
+    const r = await service.obtenerResumen({ id: 9, idrol: 3 }, periodo);
     expect(r.familias).toEqual([]);
   });
 });

@@ -1,12 +1,12 @@
 import { Controller, Get, Param, UseGuards } from '@nestjs/common';
 import { ApiCookieAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { jwtAuthGuard } from 'src/shared/guard/jwtAuth.guard';
+import { JwtAuthGuard } from 'src/shared/auth/jwt-auth.guard';
 import { BunnyTokenService } from 'src/core/services/bunny/bunny-token.service';
 
 @ApiTags('Bunny')
 @ApiCookieAuth('accessToken')
 @Controller('bunny')
-@UseGuards(jwtAuthGuard)
+@UseGuards(JwtAuthGuard)
 export class BunnyController {
   constructor(private readonly bunnyTokenService: BunnyTokenService) {}
 
