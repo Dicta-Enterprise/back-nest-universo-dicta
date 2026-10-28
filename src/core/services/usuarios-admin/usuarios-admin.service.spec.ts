@@ -169,3 +169,80 @@ describe('UsuariosAdminService.comprasDeUsuario', () => {
     await expect(service.comprasDeUsuario('USR-P-001')).rejects.toThrow('caído');
   });
 });
+
+describe('tipoUsuario (PREMIUM o FREE)', () => {
+  const familia = (id: number) => ({ id, uuid: `f-${id}`, codigo: `FAM-00${id}`, nombre: null });
+  const hijo = (id: number, idFamilia: number | null): UsuarioAdminAuth => ({ ...usuario(id, 'NINO'), familia: idFamilia === null ? null : familia(idFamilia) });
+  // familia 10 es del padre 1 (compró); familia 20 es del padre 2 (no ha comprado)
+  const padrePorFamilia = new Map([
+    [10, 1],
+    [20, 2],
+  ]);
+
+  it('un padre es PREMIUM si ya compró y FREE si todavía no', () => {
+    const r = aplicarCompras([usuario(1, 'PADRE'), usuario(2, 'PADRE')], resumenes);
+    expect(r.map((u) => u.tipoUsuario)).toEqual(['PREMIUM', 'FREE']);
+  });
+
+  it('un niño o joven toma el tipo de su familia, es decir, el de su padre', () => {
+    const r = aplicarCompras([hijo(4, 10), hijo(5, 20)], resumenes, padrePorFamilia);
+    expect(r.map((u) => u.tipoUsuario)).toEqual(['PREMIUM', 'FREE']);
+    expect(r.every((u) => u.compra === null)).toBe(true); // su compra sigue sin dato: no compran por sí mismos
+  });
+
+  it('si no se puede saber, queda en null y nunca se inventa FREE', () => {
+    // el servicio de compras no respondió (sin resúmenes)
+    expect(aplicarCompras([usuario(1, 'PADRE'), hijo(4, 10)], [], padrePorFamilia).map((u) => u.tipoUsuario)).toEqual([null, null]);
+    // un hijo sin familia, o de una familia que no se pudo traer
+    expect(aplicarCompras([hijo(4, null), hijo(5, 99)], resumenes, padrePorFamilia).map((u) => u.tipoUsuario)).toEqual([null, null]);
+  });
+
+  describe('en la lista', () => {
+    const paginaConHijos = { items: [usuario(2, 'PADRE'), hijo(4, 10)], total: 2, page: 1, limit: 20 };
+    const familias = [
+      { id: 10, padre: { id: 1 } },
+      { id: 20, padre: { id: 2 } },
+    ];
+
+    const crearConFamilias = (listarFamilias: jest.Mock, transaction: { resumenCompras: jest.Mock }) => {
+      const auth = { listarUsuarios: jest.fn().mockResolvedValue(paginaConHijos), listarFamilias };
+      return { service: new UsuariosAdminService(auth as never, transaction as never), auth };
+    };
+
+    it('también pide las compras del padre de cada niño de la lista', async () => {
+      const transaction = { resumenCompras: jest.fn().mockResolvedValue(resumenes) };
+      const { service } = crearConFamilias(jest.fn().mockResolvedValue(familias), transaction);
+      const r = await service.listar({});
+
+      expect([...transaction.resumenCompras.mock.calls[0][0]].sort()).toEqual([1, 2]);
+      expect(r.items.map((u) => u.tipoUsuario)).toEqual(['FREE', 'PREMIUM']);
+    });
+
+    it('si no hay niños o jóvenes con familia, no consulta las familias', async () => {
+      const auth = { listarUsuarios: jest.fn().mockResolvedValue({ items: [usuario(1, 'PADRE')], total: 1, page: 1, limit: 20 }), listarFamilias: jest.fn() };
+      const transaction = { resumenCompras: jest.fn().mockResolvedValue(resumenes) };
+      const service = new UsuariosAdminService(auth as never, transaction as never);
+      const r = await service.listar({});
+
+      expect(auth.listarFamilias).not.toHaveBeenCalled();
+      expect(r.items[0].tipoUsuario).toBe('PREMIUM');
+    });
+
+    it('si back-auth no responde con las familias, los padres siguen con su tipo y los hijos quedan en null', async () => {
+      const transaction = { resumenCompras: jest.fn().mockResolvedValue(resumenes) };
+      const { service } = crearConFamilias(jest.fn().mockRejectedValue(new Error('caído')), transaction);
+      const r = await service.listar({});
+
+      expect(r.items.map((u) => u.tipoUsuario)).toEqual(['FREE', null]);
+    });
+
+    it('si el servicio de compras no responde, el tipo queda en null para todos', async () => {
+      const transaction = { resumenCompras: jest.fn().mockRejectedValue(new Error('caído')) };
+      const { service } = crearConFamilias(jest.fn().mockResolvedValue(familias), transaction);
+      const r = await service.listar({});
+
+      expect(r.comprasDisponibles).toBe(false);
+      expect(r.items.every((u) => u.tipoUsuario === null)).toBe(true);
+    });
+  });
+});
