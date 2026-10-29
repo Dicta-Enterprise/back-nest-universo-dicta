@@ -164,6 +164,20 @@ type Beneficio {
   descripcion String
 }
 
+type Quiz {
+  pregunta          String
+  opciones          String[]
+  respuestaCorrecta String
+}
+
+type Modulo {
+  id           String
+  nombre       String
+  bunnyVideoId String
+  orden        Int
+  quizzes      Quiz[]
+}
+
 model Curso {
   id                 String      @id @default(auto()) @map("_id") @db.ObjectId
   nombre             String      @unique
@@ -171,6 +185,7 @@ model Curso {
   resumenDescripcion String?
   valoracion         Float?      @default(0)
   beneficios         Beneficio[]
+  modulos            Modulo[]
   fechaCreacion      DateTime    @default(now())
   fechaInicio        DateTime?
   fechaFinal         DateTime?
@@ -388,4 +403,30 @@ model MenuSidebar {
   parentId String? @db.ObjectId
   order    Int     @default(0)
   active   Boolean @default(true)
+}
+
+enum EstadoProgreso {
+  EN_PROGRESO
+  COMPLETADO
+}
+
+// Resumen del avance de un estudiante en un módulo. Se actualiza con cada evento xAPI
+// para que el dashboard no dependa de leer el LRS.
+model ProgresoModulo {
+  id                String         @id @default(auto()) @map("_id") @db.ObjectId
+  usuarioId         Int // id del usuario en back-auth (campo "sub" del JWT)
+  cursoId           String         @db.ObjectId
+  moduloId          String         @db.ObjectId
+  estado            EstadoProgreso @default(EN_PROGRESO)
+  porcentajeVideo   Int            @default(0)
+  quizPuntaje       Int?
+  quizTotal         Int?
+  quizAprobado      Boolean?
+  pistasUsadas      Int            @default(0)
+  eventosProcesados String[] // ids de eventos ya aplicados (evita duplicados al reenviar)
+  ultimaActividad   DateTime       @default(now())
+  completadoEn      DateTime?
+  fechaCreacion     DateTime       @default(now())
+
+  @@unique([usuarioId, cursoId, moduloId])
 }

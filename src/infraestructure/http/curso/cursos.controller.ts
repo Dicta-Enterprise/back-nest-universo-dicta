@@ -125,6 +125,22 @@ export class CursosController {
     return { data: result, message: 'Curso obtenido.' };
   }
 
+  @Get(':cursoId/modulos/:moduloId')
+  @ApiOperation({ summary: 'Obtiene un módulo específico de un curso (incluye su bunnyVideoId).' })
+  async findOneModulo(
+    @Param('cursoId', ParseObjectIdPipe) cursoId: string,
+    @Param('moduloId') moduloId: string,
+  ) {
+    const result = await this.getOneCursoUseCase.execute(cursoId);
+    if (result.isFailure) throw new HttpException(result.error.message, HttpStatus.BAD_REQUEST);
+
+    const curso = result.getValue();
+    const modulo = curso.modulos?.find((m) => m.id === moduloId);
+    if (!modulo) throw new HttpException('Módulo no encontrado', HttpStatus.NOT_FOUND);
+
+    return { data: modulo, message: 'Módulo obtenido.' };
+  }
+
   @Delete(':id')
   async remove(@Param('id', ParseObjectIdPipe) id: string) {
     const result = await this.deleteCursoUseCase.execute(id);
