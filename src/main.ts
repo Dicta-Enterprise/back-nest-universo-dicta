@@ -17,7 +17,8 @@ async function bootstrap() {
   app.use(cookieParser());
 
   app.enableCors({
-    origin: 'http://localhost:4200',
+    // OJO: local de prueba -- avisar a David para que agregue 4201 (admin) también en su rama real.
+    origin: ['http://localhost:4200', 'http://localhost:4201'],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
   });
