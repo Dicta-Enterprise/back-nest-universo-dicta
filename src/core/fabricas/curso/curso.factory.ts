@@ -1,4 +1,4 @@
-import { Curso, CursoImagenes } from '@entities/curso/curso.entity';
+import { Curso, CursoImagenes, ModuloCurso } from '@entities/curso/curso.entity';
 import { Prisma, Curso as PrismaCurso } from '@prisma/client';
 import { Profesor } from '@entities/profesor/profesor.entity';
 import { Categoria } from '@entities/categoria/categoria.entity';
@@ -76,6 +76,8 @@ export class DefaultCursoFactory implements CursoFactory {
       undefined,
       undefined,
       datosExtensos.beneficios as Beneficio[] ?? undefined,
+      datosExtensos.modulos as ModuloCurso[] ?? undefined,
+      datosExtensos.duracionEstimadaMinutos as number ?? undefined,
     );
   }
 

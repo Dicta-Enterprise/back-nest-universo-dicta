@@ -17,6 +17,7 @@ interface EnvVars {
   JWT_SECRET: string;
   AUTH_API_URL: string;
   TRANSACTION_API_URL: string;
+  BUNNY_STREAM_LIBRERIAS?: string;
 }
 
 const envSchema = joi
@@ -37,6 +38,7 @@ const envSchema = joi
     JWT_SECRET: joi.string().required(),
     AUTH_API_URL: joi.string().required(),
     TRANSACTION_API_URL: joi.string().required(),
+    BUNNY_STREAM_LIBRERIAS: joi.string().optional(),
   })
   .unknown(true);
 
@@ -65,4 +67,5 @@ export const envs = {
   jwtSecret: envVars.JWT_SECRET,
   authApiUrl: envVars.AUTH_API_URL,
   transactionApiUrl: envVars.TRANSACTION_API_URL,
+  bunnyStreamLibrerias: envVars.BUNNY_STREAM_LIBRERIAS,
 };

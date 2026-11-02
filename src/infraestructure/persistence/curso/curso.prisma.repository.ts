@@ -51,6 +51,8 @@ export class CursoPrismaRepository implements CursoRepository {
           estado: curso.estado,
           imagenes: curso.imagenes as unknown as Prisma.InputJsonValue,
           duracionSemanas: curso.duracionSemanas,
+          modulos: curso.modulos as unknown as Prisma.CursoCreateInput['modulos'],
+          duracionEstimadaMinutos: curso.duracionEstimadaMinutos,
           profesor: {
             connect: { id: curso.profesorId },
           },
@@ -97,6 +99,8 @@ export class CursoPrismaRepository implements CursoRepository {
         estado: curso.estado,
         imagenes: curso.imagenes as unknown as Prisma.InputJsonValue,
         duracionSemanas: curso.duracionSemanas,
+        modulos: curso.modulos as unknown as Prisma.CursoUpdateInput['modulos'],
+        duracionEstimadaMinutos: curso.duracionEstimadaMinutos,
       };
 
       if (curso.profesorId) {

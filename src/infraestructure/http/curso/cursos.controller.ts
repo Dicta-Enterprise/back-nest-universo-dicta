@@ -9,17 +9,22 @@ import {
   Param,
   Patch,
   Post,
+  UploadedFile,
   UploadedFiles,
   UseInterceptors,
 } from '@nestjs/common';
-import { FileFieldsInterceptor } from '@nestjs/platform-express'; 
+import { FileFieldsInterceptor, FileInterceptor } from '@nestjs/platform-express';
 import * as useCase from 'src/application/uses-cases/curso';
 import { ParseObjectIdPipe } from 'src/shared/pipes/parse-object-id.pipe';
 import * as dto from 'src/application/dto/curso';
-import { ApiConsumes, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'; 
+import { ApiConsumes, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { RequestListarCurso } from 'src/shared/enums/request-list-curso-enum';
 import { ImageProcessingService } from 'src/application/services/image-processing.service';
 import { MULTER_HARD_LIMIT_BYTES, validarImagenWebp } from 'src/shared/helper/imagen-webp.helper';
+import { BunnyStreamService } from 'src/shared/services/bunny-stream.service';
+import { PrismaService } from 'src/core/services/prisma/prisma.service';
+
+const MULTER_VIDEO_LIMIT_BYTES = 500 * 1024 * 1024;
 
 @ApiTags('Cursos')
 @Controller('cursos')
@@ -30,8 +35,44 @@ export class CursosController {
     private getOneCursoUseCase: useCase.GetOneCursoUseCase,
     private updateCursoUseCase: useCase.UpdateCursoUseCase,
     private deleteCursoUseCase: useCase.DeleteCursoUseCase,
-    private readonly imageProcessingService: ImageProcessingService, 
+    private readonly imageProcessingService: ImageProcessingService,
+    private readonly bunnyStreamService: BunnyStreamService,
+    private readonly prisma: PrismaService,
   ) {}
+
+  @Post(':cursoId/modulos/video')
+  @UseInterceptors(FileInterceptor('video', { limits: { fileSize: MULTER_VIDEO_LIMIT_BYTES } }))
+  @ApiConsumes('multipart/form-data')
+  @ApiOperation({ summary: 'Sube el video de un modulo a la biblioteca de Bunny Stream del curso (segun su categoria/galaxia) y devuelve el id del video' })
+  async subirVideoModulo(
+    @Param('cursoId', ParseObjectIdPipe) cursoId: string,
+    @UploadedFile() video?: Express.Multer.File,
+  ) {
+    if (!video) throw new BadRequestException('Se requiere el archivo de video.');
+
+    const curso = await this.prisma.curso.findUnique({
+      where: { id: cursoId },
+      select: { categoriaId: true, planetaId: true },
+    });
+    if (!curso) throw new BadRequestException('Curso no encontrado.');
+
+    const [categoria, planeta] = await Promise.all([
+      curso.categoriaId ? this.prisma.categoria.findUnique({ where: { id: curso.categoriaId }, select: { nombre: true } }) : null,
+      curso.planetaId
+        ? this.prisma.planeta.findUnique({ where: { id: curso.planetaId }, select: { galaxia: { select: { nombre: true } } } })
+        : null,
+    ]);
+    if (!categoria || !planeta?.galaxia) {
+      throw new BadRequestException('El curso necesita tener categoría y planeta (galaxia) asignados para saber a qué biblioteca de Bunny Stream subir el video.');
+    }
+
+    const credenciales = this.bunnyStreamService.resolverLibreria(categoria.nombre, planeta.galaxia.nombre);
+    const bunnyVideoId = await this.bunnyStreamService.subirVideo(credenciales, video.originalname, video.buffer);
+    return {
+      data: { bunnyVideoId, bunnyLibraryId: credenciales.libraryId },
+      message: 'Video subido correctamente.',
+    };
+  }
 
   @Post()
   @UseInterceptors(FileFieldsInterceptor([
