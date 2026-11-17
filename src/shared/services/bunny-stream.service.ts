@@ -4,6 +4,11 @@ import { envs } from 'src/config/envs';
 export interface CredencialesBunnyStream {
   libraryId: string;
   apiKey: string;
+  // Clave de "Token Authentication" de la libreria (Bunny Dashboard > Stream > libreria >
+  // Security), DISTINTA del apiKey de arriba (ese es para subir/gestionar videos). Sin esta
+  // clave no se pueden firmar los links de reproduccion -- ver BunnyTokenService. Opcional
+  // porque las librerias existentes en el .env todavia no la tienen cargada.
+  securityKey?: string;
 }
 
 /** Quita tildes y pasa a minúsculas, para comparar "Niños" con "niños" o "Peligros Digitales" con "peligros digitales". */
@@ -66,6 +71,20 @@ export class BunnyStreamService {
       );
     }
     return credenciales;
+  }
+
+  /**
+   * Busca las credenciales de la libreria a partir de su libraryId (no de categoria/galaxia).
+   * La necesita BunnyTokenService: a esa altura ya se sabe en que libreria vive el video
+   * (viene guardado en el modulo), pero no necesariamente la categoria/galaxia del curso.
+   */
+  resolverLibreriaPorId(libraryId: string): CredencialesBunnyStream {
+    for (const galaxias of Object.values(this.librerias())) {
+      for (const credenciales of Object.values(galaxias)) {
+        if (credenciales.libraryId === libraryId) return credenciales;
+      }
+    }
+    throw new BadRequestException(`No hay ninguna libreria de Bunny Stream configurada con libraryId "${libraryId}".`);
   }
 
   /** Crea el objeto de video en Bunny Stream y devuelve su id (guid). */

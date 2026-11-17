@@ -15,7 +15,6 @@ import { LandingPageModule } from './infraestructure/http/landing-page/landing-p
 import { AstronautasModule } from './infraestructure/http/astronauta/astronautas.module';
 import { PlantillasCertificacionModule } from './infraestructure/http/plantilla-certificacion/plantillas-certificacion.module';
 import { ProgresoCursoModule } from './infraestructure/http/progreso-curso/progreso-curso.module';
-import { BunnyModule } from './infraestructure/http/bunny/bunny.module';
 import { XapiModule } from './infraestructure/http/xapi/xapi.module';
 import { ProgresoModule } from './infraestructure/http/progreso/progreso.module';
 import { AdminModule } from './infraestructure/http/admin/admin.module';
@@ -36,7 +35,6 @@ import { AdminModule } from './infraestructure/http/admin/admin.module';
     AstronautasModule,
     PlantillasCertificacionModule,
     ProgresoCursoModule,
-    BunnyModule,
     XapiModule,
     ProgresoModule,
     AdminModule,

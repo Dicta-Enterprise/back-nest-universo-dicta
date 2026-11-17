@@ -52,6 +52,32 @@ export type FiltrosUsuariosAuth = Partial<{
   limit: number;
 }>;
 
+export interface PermisoCuentaAuth {
+  idPermiso: number | null;
+  puedeVerCursos: boolean;
+  puedeComprarCursos: boolean;
+  puedeVerProgreso: boolean;
+  puedeUsarChat: boolean;
+  puedeDescargarMaterial: boolean;
+  puedeVerCertificados: boolean;
+  tiempoMaximoDiario: number | null;
+  horarioInicio: string | null;
+  horarioFin: string | null;
+}
+
+export interface CuentaAsociadaAuth {
+  id: number;
+  tipocuenta: 'NINO' | 'JOVEN';
+  estado: string;
+  alias: string | null;
+  fechacreacion: string;
+  padre: { id: number; username: string; email: string };
+  usuario: { id: number; username: string; email: string } | null;
+  permiso: PermisoCuentaAuth;
+}
+
+export type ActualizarPermisoCuentaAuth = Partial<Omit<PermisoCuentaAuth, 'idPermiso'>>;
+
 const TIMEOUT_MS = 5000;
 
 // Cliente de los endpoints /internal de back-auth (quién es de qué familia, nombres, tipo de cuenta).
@@ -85,11 +111,31 @@ export class AuthApiService {
     return (await response.json()) as FamiliaAuth;
   }
 
-  private async llamar(ruta: string, estadosAceptados: number[] = []): Promise<Response> {
+  async listarCuentasAsociadas(): Promise<CuentaAsociadaAuth[]> {
+    const response = await this.llamar('/api/internal/cuentas-asociadas');
+    return (await response.json()) as CuentaAsociadaAuth[];
+  }
+
+  async actualizarPermisoCuenta(id: number, data: ActualizarPermisoCuentaAuth): Promise<PermisoCuentaAuth> {
+    const response = await this.llamar(`/api/internal/cuentas-asociadas/${id}/permisos`, [], 'PATCH', data);
+    return (await response.json()) as PermisoCuentaAuth;
+  }
+
+  private async llamar(
+    ruta: string,
+    estadosAceptados: number[] = [],
+    metodo: 'GET' | 'PATCH' = 'GET',
+    body?: unknown,
+  ): Promise<Response> {
     let response: Response;
     try {
       response = await fetch(`${envs.authApiUrl}${ruta}`, {
-        headers: { 'x-internal-api-key': envs.internalApiKey },
+        method: metodo,
+        headers: {
+          'x-internal-api-key': envs.internalApiKey,
+          ...(body !== undefined ? { 'Content-Type': 'application/json' } : {}),
+        },
+        ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
         signal: AbortSignal.timeout(TIMEOUT_MS),
       });
     } catch (error) {

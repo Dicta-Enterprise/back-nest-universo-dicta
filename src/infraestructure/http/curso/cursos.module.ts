@@ -11,9 +11,12 @@ import { PrismaModule } from 'src/core/services/prisma/prisma.module';
 import { CURSO_FACTORY } from '@constants/factories';
 import { DefaultCursoFactory } from 'src/core/fabricas/curso/curso.factory';
 import { ImageProcessingService } from 'src/application/services/image-processing.service';
+import { AuthModule } from 'src/shared/auth/auth.module';
+import { IntegracionesModule } from 'src/core/services/integraciones/integraciones.module';
+import { BunnyTokenService } from 'src/core/services/bunny/bunny-token.service';
 
 @Module({
-  imports: [SharedModule, PrismaModule],
+  imports: [SharedModule, PrismaModule, AuthModule, IntegracionesModule],
   controllers: [CursosController],
   providers: [
     {
@@ -34,6 +37,7 @@ import { ImageProcessingService } from 'src/application/services/image-processin
     azureCase.DeleteImageStorageUseCase,
     AzureStorageService,
     ImageProcessingService,
+    BunnyTokenService,
   ],
 })
 export class CursosModule {}
