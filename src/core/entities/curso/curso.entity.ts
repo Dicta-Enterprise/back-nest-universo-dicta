@@ -10,7 +10,6 @@ export class BeneficioCurso {
   ) {}
 }
 
-
 // Una sola imagen por curso (ver nota en create-curso.dto.ts).
 export interface CursoImagenes {
   principal: string;

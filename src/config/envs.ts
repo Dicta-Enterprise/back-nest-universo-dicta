@@ -18,6 +18,10 @@ interface EnvVars {
   AUTH_API_URL: string;
   TRANSACTION_API_URL: string;
   BUNNY_STREAM_LIBRERIAS?: string;
+  LRS_ENDPOINT: string;
+  LRS_KEY: string;
+  LRS_SECRET: string;
+  INTERNAL_API_KEY: string;
 }
 
 const envSchema = joi
@@ -36,9 +40,13 @@ const envSchema = joi
     BUNNY_TEXTURAS_PASSWORD: joi.string().required(),
     BUNNY_TEXTURAS_CDN_URL: joi.string().required(),
     JWT_SECRET: joi.string().required(),
-    AUTH_API_URL: joi.string().required(),
-    TRANSACTION_API_URL: joi.string().required(),
+    AUTH_API_URL: joi.string().default('http://localhost:3002'),
+    TRANSACTION_API_URL: joi.string().default('http://localhost:3001'),
     BUNNY_STREAM_LIBRERIAS: joi.string().optional(),
+    LRS_ENDPOINT: joi.string().allow('').default(''),
+    LRS_KEY: joi.string().allow('').default(''),
+    LRS_SECRET: joi.string().allow('').default(''),
+    INTERNAL_API_KEY: joi.string().min(16).required(),
   })
   .unknown(true);
 
@@ -68,4 +76,8 @@ export const envs = {
   authApiUrl: envVars.AUTH_API_URL,
   transactionApiUrl: envVars.TRANSACTION_API_URL,
   bunnyStreamLibrerias: envVars.BUNNY_STREAM_LIBRERIAS,
+  lrsEndpoint: envVars.LRS_ENDPOINT,
+  lrsKey: envVars.LRS_KEY,
+  lrsSecret: envVars.LRS_SECRET,
+  internalApiKey: envVars.INTERNAL_API_KEY,
 };
