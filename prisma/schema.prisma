@@ -58,6 +58,27 @@ enum TipoUsuario {
   DESARROLLADOR
 }
 
+enum TipoAstronauta {
+  PAPA
+  MAMA
+  HIJO
+  HIJA
+}
+
+// Los 4 modelos 3D (.glb) de la familia que flota en la intro de universo-3d-react. Uno solo
+// por tipo (@unique) -- subir uno nuevo reemplaza el anterior, no se acumulan versiones viejas.
+// Gestionables desde el panel admin en vez de archivos sueltos en el repositorio de
+// universo-3d-react.
+model Astronauta {
+  id                 String         @id @default(auto()) @map("_id") @db.ObjectId
+  tipo               TipoAstronauta @unique
+  nombreArchivo      String
+  url                String
+  pesoBytes           Int
+  fechaActualizacion DateTime       @updatedAt
+  fechaCreacion      DateTime       @default(now())
+}
+
 enum TipoCertificacion {
   RECONOCIMIENTO
   JOVEN
@@ -164,20 +185,49 @@ type Beneficio {
   descripcion String
 }
 
+// Módulo (clase/capítulo) de un curso. "esGratis" marca los módulos que se pueden ver sin
+// comprar el curso (vista previa) -- el candado en el reproductor y el flujo de pago/registro
+// gratis que usan esta bandera viven en el sitio del LMS de cara al estudiante, no en el admin.
+// "quizzes" usa la misma forma que ya existia en la rama de David (feature/usuarios-admin-back-nest,
+// puerto 3005) para no tener dos formas distintas del mismo dato -- Andrea decidio quedarse con
+// esa forma (26-oct-2026) en vez de la que se armo primero aqui en master.
+type Modulo {
+  id             String  @default(uuid())
+  nombre         String
+  bunnyVideoId   String?
+  // Biblioteca de Bunny Stream a la que se subio bunnyVideoId (una de las 12, por categoria x
+  // galaxia). Se guarda junto al video -- no se vuelve a resolver despues por categoria/galaxia
+  // del curso, para que el video siga reproduciendo aunque el curso cambie de categoria/planeta.
+  bunnyLibraryId String?
+  orden          Int
+  esGratis       Boolean @default(false)
+  quizzes        Quiz[]
+}
+
+/// Quiz opcional de un modulo (no todos los modulos tienen uno). Opcion multiple simple:
+/// "respuestaCorrecta" es el texto exacto de la opcion correcta (no un indice).
+type Quiz {
+  pregunta          String
+  opciones          String[]
+  respuestaCorrecta String
+}
+
 model Curso {
-  id                 String      @id @default(auto()) @map("_id") @db.ObjectId
-  nombre             String      @unique
-  descripcion        String
-  resumenDescripcion String?
-  valoracion         Float?      @default(0)
-  beneficios         Beneficio[]
-  fechaCreacion      DateTime    @default(now())
-  fechaInicio        DateTime?
-  fechaFinal         DateTime?
-  precio             Float
-  estado             Boolean     @default(true)
-  imagenes           Json?
-  duracionSemanas    Float?
+  id                      String      @id @default(auto()) @map("_id") @db.ObjectId
+  nombre                  String      @unique
+  descripcion             String
+  resumenDescripcion      String?
+  valoracion              Float?      @default(0)
+  beneficios              Beneficio[]
+  modulos                 Modulo[]
+  fechaCreacion           DateTime    @default(now())
+  fechaInicio             DateTime?
+  fechaFinal              DateTime?
+  precio                  Float
+  estado                  Boolean     @default(true)
+  imagenes                Json?
+  duracionSemanas         Float?
+  duracionEstimadaMinutos Int?
 
   profesor    Profesor?  @relation(fields: [profesorId], references: [id])
   profesorId  String?    @db.ObjectId
@@ -388,4 +438,29 @@ model MenuSidebar {
   parentId String? @db.ObjectId
   order    Int     @default(0)
   active   Boolean @default(true)
+}
+enum EstadoProgreso {
+  EN_PROGRESO
+  COMPLETADO
+}
+
+// Resumen del avance de un estudiante en un módulo. Se actualiza con cada evento xAPI
+// para que el dashboard no dependa de leer el LRS.
+model ProgresoModulo {
+  id               String         @id @default(auto()) @map("_id") @db.ObjectId
+  usuarioId        Int // id del usuario en back-auth (campo "sub" del JWT)
+  cursoId          String         @db.ObjectId
+  moduloId         String         @db.ObjectId
+  estado           EstadoProgreso @default(EN_PROGRESO)
+  porcentajeVideo  Int            @default(0)
+  quizPuntaje      Int?
+  quizTotal        Int?
+  quizAprobado     Boolean?
+  pistasUsadas     Int            @default(0)
+  eventosProcesados String[] // ids de eventos ya aplicados (evita duplicados al reenviar)
+  ultimaActividad  DateTime       @default(now())
+  completadoEn     DateTime?
+  fechaCreacion    DateTime       @default(now())
+
+  @@unique([usuarioId, cursoId, moduloId])
 }

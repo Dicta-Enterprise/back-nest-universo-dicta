@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
 import {
+  ArrayMinSize,
   IsArray,
   IsBoolean,
   IsDate,
@@ -28,28 +29,84 @@ class BeneficioDto {
   descripcion: string;
 }
 
-class ImagenesVersionDto {
+// Pregunta de opción múltiple de un quiz. Es opcional por módulo (pedido de Carlos: no todos
+// los módulos necesitan quiz). Misma forma que ya existía en la rama de David
+// (feature/usuarios-admin-back-nest, puerto 3005) -- "respuestaCorrecta" es el texto exacto de
+// la opción correcta, no un índice. Sin id (esa rama tampoco lo tiene).
+export class QuizDto {
+  @ApiProperty({ example: '¿Qué es el ciberacoso?' })
+  @MinLength(2, { message: 'La pregunta debe tener mas de 1 carácter.' })
+  @MaxLength(300, { message: 'La pregunta debe tener menos de 300 caracteres.' })
+  @IsString()
+  @IsNotEmpty()
+  pregunta: string;
+
+  @ApiProperty({ example: ['Opción A', 'Opción B', 'Opción C'], type: [String] })
+  @IsArray()
+  @ArrayMinSize(2, { message: 'Debe haber al menos 2 opciones.' })
+  @IsString({ each: true })
+  opciones: string[];
+
+  @ApiProperty({ example: 'Opción A', description: 'Texto exacto de la opción correcta.' })
+  @IsString()
+  @IsNotEmpty()
+  respuestaCorrecta: string;
+}
+
+// Módulo (clase/capítulo) del curso. "esGratis" lo marca como vista previa, visible sin comprar
+// el curso -- el candado/paywall que usa esta bandera vive en el sitio del LMS, no en el admin.
+// El id lo genera el panel al crear un módulo nuevo (para distinguir editar de agregar).
+export class ModuloDto {
+  @ApiProperty({ example: 'a1b2c3d4-...' })
+  @IsString()
+  @IsNotEmpty()
+  id: string;
+
+  @ApiProperty({ example: 'Qué es el ciberacoso' })
+  @MinLength(2, { message: 'El nombre del módulo debe tener mas de 1 carácter.' })
+  @MaxLength(150, { message: 'El nombre del módulo debe tener menos de 150 caracteres.' })
+  @IsString()
+  @IsNotEmpty()
+  nombre: string;
+
+  @ApiProperty({ example: 1, description: 'Orden en el que aparece dentro del curso.' })
+  @IsNumber()
+  @Min(1)
+  orden: number;
+
+  @ApiProperty({ example: false, description: 'Si se puede ver sin comprar el curso.' })
+  @IsBoolean()
+  esGratis: boolean;
+
+  @ApiProperty({ required: false, description: 'Id del video en Bunny Stream, si ya se subió.' })
+  @IsString()
+  @IsOptional()
+  bunnyVideoId?: string;
+
+  @ApiProperty({ required: false, description: 'Biblioteca de Bunny Stream donde vive bunnyVideoId.' })
+  @IsString()
+  @IsOptional()
+  bunnyLibraryId?: string;
+
+  @ApiProperty({
+    required: false,
+    description: 'Quiz opcional del módulo (no todos los módulos necesitan uno).',
+    type: [QuizDto],
+  })
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => QuizDto)
+  quizzes?: QuizDto[];
+}
+
+// Una sola imagen por curso (decisión de Carlos/Wilson, reunión 30-sep-2026): se usa la misma
+// en el catálogo y en la LMS, en vez de las 6 versiones (principal/secundaria x pc/tablet/mobile)
+// que se subían antes a Cloudinary.
+class CursoImagenesDto {
   @IsUrl({}, { message: 'Debe ser una URL válida.' })
   @IsNotEmpty()
   principal: string;
-
-  @IsUrl({}, { message: 'Debe ser una URL válida.' })
-  @IsNotEmpty()
-  secundaria: string;
-}
-
-class CursoImagenesDto {
-  @ValidateNested()
-  @Type(() => ImagenesVersionDto)
-  mobile: ImagenesVersionDto;
-
-  @ValidateNested()
-  @Type(() => ImagenesVersionDto)
-  tablet: ImagenesVersionDto;
-
-  @ValidateNested()
-  @Type(() => ImagenesVersionDto)
-  pc: ImagenesVersionDto;
 }
 
 export class CreateCursoDto {
@@ -241,4 +298,30 @@ export class CreateCursoDto {
   @ValidateNested({ each: true })
   @Type(() => BeneficioDto)
   beneficios: BeneficioDto[];
+
+  @ApiProperty({
+    description: 'Lista de módulos (clases) del curso, con su orden y si son vista previa gratis.',
+    required: false,
+    type: [ModuloDto],
+  })
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => ModuloDto)
+  modulos?: ModuloDto[];
+
+  @ApiProperty({
+    example: 45,
+    description: 'Tiempo estimado para completar el curso, en minutos.',
+    required: false,
+  })
+  @Min(1, { message: 'La duración estimada debe ser mayor a 0.' })
+  @IsNumber({}, { message: 'La duración estimada debe ser un valor de tipo Number.' })
+  @IsOptional()
+  @Transform(({ value }) =>
+    value !== null && value !== undefined
+      ? parseFloat(String(value).trim())
+      : value
+  )
+  duracionEstimadaMinutos?: number;
 }
