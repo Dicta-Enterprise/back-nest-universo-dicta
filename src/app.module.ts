@@ -14,10 +14,15 @@ import { ParametersModule } from './infraestructure/http/parameters/parameters.m
 import { LandingPageModule } from './infraestructure/http/landing-page/landing-page.module';
 import { PlantillasCertificacionModule } from './infraestructure/http/plantilla-certificacion/plantillas-certificacion.module';
 import { ProgresoCursoModule } from './infraestructure/http/progreso-curso/progreso-curso.module';
+import { BlockchainPruebaModule } from './infraestructure/http/blockchain-prueba/blockchain-prueba.module';
+import { CertificacionModule } from './infraestructure/http/certificacion/certificacion.module';
+import { BlockchainHttpModule } from './infraestructure/http/blockchain/blockchain-http.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
     EventEmitterModule.forRoot(),
+    ScheduleModule.forRoot(),
     CursosModule,
     PlanetasModule,
     GalaxiasModule,
@@ -30,6 +35,9 @@ import { ProgresoCursoModule } from './infraestructure/http/progreso-curso/progr
     LandingPageModule,
     PlantillasCertificacionModule,
     ProgresoCursoModule,
+    BlockchainPruebaModule,
+    CertificacionModule,
+    BlockchainHttpModule,
   ],
   controllers: [AppController],
   providers: [AppService],

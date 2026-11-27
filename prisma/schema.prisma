@@ -74,6 +74,14 @@ enum EstadoPlantilla {
   INACTIVA
 }
 
+enum EstadoBlockchain {
+  PENDIENTE
+  REGISTRADO
+  FALLIDO
+  // Estuvo registrado y se revocó en el contrato (anulación o reemisión)
+  REVOCADO
+}
+
 enum EstadoProgresoCurso {
   EN_PROGRESO
   COMPLETADO
@@ -243,8 +251,21 @@ model Certificacion {
   estado EstadoCertificacion @default(EMITIDA)
 
   // Anulación
-  fechaAnulacion  DateTime?
-  motivoAnulacion String?
+  fechaAnulacion         DateTime?
+  motivoAnulacion        String?
+  idUsuarioAnulacion     Int?
+  // Certificado nuevo que reemplaza a este cuando se reemite
+  idCertificadoReemplazo String?   @db.ObjectId
+
+  // Blockchain (Polygon)
+  estadoBlockchain        EstadoBlockchain @default(PENDIENTE)
+  walletDestino           String?
+  uriMetadatos            String?
+  tokenId                 String?
+  txHash                  String?
+  fechaRegistroBlockchain DateTime?
+  errorBlockchain         String?
+  txHashRevocacion        String?
 
   fechaCreacion      DateTime @default(now())
   fechaActualizacion DateTime @updatedAt
@@ -253,13 +274,17 @@ model Certificacion {
   curso     Curso                  @relation(fields: [idCurso], references: [id])
   plantilla PlantillaCertificacion @relation(fields: [idPlantilla], references: [id])
 
-  @@unique([idUsuario, idCuentaAsociada, idCurso, tipoCertificacion])
+  // Sin @@unique: al reemitir conviven el anulado y el nuevo. El servicio
+  // controla que haya un solo certificado EMITIDA por titular, curso y tipo.
+  @@index([idUsuario, idCuentaAsociada, idCurso, tipoCertificacion])
   @@index([idUsuario])
   @@index([idCuentaAsociada])
   @@index([idCurso])
   @@index([idPlantilla])
   @@index([tipoCertificacion])
   @@index([estado])
+  @@index([estadoBlockchain])
+  @@index([tokenId])
   @@index([fechaEmision])
   @@map("certificaciones")
 }
