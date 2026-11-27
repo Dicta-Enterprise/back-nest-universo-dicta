@@ -32,6 +32,15 @@ export interface CursoAsignadoAuth {
   estado: 'ACTIVO' | 'COMPLETADO' | 'CANCELADO';
 }
 
+export interface DetalleCuentaAsociadaAuth {
+  id: number;
+  idpadre: number;
+  tipocuenta: 'NINO' | 'JOVEN';
+  alias: string | null;
+  estado: 'PENDIENTE' | 'ACTIVA' | 'INACTIVA';
+  usuario?: { id: number; username: string; email: string };
+}
+
 @Injectable()
 export class AuthApiService {
   private readonly baseUrl = envs.authApiUrl;
@@ -50,6 +59,18 @@ export class AuthApiService {
   ): Promise<CursoAsignadoAuth[]> {
     const body = await this.get<{ data: CursoAsignadoAuth[] }>(
       `/api/cuentas-asociadas/${idCuentaAsociada}/cursos`,
+      accessToken,
+    );
+    return body.data;
+  }
+
+  // Back Auth solo devuelve la cuenta si pertenece al padre autenticado
+  async obtenerDetalleCuentaAsociada(
+    idCuentaAsociada: number,
+    accessToken: string,
+  ): Promise<DetalleCuentaAsociadaAuth> {
+    const body = await this.get<{ data: DetalleCuentaAsociadaAuth }>(
+      `/api/cuentas-asociadas/${idCuentaAsociada}`,
       accessToken,
     );
     return body.data;
@@ -75,6 +96,14 @@ export class AuthApiService {
         'La sesión no es válida o ha expirado',
         HttpStatus.UNAUTHORIZED,
         { codigoError: 'SESION_INVALIDA' },
+      );
+    }
+
+    if (response.status === HttpStatus.NOT_FOUND) {
+      throw new BussinesRuleException(
+        'No se encontró el recurso en el servicio de autenticación o no pertenece a esta cuenta',
+        HttpStatus.NOT_FOUND,
+        { codigoError: 'AUTH_API_NO_ENCONTRADO', path },
       );
     }
 

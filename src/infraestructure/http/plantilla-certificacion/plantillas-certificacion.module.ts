@@ -30,5 +30,6 @@ import { PlantillasCertificacionController } from './plantillas-certificacion.co
     useCase.DesactivarPlantillaCertificacionUseCase,
     useCase.DeletePlantillaCertificacionUseCase,
   ],
+  exports: [PLANTILLA_CERTIFICACION_REPOSITORY],
 })
 export class PlantillasCertificacionModule {}
