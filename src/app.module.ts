@@ -12,12 +12,16 @@ import { AzureModule } from './infraestructure/http/azure/azure.module';
 import { ProfesorModule } from './infraestructure/http/profesor/profesor.module';
 import { ParametersModule } from './infraestructure/http/parameters/parameters.module';
 import { LandingPageModule } from './infraestructure/http/landing-page/landing-page.module';
+import { AstronautasModule } from './infraestructure/http/astronauta/astronautas.module';
 import { PlantillasCertificacionModule } from './infraestructure/http/plantilla-certificacion/plantillas-certificacion.module';
 import { ProgresoCursoModule } from './infraestructure/http/progreso-curso/progreso-curso.module';
 import { BlockchainPruebaModule } from './infraestructure/http/blockchain-prueba/blockchain-prueba.module';
 import { CertificacionModule } from './infraestructure/http/certificacion/certificacion.module';
 import { BlockchainHttpModule } from './infraestructure/http/blockchain/blockchain-http.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { XapiModule } from './infraestructure/http/xapi/xapi.module';
+import { ProgresoModule } from './infraestructure/http/progreso/progreso.module';
+import { AdminModule } from './infraestructure/http/admin/admin.module';
 
 @Module({
   imports: [
@@ -33,11 +37,15 @@ import { ScheduleModule } from '@nestjs/schedule';
     ParametersModule,
     MenuModule,
     LandingPageModule,
+    AstronautasModule,
     PlantillasCertificacionModule,
     ProgresoCursoModule,
     BlockchainPruebaModule,
     CertificacionModule,
     BlockchainHttpModule,
+    XapiModule,
+    ProgresoModule,
+    AdminModule,
   ],
   controllers: [AppController],
   providers: [AppService],

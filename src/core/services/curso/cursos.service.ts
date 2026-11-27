@@ -78,7 +78,11 @@ export class CursosService {
       dtoCurso.valoracion ?? 0,
       dtoDinamico.planetaId,
       undefined,
+      undefined,
+      undefined,
       dtoCurso.beneficios as unknown,
+      dtoCurso.modulos as unknown,
+      dtoCurso.duracionEstimadaMinutos,
     );
 
     return this.repository.save(curso);
@@ -160,7 +164,11 @@ export class CursosService {
       dtoCurso.valoracion ?? existe.valoracion,
       dtoDinamico.planetaId ?? cursoBaseDinamico.planetaId,
       undefined,
+      undefined,
+      undefined,
       (dtoCurso.beneficios as unknown) ?? existe.beneficios,
+      (dtoCurso.modulos as unknown) ?? existe.modulos,
+      dtoCurso.duracionEstimadaMinutos ?? existe.duracionEstimadaMinutos,
     );
 
     return this.repository.update(id, curso);

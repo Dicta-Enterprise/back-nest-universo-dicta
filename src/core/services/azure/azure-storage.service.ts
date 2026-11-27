@@ -1,71 +1,38 @@
-import {
-  BlobClient,
-  BlobServiceClient,
-  StorageSharedKeyCredential,
-} from '@azure/storage-blob';
 import { Injectable } from '@nestjs/common';
-import { envs } from 'src/config/envs';
 import { AllowedFolder } from 'src/shared/types/folder.type';
+import { BunnyStorageService, ZONA_TEXTURAS } from 'src/shared/services/bunny-storage.service';
 
+/**
+ * Sube las imágenes de galaxias, planetas y categorías a Bunny (zona
+ * "texturas-de-mundos-mundodictariano"), en lugar de Azure Blob Storage.
+ *
+ * La clase conserva el nombre "AzureStorageService" y la misma forma (uploadFile/deleteBlob)
+ * a propósito: la usan 4 módulos y 2 casos de uso que no hacía falta tocar. Si se quiere
+ * renombrarla más adelante para que el nombre no confunda, es un cambio aparte, de bajo riesgo.
+ */
 @Injectable()
 export class AzureStorageService {
-  private blobServiceClient: BlobServiceClient;
-  private containerName: string = envs.azureBlobContainerName;
-
-  constructor() {
-    const account = envs.azureStorageAccountName;
-    const accountKey = envs.azureStorageAccountKey;
-    const sharedKeyCredential = new StorageSharedKeyCredential(
-      account,
-      accountKey,
-    );
-    this.blobServiceClient = new BlobServiceClient(
-      envs.azureBlobStorageEndpoint,
-      sharedKeyCredential,
-    );
-  }
+  constructor(private readonly bunny: BunnyStorageService) {}
 
   async uploadFile(
     file: Express.Multer.File,
     folder: AllowedFolder,
   ): Promise<string> {
-    const containerClient = this.blobServiceClient.getContainerClient(
-      this.containerName,
-    );
-    // await containerClient.createIfNotExists();
     const safeFileName = file.originalname.replace(/\s+/g, '');
     const uniqueFileName = `${Date.now()}-${safeFileName}`;
-    const blobName = `${folder}/${uniqueFileName}`;
+    const ruta = `${folder}/${uniqueFileName}`;
 
-    const blockBlobClient = containerClient.getBlockBlobClient(blobName);
-
-    await blockBlobClient.uploadData(file.buffer, {
-      blobHTTPHeaders: { blobContentType: file.mimetype },
-    });
-
-    return blockBlobClient.url;
-  }
-
-  async getBlob(blobName: string): Promise<BlobClient> {
-    const containerClient = this.blobServiceClient.getContainerClient(
-      this.containerName,
-    );
-    const blobClient = containerClient.getBlobClient(blobName);
-    return blobClient;
+    return this.bunny.subirArchivo(ZONA_TEXTURAS, ruta, file.buffer, file.mimetype || 'image/webp');
   }
 
   async deleteBlob(blobName: string): Promise<boolean> {
-    const containerClient = this.blobServiceClient.getContainerClient(
-      this.containerName,
-    );
-    const blobClient = containerClient.getBlobClient(blobName);
-
-    const exists = await blobClient.exists();
-
-    if (exists) {
-      await blobClient.delete();
+    // Nota: igual que en la versión de Azure, aquí llega solo el nombre del archivo (sin la
+    // carpeta), porque quien llama extrae nada más el último segmento de la URL. Es una
+    // limitación que ya existía antes de este cambio, no algo nuevo de Bunny.
+    try {
+      await this.bunny.borrarArchivo(ZONA_TEXTURAS, blobName);
       return true;
-    } else {
+    } catch {
       return false;
     }
   }
